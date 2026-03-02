@@ -8,8 +8,18 @@ export class AppError extends Error {
   }
 }
 
+export type UnauthorizedReason =
+  | "invalid_credentials"
+  | "email_not_found"
+  | "invalid_password"
+  | "token_invalid"
+  | "token_expired";
+
 export class UnauthorizedError extends AppError {
-  constructor(message = "Unauthorized") {
+  constructor(
+    public readonly reason: UnauthorizedReason = "invalid_credentials",
+    message = "Unauthorized",
+  ) {
     super(401, message);
   }
 }
