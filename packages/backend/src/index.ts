@@ -2,6 +2,7 @@ import express from 'express';
 import mongoose from 'mongoose';
 import cors from 'cors';
 import { loadEnv } from './config/loadEnv';
+import { registerRoutes } from './app/registerRoutes';
 
 const appEnv = loadEnv();
 
@@ -21,6 +22,8 @@ mongoose.connect(MONGO_URI)
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date() });
 });
+
+registerRoutes(app);
 
 app.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);

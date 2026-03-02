@@ -1,5 +1,9 @@
-export type UserRole = 'guest' | 'customer' | 'manager' | 'admin';
+export type UserRole = "guest" | "customer" | "manager" | "admin";
 
+export type AuthUser = {
+  id: string;
+  role: UserRole;
+};
 
 export interface Product {
   _id?: string;
@@ -12,7 +16,6 @@ export interface Product {
   isFlashSale: boolean;
   saleStartTime?: string;
 }
-
 
 export interface User {
   _id?: string;
