@@ -15,6 +15,9 @@ import {
 } from "./schema";
 import { UnauthorizedError, ConflictError, ServiceUnavailableError } from "../../utils/errors";
 
+import {logger} from '../../utils/logger';
+
+
 // PART 1: Database helpers
 
 /**
@@ -62,6 +65,8 @@ export async function registerCustomer(
   const exists = await getExistingUserByEmail(userDB, _input.email);
   if (exists) throw new ConflictError();
 
+  logger.debug({exists}, "user-e-mail not conflicting, inserting new user")
+
   const passwordHash = await bcrypt.hash(_input.password, 10);
 
   let dbResult;
@@ -69,11 +74,12 @@ export async function registerCustomer(
     dbResult = await insertNewUser(userDB, _input.name, _input.email, passwordHash);
   } catch (err) {
     if (err instanceof MongoServerError && err.code === 11000) {
+      logger.warn({err},"MongoDB insert Failed.");
       throw new ConflictError();
     }
     throw err;
   }
-
+  logger.debug('finished new user inserted correctly.')
   const userId = dbResult.insertedId.toString();
 
   // PART 2: Access token issuance
