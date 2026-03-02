@@ -1,0 +1,30 @@
+# Dependency directories (これを入れるとGitが死にます)
+node_modules/
+jspm_packages/
+
+# Build outputs (ビルド結果はアップロードしない)
+dist/
+build/
+.cache/
+
+# Environment variables (DBのパスワードなど。セキュリティ上絶対NG)
+.env
+.env.local
+.env.*.local
+
+# Debug logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+
+
+# db local
+/db/db/data/*

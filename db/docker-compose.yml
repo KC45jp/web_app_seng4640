@@ -1,0 +1,23 @@
+services:
+  mongodb:
+      image: mongo:latest
+      container_name: mongodb_seng4640
+      ports:
+        - "27017:27017"
+      volumes:
+        - ./db/data:/data/db
+      environment:
+        - MONGO_INITDB_DATABASE=seng4640
+      restart: always
+
+  mongo-express:
+    image: mongo-express
+    container_name: mongo_express_seng4640
+    restart: always
+    ports:
+      - "8081:8081"
+    environment:
+      - ME_CONFIG_MONGODB_SERVER=mongodb
+      - ME_CONFIG_MONGODB_URL=mongodb://mongodb:27017/
+    depends_on:
+      - mongodb
