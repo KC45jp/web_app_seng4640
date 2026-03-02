@@ -28,3 +28,6 @@ Thumbs.db
 
 # db local
 /db/db/data/*
+
+# unnesessary document
+/.document/*
