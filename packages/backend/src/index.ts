@@ -1,9 +1,9 @@
 import express from 'express';
 import mongoose from 'mongoose';
 import cors from 'cors';
-import dotenv from 'dotenv';
+import { loadEnv } from './config/loadEnv';
 
-dotenv.config();
+const appEnv = loadEnv();
 
 const app = express();
 app.use(cors());
@@ -14,7 +14,7 @@ const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/seng4640';
 
 // MongoDB接続 (Req_5.1)
 mongoose.connect(MONGO_URI)
-  .then(() => console.log('✅ MongoDB connected'))
+  .then(() => console.log(`✅ MongoDB connected (${appEnv})`))
   .catch(err => console.error('❌ Connection error:', err));
 
 // ヘルスチェック (Req_11.1)
