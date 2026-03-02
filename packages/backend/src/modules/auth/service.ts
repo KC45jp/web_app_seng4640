@@ -1,17 +1,19 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import mongoose from "mongoose";
-import { UserRole } from "@seng4640/shared";
+import {
+  UserRole,
+  type LoginInput,
+  type LoginResult,
+  type RegisterInput,
+  type RegisterResult,
+} from "@seng4640/shared";
 import { MongoServerError } from "mongodb";
 
 import type { AuthTokenPayload, UserCollection, UserDoc } from "../../types/auth";
 import {
   loginResultSchema,
   registerResultSchema,
-  type LoginInput,
-  type LoginResult,
-  type RegisterInput,
-  type RegisterResult,
 } from "./schema";
 import { UnauthorizedError, ConflictError, ServiceUnavailableError } from "../../utils/errors";
 
@@ -112,7 +114,7 @@ export async function login(_input: LoginInput): Promise<LoginResult>{
 
   const secret = process.env.JWT_SECRET;
 
-  if (await !bcrypt.compare(_input.password, user.passwordHash)){
+  if (!(await bcrypt.compare(_input.password, user.passwordHash))){
     logger.info({user}, "Invalid password.")
     throw new UnauthorizedError("invalid_password");
   }

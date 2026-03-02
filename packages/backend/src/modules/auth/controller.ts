@@ -33,8 +33,8 @@ export async function login(req: Request, res: Response): Promise<void> {
   }
 
   try {
-    await loginCustomer(parseResult.data);
-    res.status(200).json({ message: "Login accepted" });
+    const result = await loginCustomer(parseResult.data);
+    res.status(200).json(result);
   } catch (error) {
     if (error instanceof AppError) {
       res.status(error.status).json({ message: error.message });

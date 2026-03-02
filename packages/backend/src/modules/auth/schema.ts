@@ -1,13 +1,19 @@
 import { z } from "zod";
-import { UserRole } from "@seng4640/shared";
+import {
+  UserRole,
+  type LoginInput,
+  type LoginResult,
+  type RegisterInput,
+  type RegisterResult,
+} from "@seng4640/shared";
 
-export const registerSchema = z.object({
+export const registerSchema: z.ZodType<RegisterInput> = z.object({
   name: z.string().min(1),
   email: z.string().email(),
   password: z.string().min(8),
 });
 
-export const loginSchema = z.object({
+export const loginSchema: z.ZodType<LoginInput> = z.object({
   email: z.string().email(),
   password: z.string().min(8),
 });
@@ -20,7 +26,7 @@ const userRoleSchema = z.enum([
   UserRole.ADMIN,
 ]);
 
-export const registerResultSchema = z.object({
+export const registerResultSchema: z.ZodType<RegisterResult> = z.object({
   user: z.object({
     id: z.string(),
     name: z.string(),
@@ -30,9 +36,4 @@ export const registerResultSchema = z.object({
   accessToken: z.string(),
 });
 
-export const loginResultSchema = registerResultSchema;
-
-export type RegisterInput = z.infer<typeof registerSchema>;
-export type LoginInput = z.infer<typeof loginSchema>;
-export type RegisterResult = z.infer<typeof registerResultSchema>;
-export type LoginResult = z.infer<typeof loginResultSchema>;
+export const loginResultSchema: z.ZodType<LoginResult> = registerResultSchema;

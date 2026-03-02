@@ -12,6 +12,31 @@ export type AuthUser = {
   role: UserRoleValue;
 };
 
+export type RegisterInput = {
+  name: string;
+  email: string;
+  password: string;
+};
+
+export type LoginInput = {
+  email: string;
+  password: string;
+};
+
+export type AuthResponseUser = {
+  id: string;
+  name: string;
+  email: string;
+  role: UserRoleValue;
+};
+
+export type RegisterResult = {
+  user: AuthResponseUser;
+  accessToken: string;
+};
+
+export type LoginResult = RegisterResult;
+
 export interface Product {
   _id?: string;
   name: string;
