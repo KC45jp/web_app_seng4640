@@ -38,4 +38,8 @@ export async function ensureBaseCollectionsAndIndexes(): Promise<void> {
 
   await db.collection("users").createIndex({ email: 1 }, { unique: true });
   await db.collection("products").createIndex({ name: "text", category: 1 });
+  await db.collection("products").createIndex({ productOwnerId: 1 });
+  await db
+    .collection("products")
+    .createIndex({ isFlashSale: 1, flashSaleStartAt: 1, flashSaleEndAt: 1 });
 }

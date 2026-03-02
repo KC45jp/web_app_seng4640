@@ -15,10 +15,23 @@ type DevUser = {
 type DevProduct = {
   name: string;
   description: string;
+  detailedDescription: string | null;
   price: number;
+  flashSalePrice: number | null;
   stock: number;
   imageUrl: string;
+  descriptionImages: string[];
   category: string;
+  productOwnerId: Types.ObjectId | null;
+  specs: {
+    sizeCm: {
+      depth: number;
+      width: number;
+      height: number;
+    } | null;
+    weightG: number | null;
+    extra: Record<string, string | number | boolean | null>;
+  };
   isFlashSale: boolean;
 };
 
@@ -57,46 +70,91 @@ const devProducts: DevProduct[] = [
   {
     name: "Basic White T-Shirt",
     description: "Minimal cotton t-shirt for everyday use.",
+    detailedDescription: "Soft cotton, regular fit, machine washable.",
     price: 19.99,
+    flashSalePrice: null,
     stock: 120,
     imageUrl: "/images/p1.jpg",
+    descriptionImages: ["/images/p1.jpg"],
     category: "apparel",
+    productOwnerId: null,
+    specs: {
+      sizeCm: null,
+      weightG: null,
+      extra: {},
+    },
     isFlashSale: false,
   },
   {
     name: "Flash Deal Sneakers",
     description: "Lightweight sneakers with limited stock flash sale.",
+    detailedDescription: "Breathable upper with anti-slip sole.",
     price: 49.99,
+    flashSalePrice: 39.99,
     stock: 25,
     imageUrl: "/images/p2.jpg",
+    descriptionImages: ["/images/p2.jpg", "/images/p2_detail.jpg"],
     category: "shoes",
+    productOwnerId: null,
+    specs: {
+      sizeCm: null,
+      weightG: null,
+      extra: {},
+    },
     isFlashSale: true,
   },
   {
     name: "Ceramic Coffee Mug",
     description: "350ml mug for home office setup.",
+    detailedDescription: "Dishwasher-safe ceramic mug.",
     price: 12.5,
+    flashSalePrice: null,
     stock: 80,
     imageUrl: "/images/p3.jpg",
+    descriptionImages: ["/images/p3.jpg"],
     category: "home",
+    productOwnerId: null,
+    specs: {
+      sizeCm: null,
+      weightG: null,
+      extra: {},
+    },
     isFlashSale: false,
   },
   {
     name: "Mechanical Keyboard",
     description: "Compact keyboard with tactile switches.",
+    detailedDescription: "75% layout, hot-swappable switches.",
     price: 79.0,
+    flashSalePrice: 69.0,
     stock: 35,
     imageUrl: "/images/p4.jpg",
+    descriptionImages: ["/images/p4.jpg", "/images/p4_detail.jpg"],
     category: "electronics",
+    productOwnerId: null,
+    specs: {
+      sizeCm: null,
+      weightG: null,
+      extra: {},
+    },
     isFlashSale: true,
   },
   {
     name: "Reusable Water Bottle",
     description: "750ml stainless steel bottle.",
+    detailedDescription: "BPA-free and leak-proof bottle.",
     price: 24.0,
+    flashSalePrice: null,
     stock: 60,
     imageUrl: "/images/p5.jpg",
+    descriptionImages: ["/images/p5.jpg"],
     category: "outdoor",
+    productOwnerId: null,
+    specs: {
+      sizeCm: null,
+      weightG: null,
+      extra: {},
+    },
     isFlashSale: false,
   },
 ];

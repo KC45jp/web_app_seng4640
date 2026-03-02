@@ -43,11 +43,21 @@ Fields:
 - `_id`: `ObjectId` (auto)
 - `name`: `string`
 - `description`: `string`
+- `detailedDescription`: `string | null`
 - `price`: `number`
+- `flashSalePrice`: `number | null`
 - `stock`: `number`
 - `imageUrl`: `string` (for frontend static images like `/images/p1.jpg`)
+- `descriptionImages`: `string[]`
 - `category`: `string`
+- `productOwnerId`: `ObjectId | null`
+- `specs`: object
+  - `sizeCm`: `{ depth: number, width: number, height: number } | null` (D/W/H in cm)
+  - `weightG`: `number | null` (integer grams)
+  - `extra`: `Record<string, string | number | boolean | null>`
 - `isFlashSale`: `boolean`
+- `flashSaleStartAt`: `Date | null`
+- `flashSaleEndAt`: `Date | null`
 - `createdAt`: `Date`
 - `updatedAt`: `Date`
 
@@ -57,11 +67,22 @@ Example:
   "_id": "ObjectId(...)",
   "name": "Product 1",
   "description": "Development seed product 1 in apparel category.",
+  "detailedDescription": "Detailed info for Product 1. Materials, care instructions, and usage notes.",
   "price": 11.74,
+  "flashSalePrice": null,
   "stock": 13,
   "imageUrl": "/images/p1.jpg",
+  "descriptionImages": ["/images/p1.jpg", "/images/p2.jpg"],
   "category": "apparel",
+  "productOwnerId": null,
+  "specs": {
+    "sizeCm": null,
+    "weightG": null,
+    "extra": {}
+  },
   "isFlashSale": false,
+  "flashSaleStartAt": null,
+  "flashSaleEndAt": null,
   "createdAt": "2026-03-02T00:00:00.000Z",
   "updatedAt": "2026-03-02T00:00:00.000Z"
 }
@@ -109,6 +130,8 @@ Example:
 Defined in `common.ts`:
 - `users`: `{ email: 1 }` with `{ unique: true }`
 - `products`: `{ name: "text", category: 1 }`
+- `products`: `{ productOwnerId: 1 }`
+- `products`: `{ isFlashSale: 1, flashSaleStartAt: 1, flashSaleEndAt: 1 }`
 
 ## Seed and Clean Commands
 Run under `packages/backend`:
