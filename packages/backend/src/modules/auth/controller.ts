@@ -1,6 +1,10 @@
 import type { Request, Response } from "express";
-import { notImplemented } from "../../utils/notImplemented";
 import { loginSchema, registerSchema } from "./schema";
+import {
+  login as loginCustomer,
+  registerCustomer,
+} from "./service";
+import { AppError } from "../../utils/errors";
 
 export async function register(req: Request, res: Response): Promise<void> {
   const parseResult = registerSchema.safeParse(req.body);
@@ -9,7 +13,16 @@ export async function register(req: Request, res: Response): Promise<void> {
     return;
   }
 
-  notImplemented(res, "POST /api/auth/register");
+  try {
+    const result = await registerCustomer(parseResult.data);
+    res.status(201).json(result);
+  } catch (error) {
+    if (error instanceof AppError) {
+      res.status(error.status).json({ message: error.message });
+      return;
+    }
+    res.status(500).json({ message: "Internal server error" });
+  }
 }
 
 export async function login(req: Request, res: Response): Promise<void> {
@@ -19,5 +32,14 @@ export async function login(req: Request, res: Response): Promise<void> {
     return;
   }
 
-  notImplemented(res, "POST /api/auth/login");
+  try {
+    await loginCustomer(parseResult.data);
+    res.status(200).json({ message: "Login accepted" });
+  } catch (error) {
+    if (error instanceof AppError) {
+      res.status(error.status).json({ message: error.message });
+      return;
+    }
+    res.status(500).json({ message: "Internal server error" });
+  }
 }

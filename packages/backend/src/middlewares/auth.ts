@@ -1,5 +1,5 @@
 import type { NextFunction, Request, Response } from "express";
-import type { UserRole } from "../types/auth";
+import type { UserRoleValue } from "../types/auth";
 
 export function requireAuth(
   req: Request,
@@ -14,7 +14,7 @@ export function requireAuth(
   }
 
   // TODO: verify JWT and extract user context from token payload.
-  const roleFromToken = "customer" as UserRole;
+  const roleFromToken = "customer" as UserRoleValue;
   req.user = { id: "TODO_USER_ID", role: roleFromToken };
   next();
 }

@@ -2,11 +2,20 @@
   "name": "@seng4640/shared",
   "version": "1.0.0",
   "private": true,
-  "type": "module",
-  "types": "./index.d.ts",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json || ../backend/node_modules/.bin/tsc -p tsconfig.json",
+    "clean": "rm -rf dist"
+  },
   "exports": {
     ".": {
-      "types": "./index.d.ts"
+      "types": "./dist/index.d.ts",
+      "require": "./dist/index.js",
+      "default": "./dist/index.js"
     }
   }
 }
