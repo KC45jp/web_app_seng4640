@@ -1,11 +1,13 @@
 import type { Request, Response } from "express";
 import { notImplemented } from "../../utils/notImplemented";
 import { listProductsQuerySchema } from "./schema";
+import { validateOrRespond } from "../../utils/validation";
 
 export async function listProducts(req: Request, res: Response): Promise<void> {
-  const parseResult = listProductsQuerySchema.safeParse(req.query);
-  if (!parseResult.success) {
-    res.status(400).json({ errors: parseResult.error.flatten() });
+  if (
+    validateOrRespond(listProductsQuerySchema, req.query, res, "GET /api/products") ===
+    null
+  ) {
     return;
   }
 

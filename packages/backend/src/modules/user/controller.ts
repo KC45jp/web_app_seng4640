@@ -1,6 +1,7 @@
 import type { Request, Response } from "express";
 import { notImplemented } from "../../utils/notImplemented";
 import { updateMeSchema } from "./schema";
+import { validateOrRespond } from "../../utils/validation";
 
 export async function getMe(req: Request, res: Response): Promise<void> {
   if (!req.user) {
@@ -17,9 +18,9 @@ export async function patchMe(req: Request, res: Response): Promise<void> {
     return;
   }
 
-  const parseResult = updateMeSchema.safeParse(req.body);
-  if (!parseResult.success) {
-    res.status(400).json({ errors: parseResult.error.flatten() });
+  if (
+    validateOrRespond(updateMeSchema, req.body, res, "PATCH /api/me") === null
+  ) {
     return;
   }
 

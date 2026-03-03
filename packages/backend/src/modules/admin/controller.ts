@@ -6,11 +6,17 @@ import {
   adminUpdateFlashSaleSchema,
   adminUpdateProductSchema,
 } from "./schema";
+import { validateOrRespond } from "../../utils/validation";
 
 export async function createProduct(req: Request, res: Response): Promise<void> {
-  const parseResult = adminCreateProductSchema.safeParse(req.body);
-  if (!parseResult.success) {
-    res.status(400).json({ errors: parseResult.error.flatten() });
+  if (
+    validateOrRespond(
+      adminCreateProductSchema,
+      req.body,
+      res,
+      "POST /api/admin/products"
+    ) === null
+  ) {
     return;
   }
 
@@ -23,9 +29,14 @@ export async function updateProduct(req: Request, res: Response): Promise<void> 
     return;
   }
 
-  const parseResult = adminUpdateProductSchema.safeParse(req.body);
-  if (!parseResult.success) {
-    res.status(400).json({ errors: parseResult.error.flatten() });
+  if (
+    validateOrRespond(
+      adminUpdateProductSchema,
+      req.body,
+      res,
+      "PATCH /api/admin/products/:id"
+    ) === null
+  ) {
     return;
   }
 
@@ -50,9 +61,14 @@ export async function updateFlashSale(
     return;
   }
 
-  const parseResult = adminUpdateFlashSaleSchema.safeParse(req.body);
-  if (!parseResult.success) {
-    res.status(400).json({ errors: parseResult.error.flatten() });
+  if (
+    validateOrRespond(
+      adminUpdateFlashSaleSchema,
+      req.body,
+      res,
+      "PATCH /api/admin/products/:id/flash-sale"
+    ) === null
+  ) {
     return;
   }
 
@@ -60,9 +76,14 @@ export async function updateFlashSale(
 }
 
 export async function createManager(req: Request, res: Response): Promise<void> {
-  const parseResult = adminCreateManagerSchema.safeParse(req.body);
-  if (!parseResult.success) {
-    res.status(400).json({ errors: parseResult.error.flatten() });
+  if (
+    validateOrRespond(
+      adminCreateManagerSchema,
+      req.body,
+      res,
+      "POST /api/admin/managers"
+    ) === null
+  ) {
     return;
   }
 

@@ -1,6 +1,7 @@
 import type { Request, Response } from "express";
 import { notImplemented } from "../../utils/notImplemented";
 import { checkoutSchema } from "./schema";
+import { validateOrRespond } from "../../utils/validation";
 
 export async function checkout(req: Request, res: Response): Promise<void> {
   if (!req.user) {
@@ -8,9 +9,7 @@ export async function checkout(req: Request, res: Response): Promise<void> {
     return;
   }
 
-  const parseResult = checkoutSchema.safeParse(req.body);
-  if (!parseResult.success) {
-    res.status(400).json({ errors: parseResult.error.flatten() });
+  if (validateOrRespond(checkoutSchema, req.body, res, "POST /api/checkout") === null) {
     return;
   }
 

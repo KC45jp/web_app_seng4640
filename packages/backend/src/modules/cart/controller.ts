@@ -1,6 +1,7 @@
 import type { Request, Response } from "express";
 import { notImplemented } from "../../utils/notImplemented";
 import { addCartItemSchema, updateCartItemSchema } from "./schema";
+import { validateOrRespond } from "../../utils/validation";
 
 export async function getCart(req: Request, res: Response): Promise<void> {
   if (!req.user) {
@@ -17,9 +18,10 @@ export async function addCartItem(req: Request, res: Response): Promise<void> {
     return;
   }
 
-  const parseResult = addCartItemSchema.safeParse(req.body);
-  if (!parseResult.success) {
-    res.status(400).json({ errors: parseResult.error.flatten() });
+  if (
+    validateOrRespond(addCartItemSchema, req.body, res, "POST /api/cart/items") ===
+    null
+  ) {
     return;
   }
 
@@ -40,9 +42,14 @@ export async function updateCartItem(
     return;
   }
 
-  const parseResult = updateCartItemSchema.safeParse(req.body);
-  if (!parseResult.success) {
-    res.status(400).json({ errors: parseResult.error.flatten() });
+  if (
+    validateOrRespond(
+      updateCartItemSchema,
+      req.body,
+      res,
+      "PATCH /api/cart/items/:productId"
+    ) === null
+  ) {
     return;
   }
 

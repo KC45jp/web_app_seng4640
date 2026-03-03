@@ -1,28 +1,25 @@
 import type { Request, Response } from "express";
 import { loginSchema, registerSchema } from "./schema";
-import { z } from "zod";
 import {
   login as loginCustomer,
   registerCustomer,
 } from "./service";
 import { AppError } from "../../utils/errors";
-import {logger} from '../../utils/logger';
+import { validateOrRespond } from "../../utils/validation";
 
 export async function register(req: Request, res: Response): Promise<void> {
-  const parseResult = registerSchema.safeParse(req.body);
-  if (!parseResult.success) {
-    logger.warn(
-      { issues: parseResult.error.issues, route: "POST /api/auth/login" },
-      "Validation failed"
-    );
-    res.status(400).json({
-      errors: z.flattenError(parseResult.error),
-    });
+  const input = validateOrRespond(
+    registerSchema,
+    req.body,
+    res,
+    "POST /api/auth/register"
+  );
+  if (input === null) {
     return;
   }
 
   try {
-    const result = await registerCustomer(parseResult.data);
+    const result = await registerCustomer(input);
     res.status(201).json(result);
   } catch (error) {
     if (error instanceof AppError) {
@@ -34,20 +31,13 @@ export async function register(req: Request, res: Response): Promise<void> {
 }
 
 export async function login(req: Request, res: Response): Promise<void> {
-  const parseResult = loginSchema.safeParse(req.body);
-  if (!parseResult.success) {
-    logger.warn(
-      { issues: parseResult.error.issues, route: "POST /api/auth/login" },
-      "Validation failed"
-    );
-    res.status(400).json({
-      errors: z.flattenError(parseResult.error),
-    });
+  const input = validateOrRespond(loginSchema, req.body, res, "POST /api/auth/login");
+  if (input === null) {
     return;
   }
 
   try {
-    const result = await loginCustomer(parseResult.data);
+    const result = await loginCustomer(input);
     res.status(200).json(result);
   } catch (error) {
     if (error instanceof AppError) {
