@@ -8,12 +8,7 @@ import { AppError } from "../../utils/errors";
 import { validateOrRespond } from "../../utils/validation";
 
 export async function register(req: Request, res: Response): Promise<void> {
-  const input = validateOrRespond(
-    registerSchema,
-    req.body,
-    res,
-    "POST /api/auth/register"
-  );
+  const input = validateOrRespond(registerSchema, req.body, res, "POST /api/auth/register");
   if (input === null) {
     return;
   }

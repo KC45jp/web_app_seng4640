@@ -3,6 +3,10 @@
     "target": "ESNext",
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
+    "baseUrl": "./src",
+    "paths": {
+      "@/*": ["*"]
+    },
     "outDir": "./dist",
     "rootDir": "./src",
     "strict": true,
