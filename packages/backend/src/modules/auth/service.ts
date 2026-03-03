@@ -54,8 +54,6 @@ const insertNewUser = async (
 export async function registerCustomer(
   _input: RegisterInput
 ): Promise<RegisterResult> {
-  const userDB: UserCollection = mongoose.connection.collection("users");
-
   // PART 1: DB checks and write
   const passwordHash = await bcrypt.hash(_input.password, 10);
 
@@ -104,7 +102,6 @@ const findUserByEmailForLogin = async (emailRaw : string) =>{
  * Logs in a customer account and returns an auth response payload.
  */
 export async function login(_input: LoginInput): Promise<LoginResult>{
-  // TODO: implement login flow with bcrypt + JWT.
 
   const user = await findUserByEmailForLogin(_input.email)
   if(!user){
@@ -112,13 +109,13 @@ export async function login(_input: LoginInput): Promise<LoginResult>{
     throw new UnauthorizedError("email_not_found");
   } 
 
-  const secret = process.env.JWT_SECRET;
 
   if (!(await bcrypt.compare(_input.password, user.passwordHash))){
     logger.info({user}, "Invalid password.")
     throw new UnauthorizedError("invalid_password");
   }
 
+  const secret = process.env.JWT_SECRET;
   if (!secret) throw new ServiceUnavailableError();
   const token = jwt.sign({ id: user._id.toString(), role: user.role.toString()}, secret, {
     expiresIn: "1h",

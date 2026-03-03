@@ -28,4 +28,12 @@ export const registerResultSchema: z.ZodType<RegisterResult> = z.object({
   accessToken: z.string(),
 });
 
-export const loginResultSchema: z.ZodType<LoginResult> = registerResultSchema;
+export const loginResultSchema: z.ZodType<LoginResult> = z.object({
+  user: z.object({
+    id: z.string(),
+    name: z.string(),
+    email: z.email(),
+    role: z.enum([UserRole.CUSTOMER, UserRole.MANAGER, UserRole.ADMIN])
+  }),
+  accessToken: z.string(),
+})
