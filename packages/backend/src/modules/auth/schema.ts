@@ -37,3 +37,4 @@ export const loginResultSchema: z.ZodType<LoginResult> = z.object({
   }),
   accessToken: z.string(),
 })
+

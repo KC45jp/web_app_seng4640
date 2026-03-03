@@ -3,6 +3,7 @@ import jwt from "jsonwebtoken";
 import mongoose from "mongoose";
 import {
   UserRole,
+  type UserRoleValue,
   type LoginInput,
   type LoginResult,
   type RegisterInput,
@@ -10,7 +11,7 @@ import {
 } from "@seng4640/shared";
 import { MongoServerError } from "mongodb";
 
-import type { AuthTokenPayload, UserCollection, UserDoc } from "../../types/auth";
+import type { AuthTokenPayload } from "../../types/auth";
 import {
   loginResultSchema,
   registerResultSchema,
@@ -43,6 +44,18 @@ const insertNewUser = async (
   return userResult;
 };
 
+const generateToken = (
+  userId: string,
+  role: UserRoleValue,
+  secret = process.env.JWT_SECRET
+): string => {
+  if (!secret) throw new ServiceUnavailableError();
+  const payload: AuthTokenPayload = { id: userId, role };
+  return jwt.sign(payload, secret, {
+    expiresIn: "1h",
+  });
+};
+
 /**
  * Registers a customer account and returns an auth response payload.
  *
@@ -71,11 +84,7 @@ export async function registerCustomer(
   const userId = dbResult._id.toString();
 
   // PART 2: Access token issuance
-  const secret = process.env.JWT_SECRET;
-  if (!secret) throw new ServiceUnavailableError();
-  const token = jwt.sign({ id: userId, role: UserRole.CUSTOMER }, secret, {
-    expiresIn: "1h",
-  });
+  const token = generateToken(userId, UserRole.CUSTOMER);
 
   // PART 3: API response construction
   return registerResultSchema.parse({
@@ -115,18 +124,15 @@ export async function login(_input: LoginInput): Promise<LoginResult>{
     throw new UnauthorizedError("invalid_password");
   }
 
-  const secret = process.env.JWT_SECRET;
-  if (!secret) throw new ServiceUnavailableError();
-  const token = jwt.sign({ id: user._id.toString(), role: user.role.toString()}, secret, {
-    expiresIn: "1h",
-  });
+  const userRole = user.role.toString() as UserRoleValue;
+  const token = generateToken(user._id.toString(), userRole);
 
   return loginResultSchema.parse({
     user: {
       id: user._id.toString(),
       name: user.name.toString(),
       email: user.email.toString(),
-      role: user.role.toString(),
+      role: userRole,
     },
     accessToken: token,
   })

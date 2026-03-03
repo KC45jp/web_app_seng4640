@@ -13,7 +13,11 @@ export type UnauthorizedReason =
   | "email_not_found"
   | "invalid_password"
   | "token_invalid"
-  | "token_expired";
+  | "token_expired"
+  | "token_missing"
+  | "token_malformed"
+  | "token_payload_invalid"
+  ;
 
 export class UnauthorizedError extends AppError {
   constructor(

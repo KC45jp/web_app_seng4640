@@ -1,15 +1,23 @@
 import type { Request, Response } from "express";
 import { loginSchema, registerSchema } from "./schema";
+import { z } from "zod";
 import {
   login as loginCustomer,
   registerCustomer,
 } from "./service";
 import { AppError } from "../../utils/errors";
+import {logger} from '../../utils/logger';
 
 export async function register(req: Request, res: Response): Promise<void> {
   const parseResult = registerSchema.safeParse(req.body);
   if (!parseResult.success) {
-    res.status(400).json({ errors: parseResult.error.flatten() });
+    logger.warn(
+      { issues: parseResult.error.issues, route: "POST /api/auth/login" },
+      "Validation failed"
+    );
+    res.status(400).json({
+      errors: z.flattenError(parseResult.error),
+    });
     return;
   }
 
@@ -28,7 +36,13 @@ export async function register(req: Request, res: Response): Promise<void> {
 export async function login(req: Request, res: Response): Promise<void> {
   const parseResult = loginSchema.safeParse(req.body);
   if (!parseResult.success) {
-    res.status(400).json({ errors: parseResult.error.flatten() });
+    logger.warn(
+      { issues: parseResult.error.issues, route: "POST /api/auth/login" },
+      "Validation failed"
+    );
+    res.status(400).json({
+      errors: z.flattenError(parseResult.error),
+    });
     return;
   }
 
