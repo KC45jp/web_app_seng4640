@@ -1,35 +1,58 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { MainLayout } from "@/components/MainLayout";
+import { NotFoundPage } from "@/components/NotFoundPage";
+import { RequireRole } from "@/components/RequireRole";
+import { CartPage, CheckoutPage, MyPage } from "@/components/CustomerPages";
+import { HomePage } from "@/components/Main";
+import { LoginPage, ManagerLoginPage, SignupPage, AdminLoginPage } from "@/components/AuthPages";
+import {
+  ManagerDashboardPage,
+  ManagerNewProductPage,
+  ManagerProductEditPage,
+} from "@/components/PM";
+import { AdminManagersPage } from "@/components/Admin";
+import { ProductDetailPage } from "@/components/ProductPage";
+import { SearchPage } from "@/components/Search";
+import "@/App.css";
+
+const router = createBrowserRouter([
+  {
+    element: <MainLayout />,
+    children: [
+      { path: "/", element: <HomePage /> },
+      { path: "/search", element: <SearchPage /> },
+      { path: "/products/:id", element: <ProductDetailPage /> },
+      { path: "/login", element: <LoginPage /> },
+      { path: "/signup", element: <SignupPage /> },
+      { path: "/pm/login", element: <ManagerLoginPage /> },
+      { path: "/admin/login", element: <AdminLoginPage /> },
+      {
+        element: <RequireRole roles={["customer"]} />,
+        children: [
+          { path: "/cart", element: <CartPage /> },
+          { path: "/checkout", element: <CheckoutPage /> },
+          { path: "/mypage", element: <MyPage /> },
+        ],
+      },
+      {
+        element: <RequireRole roles={["manager"]} />,
+        children: [
+          { path: "/pm/dashboard", element: <ManagerDashboardPage /> },
+          { path: "/pm/products/new", element: <ManagerNewProductPage /> },
+          { path: "/pm/products/:id", element: <ManagerProductEditPage /> },
+        ],
+      },
+      {
+        element: <RequireRole roles={["admin"]} />,
+        children: [{ path: "/admin/managers", element: <AdminManagersPage /> }],
+      },
+      { path: "*", element: <NotFoundPage /> },
+    ],
+  },
+]);
 
 function App() {
-  const [count, setCount] = useState(0)
-
-  return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+  return <RouterProvider router={router} />;
 }
 
-export default App
+export default App;

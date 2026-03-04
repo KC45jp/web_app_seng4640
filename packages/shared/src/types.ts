@@ -1,3 +1,5 @@
+// Runtime constants are consumed by backend today.
+// TODO: After shared publishes dual ESM/CJS exports, frontend can import UserRole runtime values directly.
 export const UserRole = {
   GUEST: "guest",
   CUSTOMER: "customer",
