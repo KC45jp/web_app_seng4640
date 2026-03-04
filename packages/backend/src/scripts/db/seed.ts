@@ -33,6 +33,7 @@ type ProductSeed = {
     extra: Record<string, string | number | boolean | null>;
   };
   isFlashSale: boolean;
+  isActive: boolean;
   flashSaleStartAt: Date | null;
   flashSaleEndAt: Date | null;
   createdAt: Date;
@@ -84,6 +85,7 @@ function buildProducts(count: number): ProductSeed[] {
         extra: {},
       },
       isFlashSale,
+      isActive: true,
       flashSaleStartAt,
       flashSaleEndAt,
       createdAt: now,
@@ -118,6 +120,7 @@ async function run(): Promise<void> {
             productOwnerId: product.productOwnerId,
             specs: product.specs,
             isFlashSale: product.isFlashSale,
+            isActive: product.isActive,
             flashSaleStartAt: product.flashSaleStartAt,
             flashSaleEndAt: product.flashSaleEndAt,
             updatedAt: product.updatedAt,

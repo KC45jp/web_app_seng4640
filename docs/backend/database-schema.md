@@ -18,7 +18,7 @@ Fields:
 - `_id`: `ObjectId` (auto)
 - `name`: `string`
 - `email`: `string` (unique)
-- `role`: `"customer" | "manager" | "admin"` (`guest` is not persisted)
+- `role`: `"customer" | "manager" | "admin"` 
 - `passwordHash`: `string` (bcrypt hash)
 - `createdAt`: `Date`
 - `updatedAt`: `Date`

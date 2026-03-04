@@ -8,6 +8,18 @@ import {
 } from "./schema";
 import { validateOrRespond } from "../../utils/validation";
 
+export async function listManagedProducts(
+  req: Request,
+  res: Response
+): Promise<void> {
+  if (!req.user) {
+    res.status(401).json({ message: "Unauthorized" });
+    return;
+  }
+
+  notImplemented(res, "GET /api/admin/products");
+}
+
 export async function createProduct(req: Request, res: Response): Promise<void> {
   if (
     validateOrRespond(

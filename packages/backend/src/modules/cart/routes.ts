@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { requireAuth } from "../../middlewares/auth";
+import { requireRole } from "../../middlewares/role";
 import {
   addCartItem,
   getCart,
@@ -9,9 +10,19 @@ import {
 
 const cartRouter = Router();
 
-cartRouter.get("/", requireAuth, getCart);
-cartRouter.post("/items", requireAuth, addCartItem);
-cartRouter.patch("/items/:productId", requireAuth, updateCartItem);
-cartRouter.delete("/items/:productId", requireAuth, removeCartItem);
+cartRouter.get("/", requireAuth, requireRole(["customer"]), getCart);
+cartRouter.post("/items", requireAuth, requireRole(["customer"]), addCartItem);
+cartRouter.patch(
+  "/items/:productId",
+  requireAuth,
+  requireRole(["customer"]),
+  updateCartItem
+);
+cartRouter.delete(
+  "/items/:productId",
+  requireAuth,
+  requireRole(["customer"]),
+  removeCartItem
+);
 
 export default cartRouter;

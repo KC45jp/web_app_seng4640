@@ -6,6 +6,7 @@ import {
   createProduct,
   deleteManager,
   deleteProduct,
+  listManagedProducts,
   listManagers,
   updateFlashSale,
   updateProduct,
@@ -13,28 +14,34 @@ import {
 
 const adminRouter = Router();
 
+adminRouter.get(
+  "/products",
+  requireAuth,
+  requireRole(["manager"]),
+  listManagedProducts
+);
 adminRouter.post(
   "/products",
   requireAuth,
-  requireRole(["manager", "admin"]),
+  requireRole(["manager"]),
   createProduct
 );
 adminRouter.patch(
   "/products/:id",
   requireAuth,
-  requireRole(["manager", "admin"]),
+  requireRole(["manager"]),
   updateProduct
 );
 adminRouter.delete(
   "/products/:id",
   requireAuth,
-  requireRole(["manager", "admin"]),
+  requireRole(["manager"]),
   deleteProduct
 );
 adminRouter.patch(
   "/products/:id/flash-sale",
   requireAuth,
-  requireRole(["manager", "admin"]),
+  requireRole(["manager"]),
   updateFlashSale
 );
 

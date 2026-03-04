@@ -33,6 +33,7 @@ type DevProduct = {
     extra: Record<string, string | number | boolean | null>;
   };
   isFlashSale: boolean;
+  isActive: boolean;
 };
 
 type SeedOrderItem = {
@@ -84,6 +85,7 @@ const devProducts: DevProduct[] = [
       extra: {},
     },
     isFlashSale: false,
+    isActive: true,
   },
   {
     name: "Flash Deal Sneakers",
@@ -102,6 +104,7 @@ const devProducts: DevProduct[] = [
       extra: {},
     },
     isFlashSale: true,
+    isActive: true,
   },
   {
     name: "Ceramic Coffee Mug",
@@ -120,6 +123,7 @@ const devProducts: DevProduct[] = [
       extra: {},
     },
     isFlashSale: false,
+    isActive: true,
   },
   {
     name: "Mechanical Keyboard",
@@ -138,6 +142,7 @@ const devProducts: DevProduct[] = [
       extra: {},
     },
     isFlashSale: true,
+    isActive: true,
   },
   {
     name: "Reusable Water Bottle",
@@ -156,6 +161,7 @@ const devProducts: DevProduct[] = [
       extra: {},
     },
     isFlashSale: false,
+    isActive: true,
   },
 ];
 
