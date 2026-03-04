@@ -1,0 +1,79 @@
+# Backend Required APIs (from plan + requirements)
+
+## 1) Auth / User
+
+- `POST /api/auth/register` (Customer sign up only)
+- `POST /api/auth/login` (Customer / Manager / Admin login)
+- `GET /api/me`
+- `PATCH /api/me`
+
+## 2) Product (Guest can browse)
+
+- `GET /api/products`
+  - query examples: `q`, `category`, `minPrice`, `maxPrice`
+  - sorting/pagination: `sortBy`, `sortOrder`, `page`, `limit`
+- `GET /api/products/:id`
+
+### Guest visibility rule
+
+- Guest can browse product list/detail only.
+- Guest must not see Flash Sale inventory count.
+- Guest must not purchase (checkout/cart endpoints forbidden).
+
+## 3) Cart (Customer only)
+
+- `GET /api/cart`
+- `POST /api/cart/items`
+- `PATCH /api/cart/items/:productId`
+- `DELETE /api/cart/items/:productId`
+
+## 4) Checkout / Order (Customer only)
+
+- `POST /api/checkout`
+  - payment method: `credit_card` or `paypal` (request field required)
+  - must use atomic stock update:
+  - `findOneAndUpdate({ _id: id, stock: { $gte: quantity } }, { $inc: { stock: -quantity } })`
+- `GET /api/orders`
+- `GET /api/orders/:id`
+
+### Order tracking response (recommended)
+
+- include `status` and `timeline` fields in order response for tracking UI.
+
+## 5) Admin APIs
+
+### Product Manager only
+
+- `GET /api/admin/products/mine` (PO dashboard: own products)
+- `POST /api/admin/products`
+- `PATCH /api/admin/products/:id`
+- `DELETE /api/admin/products/:id`
+- - soft disable products: set `isActive = false` (recommended default)
+- `PATCH /api/admin/products/:id/flash-sale`
+
+## 6) Super Admin APIs
+### Super Admin only (Manager account management)
+
+- `POST /api/admin/managers`
+- `DELETE /api/admin/managers/:id`
+- `GET /api/admin/managers`
+
+### Manager deletion policy (important)
+
+- soft disable products: set `isActive = false` (recommended default)
+
+
+### Super Admin product permissions
+
+- Requirement does not explicitly require Super Admin to perform product CRUD.
+- To keep responsibilities clean:
+  - Product Manager handles day-to-day product operations.
+  - Super Admin handles manager-account lifecycle.
+- If needed, allow only emergency product actions for Super Admin (for example forced deactivation or ownership transfer), not regular product editing.
+
+## 7) Authorization Rules Notes
+
+- Auth should use JWT (`Authorization: Bearer <token>`), not API key.
+- Customer can manage profile/cart and complete purchase.
+- Product Manager can add/update/delete products and manage flash sale, but cannot create admin/manager accounts.
+- Super Admin can create/delete/manage Product Manager accounts.
