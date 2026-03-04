@@ -48,6 +48,17 @@
   color: #94a3b8;
 }
 
+.header-home-text,
+.header-home-text:visited {
+  color: white;
+  text-decoration: none;
+}
+
+.header-home-text:hover {
+  text-decoration: underline;
+}
+
+
 .header-search-button,
 .header-nav button {
   height: 2.25rem;

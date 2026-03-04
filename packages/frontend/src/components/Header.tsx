@@ -1,5 +1,6 @@
 import { useState } from "react";
-import type { FormEvent } from "react";
+import type { SubmitEvent } from "react";
+
 import { Link, useNavigate } from "react-router-dom";
 import { ROLE } from "@/constants/roles";
 import { useAuthStore } from "@/store/authStore";
@@ -10,7 +11,7 @@ export function Header() {
   const logout = useAuthStore((state) => state.logout);
   const [keyword, setKeyword] = useState("");
 
-  const submitSearch = (event: FormEvent<HTMLFormElement>) => {
+  const submitSearch = (event: SubmitEvent<HTMLFormElement>) => {
     event.preventDefault();
     const next = keyword.trim();
 
@@ -22,10 +23,10 @@ export function Header() {
     navigate(`/search?q=${encodeURIComponent(next)}`);
   };
 
-  return (
-    <header className="app-header">
-      <div className="header-inner">
-        <form className="header-search" onSubmit={submitSearch}>
+
+  const renderSearchForm = ()=> {
+    return (
+      <form className="header-search" onSubmit={submitSearch}>
           <input
             aria-label="Search products"
             className="header-search-input"
@@ -37,7 +38,26 @@ export function Header() {
             Search
           </button>
         </form>
+        )
+  }
+  const renderMainPageButton = () =>{
+    return <Link 
+            to="/" 
+            className="header-home-text"
+            >
+            Main
+            </Link>;
+    };
 
+
+  return (
+    <header className="app-header">
+      <div className="header-inner">
+        {renderMainPageButton()}
+        {(role === ROLE.GUEST || role === ROLE.CUSTOMER) && renderSearchForm()}
+
+        
+        
         <nav aria-label="Global navigation" className="header-nav">
           {role === ROLE.GUEST && (
             <>

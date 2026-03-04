@@ -12,7 +12,6 @@ import {
 } from "@/components/PM";
 import { AdminManagersPage } from "@/components/Admin";
 import { ProductDetailPage } from "@/components/ProductPage";
-import { SearchPage } from "@/components/Search";
 import "@/App.css";
 
 const router = createBrowserRouter([
@@ -20,7 +19,6 @@ const router = createBrowserRouter([
     element: <MainLayout />,
     children: [
       { path: "/", element: <HomePage /> },
-      { path: "/search", element: <SearchPage /> },
       { path: "/products/:id", element: <ProductDetailPage /> },
       { path: "/login", element: <LoginPage /> },
       { path: "/signup", element: <SignupPage /> },
