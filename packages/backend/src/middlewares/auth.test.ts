@@ -1,6 +1,7 @@
 import jwt from "jsonwebtoken";
 import * as authorizationModule from "./auth/authorization";
 import { requireAuth } from "./auth";
+import { resetEnvCacheForTest } from "../config/loadEnv";
 
 const makeRes = () => {
   const res: any = {};
@@ -12,12 +13,14 @@ const makeRes = () => {
 const originalSecret = process.env.JWT_SECRET;
 
 beforeEach(() => {
+  resetEnvCacheForTest();
   process.env.JWT_SECRET = "test-secret";
   jest.restoreAllMocks();
 });
 
 afterEach(() => {
   process.env.JWT_SECRET = originalSecret;
+  resetEnvCacheForTest();
 });
 
 it("sets req.user and calls next on valid token", setsReqUserAndCallsNextOnValidToken);

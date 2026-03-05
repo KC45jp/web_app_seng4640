@@ -23,8 +23,6 @@ import {logger} from '@/utils/logger';
 
 import {userModel, type CreateUserInput} from "@/db/models/user.models"
 
-const appConfig = loadEnv();
-
 // PART 1: Database helpers
 /**
  * Inserts a new customer document into the users collection.
@@ -38,7 +36,7 @@ const insertNewUser = async (input: CreateUserInput) => userModel.create(input);
 const generateToken = (
   userId: string,
   role: UserRoleValue,
-  secret = appConfig.JWT_SECRET
+  secret = loadEnv().JWT_SECRET
 ): string => {
   if (!secret) throw new ServiceUnavailableError();
   const payload: AuthTokenPayload = { id: userId, role };

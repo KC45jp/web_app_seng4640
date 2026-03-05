@@ -5,16 +5,19 @@ import {
   UnauthorizedError,
   type UnauthorizedReason,
 } from "@/utils/errors";
+import { resetEnvCacheForTest } from "@/config/loadEnv";
 import { authValidation } from "./authorization";
 
 const originalSecret = process.env.JWT_SECRET;
 
 beforeEach(() => {
+  resetEnvCacheForTest();
   process.env.JWT_SECRET = "test-secret";
 });
 
 afterEach(() => {
   process.env.JWT_SECRET = originalSecret;
+  resetEnvCacheForTest();
 });
 
 describe("authValidation", () => {

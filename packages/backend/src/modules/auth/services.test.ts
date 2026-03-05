@@ -10,6 +10,7 @@ import {
   ServiceUnavailableError,
   UnauthorizedError,
 } from "../../utils/errors";
+import { resetEnvCacheForTest } from "../../config/loadEnv";
 import { login as loginCustomer, registerCustomer } from "./service";
 
 type DbUser = InferSchemaType<typeof userSchema> & { _id: Types.ObjectId };
@@ -28,12 +29,14 @@ jest.mock("../../db/models/user.models", () => ({
 const originalSecret = process.env.JWT_SECRET;
 
 beforeEach(() => {
+  resetEnvCacheForTest();
   process.env.JWT_SECRET = "test-secret";
   jest.clearAllMocks();
 });
 
 afterEach(() => {
   process.env.JWT_SECRET = originalSecret;
+  resetEnvCacheForTest();
 });
 
 describe("auth service", () => {

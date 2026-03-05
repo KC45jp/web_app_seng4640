@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import dotenv from "dotenv";
+import { z } from "zod";
 
 export type AppEnv = "dev" | "stg";
 
@@ -20,84 +21,103 @@ function resolveAppEnv(): AppEnv {
   return requested === "stg" ? "stg" : "dev";
 }
 
+function parseDotenvFile(filePath: string): Record<string, string> {
+  return dotenv.parse(fs.readFileSync(filePath));
+}
+
 function loadDotenvFiles(appEnv: AppEnv): void {
+  const protectedKeys = new Set(Object.keys(process.env));
+
   const baseEnvPath = path.resolve(process.cwd(), ".env");
   if (fs.existsSync(baseEnvPath)) {
-    const parsed = dotenv.parse(fs.readFileSync(baseEnvPath));
-    for (const [key, value] of Object.entries(parsed)) {
-      if (process.env[key] === undefined) {
-        process.env[key] = value;
-      }
-    }
+    applyEnv(parseDotenvFile(baseEnvPath), protectedKeys);
   }
 
   const envPath = path.resolve(process.cwd(), `.env.${appEnv}`);
   if (fs.existsSync(envPath)) {
-    const parsed = dotenv.parse(fs.readFileSync(envPath));
-    for (const [key, value] of Object.entries(parsed)) {
-      if (process.env[key] === undefined) {
-        process.env[key] = value;
-      }
-    }
+    applyEnv(parseDotenvFile(envPath), protectedKeys);
   } else if (appEnv !== "dev") {
     throw new Error(
       `[loadEnv] APP_ENV=${appEnv} but env file was not found: ${envPath}`
     );
   }
-
 }
 
-function parseNumberFromEnv(
-  key: string,
-  fallback: number,
-  minValue: number
-): number {
-  const raw = process.env[key];
-  if (!raw || raw.trim().length === 0) {
-    return fallback;
+function applyEnv(
+  parsed: Record<string, string>,
+  protectedKeys: Set<string>
+): void {
+  for (const [key, value] of Object.entries(parsed)) {
+    if (protectedKeys.has(key)) {
+      continue;
+    }
+    process.env[key] = value;
   }
+}
 
-  const parsed = Number(raw);
-  if (!Number.isFinite(parsed) || !Number.isInteger(parsed) || parsed < minValue) {
-    throw new Error(`[loadEnv] ${key} must be an integer >= ${minValue}`);
-  }
+const envSchema = z.object({
+  APP_ENV: z.enum(["dev", "stg"]),
+  PORT: z.coerce.number().int().min(1).default(5000),
+  MONGO_URI: z
+    .string()
+    .trim()
+    .min(1)
+    .default("mongodb://localhost:27017/seng4640"),
+  JWT_SECRET: z.preprocess(
+    (value) => {
+      if (typeof value !== "string") return value;
+      const trimmed = value.trim();
+      return trimmed.length > 0 ? trimmed : undefined;
+    },
+    z.string().min(1).optional()
+  ),
+  PRODUCT_LIST_LIMIT_MAX: z.preprocess(
+    (value) => {
+      if (typeof value !== "string") return value;
+      const trimmed = value.trim();
+      return trimmed.length > 0 ? trimmed : undefined;
+    },
+    z.coerce.number().int().min(1).default(100)
+  ),
+});
 
-  return parsed;
+type ParsedEnv = z.infer<typeof envSchema>;
+
+function parseCurrentEnv(appEnv: AppEnv): ParsedEnv {
+  return envSchema.parse({
+    APP_ENV: appEnv,
+    PORT: process.env.PORT,
+    MONGO_URI: process.env.MONGO_URI,
+    JWT_SECRET: process.env.JWT_SECRET,
+    PRODUCT_LIST_LIMIT_MAX: process.env.PRODUCT_LIST_LIMIT_MAX,
+  });
 }
 
 export function loadEnv(): AppConfig {
-  const appEnv = resolveAppEnv();
+  if (cachedAppConfig) {
+    return cachedAppConfig;
+  }
 
+  const appEnv = resolveAppEnv();
   if (!isEnvLoaded) {
     loadDotenvFiles(appEnv);
     isEnvLoaded = true;
   }
 
   process.env.APP_ENV = appEnv;
-
-  if (!cachedAppConfig) {
-    cachedAppConfig = {
-      get APP_ENV(): AppEnv {
-        return resolveAppEnv();
-      },
-      get PORT(): number {
-        return parseNumberFromEnv("PORT", 5000, 1);
-      },
-      get MONGO_URI(): string {
-        const mongoUri = process.env.MONGO_URI?.trim();
-        return mongoUri && mongoUri.length > 0
-          ? mongoUri
-          : "mongodb://localhost:27017/seng4640";
-      },
-      get JWT_SECRET(): string | undefined {
-        const secret = process.env.JWT_SECRET?.trim();
-        return secret && secret.length > 0 ? secret : undefined;
-      },
-      get PRODUCT_LIST_LIMIT_MAX(): number {
-        return parseNumberFromEnv("PRODUCT_LIST_LIMIT_MAX", 100, 1);
-      },
-    };
-  }
+  const parsed = parseCurrentEnv(appEnv);
+  cachedAppConfig = {
+    APP_ENV: parsed.APP_ENV,
+    PORT: parsed.PORT,
+    MONGO_URI: parsed.MONGO_URI,
+    JWT_SECRET: parsed.JWT_SECRET,
+    PRODUCT_LIST_LIMIT_MAX: parsed.PRODUCT_LIST_LIMIT_MAX,
+  };
 
   return cachedAppConfig;
+}
+
+// Tests can mutate process.env per case and re-parse app config deterministically.
+export function resetEnvCacheForTest(): void {
+  cachedAppConfig = null;
 }

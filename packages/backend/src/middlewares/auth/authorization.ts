@@ -4,8 +4,6 @@ import type { AuthTokenPayload } from "@/types/auth";
 import { authTokenPayloadSchema } from "./schemas";
 import { loadEnv } from "@/config/loadEnv";
 
-const appConfig = loadEnv();
-
 export const authValidation = (authorization: string | undefined): AuthTokenPayload => {
   if (!authorization) {
     throw new UnauthorizedError("token_missing");
@@ -16,7 +14,7 @@ export const authValidation = (authorization: string | undefined): AuthTokenPayl
 
   const token = authorization.slice("Bearer ".length);
 
-  const secret = appConfig.JWT_SECRET;
+  const secret = loadEnv().JWT_SECRET;
   if (!secret) {
     throw new ServiceUnavailableError();
   }
