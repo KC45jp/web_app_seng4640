@@ -2,14 +2,13 @@ import mongoose from "mongoose";
 import { loadEnv } from "../../config/loadEnv";
 
 export async function connectForDbScript(scriptName: string): Promise<string> {
-  const appEnv = loadEnv();
-  const mongoUri =
-    process.env.MONGO_URI || "mongodb://localhost:27017/seng4640";
+  const appConfig = loadEnv();
+  const mongoUri = appConfig.MONGO_URI;
 
   await mongoose.connect(mongoUri);
-  console.log(`✅ MongoDB connected for ${scriptName} (${appEnv})`);
+  console.log(`✅ MongoDB connected for ${scriptName} (${appConfig.APP_ENV})`);
 
-  return appEnv;
+  return appConfig.APP_ENV;
 }
 
 export async function disconnectDbScript(): Promise<void> {

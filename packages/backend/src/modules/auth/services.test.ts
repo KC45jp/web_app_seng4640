@@ -4,7 +4,7 @@ import jwt from "jsonwebtoken";
 import mongoose from "mongoose";
 import { MongoServerError } from "mongodb";
 import { UserRole } from "@seng4640/shared";
-import { newUserModel, newUserSchema  } from "../../db/models/user.models";
+import { userModel, userSchema  } from "../../db/models/user.models";
 import {
   ConflictError,
   ServiceUnavailableError,
@@ -12,14 +12,14 @@ import {
 } from "../../utils/errors";
 import { login as loginCustomer, registerCustomer } from "./service";
 
-type DbUser = InferSchemaType<typeof newUserSchema> & { _id: Types.ObjectId };
+type DbUser = InferSchemaType<typeof userSchema> & { _id: Types.ObjectId };
 type LoginProjection = Pick<DbUser, "name" | "email" | "role" | "passwordHash"> & {
   _id: Types.ObjectId;
 };
 
 
 jest.mock("../../db/models/user.models", () => ({
-  newUserModel: {
+  userModel: {
     create: jest.fn(),
     findOne: jest.fn(),
   },
@@ -58,7 +58,7 @@ describe("auth service", () => {
 });
 
 async function customerRegisterSuccess(): Promise<void> {
-  const mockedCreate = newUserModel.create as unknown as jest.Mock;
+  const mockedCreate = userModel.create as unknown as jest.Mock;
 
   mockedCreate.mockResolvedValue({
     _id: new mongoose.Types.ObjectId("64b64c2ecf77b6a7f39d9f11"),
@@ -83,7 +83,7 @@ async function customerRegisterSuccess(): Promise<void> {
 }
 
 async function customerRegisterConflictError(): Promise<void> {
-  const mockedCreate = newUserModel.create as unknown as jest.Mock;
+  const mockedCreate = userModel.create as unknown as jest.Mock;
   const duplicateKeyError = new MongoServerError({
     errmsg: "E11000 duplicate key error",
     code: 11000,
@@ -101,7 +101,7 @@ async function customerRegisterConflictError(): Promise<void> {
 }
 
 async function customerRegisterServiceUnavailableError(): Promise<void> {
-  const mockedCreate = newUserModel.create as unknown as jest.Mock;
+  const mockedCreate = userModel.create as unknown as jest.Mock;
   mockedCreate.mockResolvedValue({
     _id: new mongoose.Types.ObjectId("64b64c2ecf77b6a7f39d9f11"),
   });
@@ -117,7 +117,7 @@ async function customerRegisterServiceUnavailableError(): Promise<void> {
 }
 
 async function customerLoginEmailNotFoundError(): Promise<void> {
-  const mockedFindOne = newUserModel.findOne as unknown as jest.Mock;
+  const mockedFindOne = userModel.findOne as unknown as jest.Mock;
   mockedFindOne.mockReturnValue(buildFindOneChain(null));
 
   await expect(
@@ -131,7 +131,7 @@ async function customerLoginEmailNotFoundError(): Promise<void> {
 }
 
 async function customerLoginInvalidPasswordError(): Promise<void> {
-  const mockedFindOne = newUserModel.findOne as unknown as jest.Mock;
+  const mockedFindOne = userModel.findOne as unknown as jest.Mock;
     
   const mockUser = {
       _id: new mongoose.Types.ObjectId("64b64c2ecf77b6a7f39d9f11"),
@@ -156,7 +156,7 @@ async function customerLoginInvalidPasswordError(): Promise<void> {
 }
 
 async function customerLoginSuccess(): Promise<void> {
-  const mockedFindOne = newUserModel.findOne as unknown as jest.Mock;
+  const mockedFindOne = userModel.findOne as unknown as jest.Mock;
   const userId = new mongoose.Types.ObjectId("64b64c2ecf77b6a7f39d9f11");
   
   const mockUser = {

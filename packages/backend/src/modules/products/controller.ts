@@ -1,27 +1,34 @@
 import type { Request, Response } from "express";
-import { notImplemented } from "../../utils/notImplemented";
 import { listProductsQuerySchema } from "./schema";
 import { validateOrRespond } from "../../utils/validation";
+import {
+  listProducts as listProductsService,
+  getProductById as getProductByIdService,
+} from "./service";
 
 export async function listProducts(req: Request, res: Response): Promise<void> {
-  if (
-    validateOrRespond(listProductsQuerySchema, req.query, res, "GET /api/products") ===
-    null
-  ) {
-    return;
-  }
+  const query = validateOrRespond(
+    listProductsQuerySchema,
+    req.query,
+    res,
+    "GET /api/products"
+  );
+  if (!query) return;
 
-  notImplemented(res, "GET /api/products");
+  const data = await listProductsService(query);
+  res.status(200).json(data);
 }
 
 export async function getProductById(
   req: Request,
   res: Response
 ): Promise<void> {
-  if (!req.params.id) {
+  const productId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+  if (!productId) {
     res.status(400).json({ message: "Product id is required" });
     return;
   }
 
-  notImplemented(res, "GET /api/products/:id");
+  const data = await getProductByIdService(productId);
+  res.status(200).json(data);
 }

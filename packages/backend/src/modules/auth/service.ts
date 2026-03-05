@@ -1,6 +1,5 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import mongoose from "mongoose";
 import {
   UserRole,
   type UserRoleValue,
@@ -16,38 +15,30 @@ import {
   loginResultSchema,
   registerResultSchema,
 } from "./schema";
+import { loadEnv } from "../../config/loadEnv";
+
 import { UnauthorizedError, ConflictError, ServiceUnavailableError } from "../../utils/errors";
 
-import {logger} from '../../utils/logger';
+import {logger} from '@/utils/logger';
 
-import {newUserModel} from "../../db/models/user.models"
+import {userModel, type CreateUserInput} from "@/db/models/user.models"
 
+const appConfig = loadEnv();
 
 // PART 1: Database helpers
 /**
  * Inserts a new customer document into the users collection.
  * newUserModel can validate if the e-mail is unique.
  */
-const insertNewUser = async (
-  name: string,
-  email: string,
-  passwordHash: string
-) => {
+const insertNewUser = async (input: CreateUserInput) => userModel.create(input);
 
-  const userResult = await newUserModel.create({
-    name: name,
-    email: email,
-    passwordHash,
-    role: UserRole.CUSTOMER,
-  })
 
-  return userResult;
-};
+
 
 const generateToken = (
   userId: string,
   role: UserRoleValue,
-  secret = process.env.JWT_SECRET
+  secret = appConfig.JWT_SECRET
 ): string => {
   if (!secret) throw new ServiceUnavailableError();
   const payload: AuthTokenPayload = { id: userId, role };
@@ -72,7 +63,16 @@ export async function registerCustomer(
 
   let dbResult;
   try {
-    dbResult = await insertNewUser(_input.name, _input.email, passwordHash);
+    
+    const createUserInput = {
+      name: _input.name,
+      email: _input.email.trim().toLowerCase(),
+      passwordHash,
+      role: UserRole.CUSTOMER,
+    } satisfies CreateUserInput;
+
+    dbResult = await insertNewUser(createUserInput);
+
   } catch (err) {
     if (err instanceof MongoServerError && err.code === 11000) {
       logger.warn({err},"MongoDB insert Failed. Email already exists.");
@@ -101,7 +101,7 @@ export async function registerCustomer(
 
 const findUserByEmailForLogin = async (emailRaw : string) =>{
   const email = emailRaw.trim().toLowerCase();
-  return newUserModel
+  return userModel
     .findOne({ email })
     .select("_id name email role passwordHash")
     .lean();

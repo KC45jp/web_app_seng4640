@@ -1,8 +1,10 @@
-import type { NextFunction, Request, Response } from "express";
 import jwt, { TokenExpiredError } from "jsonwebtoken";
-import { AppError, UnauthorizedError, ServiceUnavailableError } from "@/utils/errors";
+import { UnauthorizedError, ServiceUnavailableError } from "@/utils/errors";
 import type { AuthTokenPayload } from "@/types/auth";
 import { authTokenPayloadSchema } from "./schemas";
+import { loadEnv } from "@/config/loadEnv";
+
+const appConfig = loadEnv();
 
 export const authValidation = (authorization: string | undefined): AuthTokenPayload => {
   if (!authorization) {
@@ -14,7 +16,7 @@ export const authValidation = (authorization: string | undefined): AuthTokenPayl
 
   const token = authorization.slice("Bearer ".length);
 
-  const secret = process.env.JWT_SECRET;
+  const secret = appConfig.JWT_SECRET;
   if (!secret) {
     throw new ServiceUnavailableError();
   }

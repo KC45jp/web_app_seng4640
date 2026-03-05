@@ -4,18 +4,18 @@ import cors from 'cors';
 import { loadEnv } from './config/loadEnv';
 import { registerRoutes } from './app/registerRoutes';
 
-const appEnv = loadEnv();
+const appConfig = loadEnv();
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-const PORT = process.env.PORT || 5000;
-const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/seng4640';
+const PORT = appConfig.PORT;
+const MONGO_URI = appConfig.MONGO_URI;
 
 // MongoDB接続 (Req_5.1)
 mongoose.connect(MONGO_URI)
-  .then(() => console.log(`✅ MongoDB connected (${appEnv})`))
+  .then(() => console.log(`✅ MongoDB connected (${appConfig.APP_ENV})`))
   .catch(err => console.error('❌ Connection error:', err));
 
 // ヘルスチェック (Req_11.1)
