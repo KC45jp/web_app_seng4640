@@ -3,6 +3,41 @@ import path from "node:path";
 import dotenv from "dotenv";
 import { z } from "zod";
 
+/*
+Refactor plan (next step, not implemented in this file yet):
+
+Goal:
+- Move from "return full AppConfig object" to a key-based API.
+- Keep type safety while reducing accidental exposure of secrets.
+- Make DI/testing simpler without relying on global process.env mutation.
+
+Target shape:
+1) Build one validated env object once at startup:
+   - const resolvedEnv = envSchema.parse(...)
+   - Keep it in module-local cache.
+2) Expose key-based getter:
+   - getEnv<K extends EnvKey>(key: K, source?: EnvSource): Env[K]
+   - Default source is process.env for runtime.
+   - Tests can pass explicit source object for DI.
+3) Keep optional compat layer during migration:
+   - loadEnv() can temporarily return AppConfig from getEnv-backed values.
+4) Split "public" vs "secret" access (recommended):
+   - public config keys: APP_ENV, PORT, MONGO_URI, PRODUCT_LIST_LIMIT_MAX
+   - secret keys: JWT_SECRET
+   - expose secret via dedicated helper (example: getJwtSecretOrThrow()).
+
+Migration order:
+- Step A: Introduce getEnv/getJwtSecret helpers in parallel.
+- Step B: Replace call sites in auth/index/scripts.
+- Step C: Remove old loadEnv object API after all call sites migrate.
+- Step D: Simplify tests to use injected source object instead of process.env writes.
+
+Test notes:
+- If keeping cache, provide deterministic reset helper for tests.
+- Avoid re-reading dotenv files per test by default.
+- Prefer table-driven tests with explicit EnvSource objects.
+*/
+
 export type AppEnv = "dev" | "stg";
 
 export type AppConfig = {
