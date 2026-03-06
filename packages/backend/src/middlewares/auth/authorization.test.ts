@@ -9,14 +9,23 @@ import { resetEnvCacheForTest } from "@/config/loadEnv";
 import { authValidation } from "./authorization";
 
 const originalSecret = process.env.JWT_SECRET;
+const originalPort = process.env.PORT;
+const originalMongoUri = process.env.MONGO_URI;
+const originalProductListLimitMax = process.env.PRODUCT_LIST_LIMIT_MAX;
 
 beforeEach(() => {
   resetEnvCacheForTest();
   process.env.JWT_SECRET = "test-secret";
+  process.env.PORT = "5000";
+  process.env.MONGO_URI = "mongodb://localhost:27017/seng4640_test";
+  process.env.PRODUCT_LIST_LIMIT_MAX = "100";
 });
 
 afterEach(() => {
   process.env.JWT_SECRET = originalSecret;
+  process.env.PORT = originalPort;
+  process.env.MONGO_URI = originalMongoUri;
+  process.env.PRODUCT_LIST_LIMIT_MAX = originalProductListLimitMax;
   resetEnvCacheForTest();
 });
 

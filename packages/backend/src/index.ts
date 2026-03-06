@@ -13,12 +13,12 @@ app.use(express.json());
 const PORT = appConfig.PORT;
 const MONGO_URI = appConfig.MONGO_URI;
 
-// MongoDB接続 (Req_5.1)
+// MongoDB connection (Req_5.1)
 mongoose.connect(MONGO_URI)
-  .then(() => console.log(`✅ MongoDB connected (${appConfig.APP_ENV})`))
+  .then(() => console.log(`✅ MongoDB connected: Env:(${appConfig.APP_ENV}) URI:Env:(${MONGO_URI})`))
   .catch(err => console.error('❌ Connection error:', err));
 
-// ヘルスチェック (Req_11.1)
+// Health Req_11.1
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date() });
 });
