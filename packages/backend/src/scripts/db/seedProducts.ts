@@ -98,7 +98,7 @@ function buildProducts(count: number): ProductSeed[] {
 
 async function run(): Promise<void> {
   try {
-    await connectForDbScript("seed");
+    await connectForDbScript("seed:products");
     await ensureBaseCollectionsAndIndexes();
 
     const products = buildProducts(50);

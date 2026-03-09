@@ -5,13 +5,15 @@
   "main": "index.js",
   "scripts": {
     "dev": "node --env-file=.env --env-file=.env.dev --import tsx --watch src/index.ts",
+    "stg": "node --env-file=.env --env-file=.env.stg --import tsx src/index.ts",
     "build": "tsc",
-    "start": "node dist/index.js",
-    "seed": "npm run db:seed",
-    "db:seed": "tsx src/scripts/db/seed.ts",
-    "db:seed:dev": "tsx src/scripts/db/seedDev.ts",
-    "db:clean": "tsx src/scripts/db/clean.ts",
-    "test": "jest"
+
+    "db:clean:dev": "node --env-file=.env --env-file=.env.dev --import tsx src/scripts/db/clean.ts",
+    "db:clean:stg": "node --env-file=.env --env-file=.env.stg --import tsx src/scripts/db/clean.ts",
+
+    "db:seed:customer:dev": "node --env-file=.env --env-file=.env.dev --import tsx src/scripts/db/customerSeed.ts",
+    "db:seed:products:dev": "node --env-file=.env --env-file=.env.dev --import tsx src/scripts/db/seedProducts.ts",
+    "db:seed:products:stg": "node --env-file=.env --env-file=.env.stg --import tsx src/scripts/db/seedProducts.ts"
   },
   "keywords": [],
   "author": "",
