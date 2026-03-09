@@ -1,5 +1,6 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import type { Logger } from "pino";
 import {
   UserRole,
   type UserRoleValue,
@@ -22,6 +23,8 @@ import { UnauthorizedError, ConflictError, ServiceUnavailableError } from "../..
 import {logger} from '@/utils/logger';
 
 import {userModel, type CreateUserInput} from "@/db/models/user.models"
+
+const authServiceLogger = logger.child({ module: "auth-service" });
 
 // PART 1: Database helpers
 /**
@@ -54,9 +57,14 @@ const generateToken = (
  * 3) Build and parse response shape
  */
 export async function registerCustomer(
-  _input: RegisterInput
+  _input: RegisterInput,
+  requestLogger: Logger = authServiceLogger
 ): Promise<RegisterResult> {
   // PART 1: DB checks and write
+  requestLogger.debug(
+    { email: _input.email, name: _input.name },
+    "Register customer started"
+  );
   const passwordHash = await bcrypt.hash(_input.password, 10);
 
   let dbResult;
@@ -70,20 +78,27 @@ export async function registerCustomer(
     } satisfies CreateUserInput;
 
     dbResult = await insertNewUser(createUserInput);
+    requestLogger.debug(
+      { email: createUserInput.email, userId: dbResult._id.toString() },
+      "User inserted"
+    );
 
   } catch (err) {
     if (err instanceof MongoServerError && err.code === 11000) {
-      logger.warn({err},"MongoDB insert Failed. Email already exists.");
+      requestLogger.warn(
+        { err, email: _input.email.trim().toLowerCase() },
+        "MongoDB insert failed because email already exists"
+      );
       throw new ConflictError();
     }
     throw err;
   }
-  logger.debug('finished new user inserted correctly.')
   const userId = dbResult._id.toString();
 
   // PART 2: Access token issuance
   const token = generateToken(userId, UserRole.CUSTOMER);
 
+  requestLogger.debug({ userId }, "Access token generated");
   // PART 3: API response construction
   return registerResultSchema.parse({
     user: {
@@ -108,22 +123,36 @@ const findUserByEmailForLogin = async (emailRaw : string) =>{
 /**
  * Logs in a customer account and returns an auth response payload.
  */
-export async function login(_input: LoginInput): Promise<LoginResult>{
+export async function login(
+  _input: LoginInput,
+  requestLogger: Logger = authServiceLogger
+): Promise<LoginResult>{
 
   const user = await findUserByEmailForLogin(_input.email)
   if(!user){
-    logger.info({user}, "user with this e-mail not found")
+    requestLogger.info(
+      { email: _input.email.trim().toLowerCase() },
+      "Login failed because email was not found"
+    );
     throw new UnauthorizedError("email_not_found");
   } 
 
 
   if (!(await bcrypt.compare(_input.password, user.passwordHash))){
-    logger.info({user}, "Invalid password.")
+    requestLogger.info(
+      { email: user.email.toString(), userId: user._id.toString() },
+      "Login failed because password was invalid"
+    );
     throw new UnauthorizedError("invalid_password");
   }
 
   const userRole = user.role.toString() as UserRoleValue;
   const token = generateToken(user._id.toString(), userRole);
+
+  requestLogger.debug(
+    { userId: user._id.toString(), role: userRole },
+    "Login succeeded and access token generated"
+  );
 
   return loginResultSchema.parse({
     user: {

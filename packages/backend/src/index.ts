@@ -3,11 +3,14 @@ import mongoose from 'mongoose';
 import cors from 'cors';
 import { loadEnv } from './config/loadEnv';
 import { registerRoutes } from './app/registerRoutes';
+import { logger } from './utils/logger';
+import { requestContext } from './middlewares/requestContext';
 
 const appConfig = loadEnv();
 
 const app = express();
 app.use(cors());
+app.use(requestContext);
 app.use(express.json());
 
 const PORT = appConfig.PORT;
@@ -15,8 +18,12 @@ const MONGO_URI = appConfig.MONGO_URI;
 
 // MongoDB connection (Req_5.1)
 mongoose.connect(MONGO_URI)
-  .then(() => console.log(`✅ MongoDB connected: Env:(${appConfig.APP_ENV}) URI:Env:(${MONGO_URI})`))
-  .catch(err => console.error('❌ Connection error:', err));
+  .then(() => {
+    logger.info({ appEnv: appConfig.APP_ENV }, "MongoDB connected");
+  })
+  .catch((err) => {
+    logger.error({ err }, "MongoDB connection failed");
+  });
 
 // Health Req_11.1
 app.get('/api/health', (req, res) => {
@@ -26,5 +33,5 @@ app.get('/api/health', (req, res) => {
 registerRoutes(app);
 
 app.listen(PORT, () => {
-  console.log(`🚀 Server running on http://localhost:${PORT}`);
+  logger.info({ port: PORT }, "Server started");
 });
