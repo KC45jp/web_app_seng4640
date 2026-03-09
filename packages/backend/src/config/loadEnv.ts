@@ -23,17 +23,33 @@ export type AppConfig = {
 
 export type EnvSource = Partial<Record<EnvKey, string | undefined>>;
 
+/**
+ * Normalizes an env string by trimming whitespace and treating blank values as
+ * missing.
+ *
+ * Returns `undefined` when the input is not a string or when the trimmed value
+ * is empty.
+ */
 function normalizeEnvString(value: string | undefined): string | undefined {
   if (typeof value !== "string") return undefined;
   const trimmed = value.trim();
   return trimmed.length > 0 ? trimmed : undefined;
 }
 
+/**
+ * Resolves the application environment from the provided source.
+ *
+ * Only `stg` is preserved explicitly. Any other missing or unsupported value
+ * falls back to `dev`.
+ */
 function resolveAppEnv(source: EnvSource): AppEnv {
   const requested = normalizeEnvString(source.APP_ENV)?.toLowerCase();
   return requested === "stg" ? "stg" : "dev";
 }
 
+/**
+ * Reads a required env string and throws when the value is missing or blank.
+ */
 function readRequiredString(source: EnvSource, key: EnvKey): string {
   const value = normalizeEnvString(source[key]);
   if (!value) {
@@ -42,10 +58,20 @@ function readRequiredString(source: EnvSource, key: EnvKey): string {
   return value;
 }
 
+/**
+ * Reads an optional env string.
+ *
+ * Blank strings such as `""` or `"   "` are normalized to `undefined`.
+ */
 function readOptionalString(source: EnvSource, key: EnvKey): string | undefined {
   return normalizeEnvString(source[key]);
 }
 
+/**
+ * Reads a required positive integer env value.
+ *
+ * Throws when the value is missing, non-numeric, non-integer, or less than 1.
+ */
 function readRequiredPositiveInt(source: EnvSource, key: EnvKey): number {
   const raw = readRequiredString(source, key);
   const parsed = Number(raw);
@@ -55,6 +81,10 @@ function readRequiredPositiveInt(source: EnvSource, key: EnvKey): number {
   return parsed;
 }
 
+/**
+ * Builds the runtime application config from a provided env source after
+ * normalizing and validating each field.
+ */
 function buildAppConfigFromSource(source: EnvSource): AppConfig {
   const appEnv = resolveAppEnv(source);
 
@@ -70,6 +100,12 @@ function buildAppConfigFromSource(source: EnvSource): AppConfig {
   };
 }
 
+/**
+ * Loads application config from either an explicit source or `process.env`.
+ *
+ * When `process.env` is used, the resolved `APP_ENV` is written back in its
+ * normalized form so downstream startup code sees a stable value.
+ */
 export function loadEnv(source?: EnvSource): AppConfig {
   if (source) {
     return buildAppConfigFromSource(source);
@@ -82,6 +118,12 @@ export function loadEnv(source?: EnvSource): AppConfig {
 
 // TODO(future work): Add optional dotenv loading + startup cache for local DX.
 // Kept for backward compatibility with existing tests.
+/**
+ * Legacy test hook kept for compatibility with older callers.
+ *
+ * The loader no longer caches config, so this function is intentionally a
+ * no-op.
+ */
 export function resetEnvCacheForTest(): void {
   // no-op
 }
