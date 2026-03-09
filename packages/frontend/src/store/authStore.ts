@@ -4,17 +4,20 @@ import { ROLE } from "@/constants/roles";
 
 const AUTH_STORAGE_KEY = "seng4640.auth";
 
-type AuthState = {
-  role: UserRoleValue;
-  token: string | null;
-  loginAs: (role: PersistedUserRoleValue) => void;
-  logout: () => void;
-};
-
-type StoredAuthState = {
+type Session = {
   role: PersistedUserRoleValue;
   token: string;
 };
+
+type AuthState = {
+  role: UserRoleValue;
+  token: string | null;
+  setSession: (session: Session) => void;
+  logout: () => void;
+};
+
+
+type StoredAuthState = Session;
 
 function parseStoredAuth(): StoredAuthState | null {
   if (typeof window === "undefined") {
@@ -67,14 +70,9 @@ const initialAuth = parseStoredAuth();
 export const useAuthStore = create<AuthState>((set) => ({
   role: initialAuth?.role ?? ROLE.GUEST,
   token: initialAuth?.token ?? null,
-  loginAs: (role) => {
-    const stored = {
-      role,
-      token: `mock-${role}-token`,
-    };
-
-    persistAuth(stored);
-    set(stored);
+  setSession: (session: Session) => {
+    persistAuth(session);
+    set(session);
   },
   logout: () => {
     persistAuth(null);

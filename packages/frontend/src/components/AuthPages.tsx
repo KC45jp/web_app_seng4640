@@ -1,115 +1,182 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import type { PersistedUserRoleValue } from "@seng4640/shared";
 import { ROLE } from "@/constants/roles";
 import { useAuthStore } from "@/store/authStore";
+import axios from "axios";
+import { login, register } from "@/api/auth";
 
-type LoginPanelProps = {
-  title: string;
-  description: string;
-  options: { label: string; role: PersistedUserRoleValue; nextPath: string }[];
-};
 
-function LoginPanel({ title, description, options }: LoginPanelProps) {
-  const loginAs = useAuthStore((state) => state.loginAs);
+// type LoginPanelProps = {
+//   title: string;
+//   description: string;
+//   options: { label: string; role: PersistedUserRoleValue; nextPath: string }[];
+// };
+
+function nextPathForRole(role: PersistedUserRoleValue) {
+  switch (role) {
+    case "customer":
+      return "/mypage";
+    case "manager":
+      return "/pm/dashboard";
+    case "admin":
+      return "/admin/managers";
+  }
+}
+
+
+function LoginScreen({ title, description }: { title: string; description: string }) {
   const navigate = useNavigate();
+  const setSession = useAuthStore((state) => state.setSession);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setSubmitting(true);
+    setError(null);
+
+    try {
+      const result = await login({ email, password });
+
+      const role = result.user.role;
+
+      if (role === ROLE.GUEST) {
+        setError("Invalid user role.");
+        return;
+      }
+      
+      setSession({
+        role: role,
+        token: result.accessToken,
+      });
+      navigate(nextPathForRole(role), { replace: true });
+    } catch (err) {
+      if (axios.isAxiosError(err) && err.response?.status === 401) {
+        setError("Invalid e-mail or Password");
+      } else {
+        setError("failed to login");
+      }
+    } finally {
+      setSubmitting(false);
+    }
+  }
 
   return (
     <section className="page-card">
       <h1>{title}</h1>
       <p>{description}</p>
-      <div className="button-row">
-        {options.map((option) => (
-          <button
-            key={option.label}
-            onClick={() => {
-              loginAs(option.role);
-              navigate(option.nextPath);
-            }}
-            type="button"
-          >
-            {option.label}
-          </button>
-        ))}
-      </div>
+      <form onSubmit={handleSubmit}>
+        <input
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="Email"
+          required
+        />
+        <input
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          placeholder="Password"
+          minLength={8}
+          required
+        />
+        {error ? <p className="muted">{error}</p> : null}
+        <button type="submit" disabled={submitting}>
+          {submitting ? "Logging in..." : "Login"}
+        </button>
+      </form>
     </section>
   );
 }
 
 export function LoginPage() {
-  return (
-    <LoginPanel
-      description="Login page shell. API hookup comes later."
-      options={[
-        {
-          label: "Login as Customer (mock)",
-          role: ROLE.CUSTOMER,
-          nextPath: "/mypage",
-        },
-        {
-          label: "Login as Manager (mock)",
-          role: ROLE.MANAGER,
-          nextPath: "/pm/dashboard",
-        },
-        {
-          label: "Login as Admin (mock)",
-          role: ROLE.ADMIN,
-          nextPath: "/admin/managers",
-        },
-      ]}
-      title="Login"
-    />
-  );
-}
-
-export function SignupPage() {
-  const loginAs = useAuthStore((state) => state.loginAs);
-  const navigate = useNavigate();
-
-  return (
-    <section className="page-card">
-      <h1>Sign up</h1>
-      <p>Customer sign up page shell.</p>
-      <button
-        onClick={() => {
-          loginAs(ROLE.CUSTOMER);
-          navigate("/mypage");
-        }}
-        type="button"
-      >
-        Create customer account (mock)
-      </button>
-    </section>
-  );
+  return <LoginScreen title="Login" description="Customer / Manager / Admin login" />;
 }
 
 export function ManagerLoginPage() {
-  return (
-    <LoginPanel
-      description="Product Manager login shell."
-      options={[
-        {
-          label: "Login as Manager (mock)",
-          role: ROLE.MANAGER,
-          nextPath: "/pm/dashboard",
-        },
-      ]}
-      title="Manager Login"
-    />
-  );
+  return <LoginScreen title="Manager Login" description="Product Manager login" />;
 }
 
 export function AdminLoginPage() {
+  return <LoginScreen title="Admin Login" description="Super Admin login" />;
+}
+
+export function SignupPage() {
+  const navigate = useNavigate();
+  const setSession = useAuthStore((state) => state.setSession);
+  const [name, setName] = useState("");
+
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setSubmitting(true);
+    setError(null);
+
+    try {
+      const result = await register({ name, email, password });
+
+
+      const role = result.user.role;
+
+      if (role !== ROLE.CUSTOMER) {
+        setError("Invalid user role.");
+        return;
+      }
+      
+      setSession({
+        role: role,
+        token: result.accessToken,
+      });
+      navigate(nextPathForRole(role), { replace: true });
+    } catch (err) {
+      if (axios.isAxiosError(err) && err.response?.status === 401) {
+        setError("Invalid e-mail or Password");
+      } else {
+        setError("failed to login");
+      }
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
   return (
-    <LoginPanel
-      description="Super Admin login shell."
-      options={[
-        {
-          label: "Login as Admin (mock)",
-          role: ROLE.ADMIN,
-          nextPath: "/admin/managers",
-        },
-      ]}
-      title="Admin Login"
-    />
+    <section className="page-card">
+      <h1>Registration</h1>
+      <form onSubmit={handleSubmit}>
+        <input
+        value={name}
+        onChange={(e)=>setName(e.target.value)}
+        placeholder="Your Name"
+        required
+        />
+        <input
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="Email"
+          required
+        />
+        <input
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          placeholder="Password"
+          minLength={8}
+          required
+        />
+        {error ? <p className="muted">{error}</p> : null}
+        <button type="submit" disabled={submitting}>
+          {submitting ? "Logging in..." : "Login"}
+        </button>
+      </form>
+    </section>
   );
 }

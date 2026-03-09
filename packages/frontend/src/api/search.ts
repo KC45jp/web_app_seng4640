@@ -3,6 +3,8 @@ import type {
   AdminListManagedProductsResult,
   AdminListManagersResult,
   Product,
+  LoginInput,
+  LoginResult
 } from "@seng4640/shared";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5000";
@@ -10,6 +12,10 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5000
 const api = axios.create({
   baseURL: API_BASE_URL,
 });
+export async function login(input: LoginInput): Promise<LoginResult> {
+  const response = await api.post<LoginResult>("/api/auth/login", input);
+  return response.data;
+}
 
 function authHeader(token: string | null) {
   if (!token) {
