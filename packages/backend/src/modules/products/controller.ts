@@ -5,6 +5,7 @@ import {
   listProducts as listProductsService,
   getProductById as getProductByIdService,
 } from "./service";
+import {AppError} from "@/utils/errors"
 
 export async function listProducts(req: Request, res: Response): Promise<void> {
   const query = validateOrRespond(
@@ -29,6 +30,15 @@ export async function getProductById(
     return;
   }
 
-  const data = await getProductByIdService(productId);
-  res.status(200).json(data);
+  try {
+    const data = await getProductByIdService(productId);
+    res.status(200).json(data);
+  } catch (error) {
+    if (error instanceof AppError) {
+      res.status(error.status).json({ message: error.message });
+      return;
+    }
+
+    res.status(500).json({ message: "Internal server error" });
+  }
 }

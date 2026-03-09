@@ -1,33 +1,185 @@
+import {isValidObjectId } from "mongoose";
+import type { InferSchemaType, QueryFilter, SortOrder,  Require_id} from "mongoose";
 import {
+
   listProductsResultSchema,
   getProductByIdResultSchema,
+  productDetailSchema,
 } from "./schema";
-import type { GetProductByIdResult, ListProductsQuery, ListProductsResult } from "./schema";
+import type {
+  GetProductByIdResult,
+  ListProductsQuery,
+  ListProductsResult,
+  ProductDetail,
+} from "./schema";
+import { productSchema, productModel} from "@/db/models/product.models";
+import { minLength } from "zod";
+import {
+  type Product
+} from "@seng4640/shared";
+
+import {NotFoundError, BadRequestError} from "@/utils/errors"
+
+
+/////////////// listProducts and its helpers //////////////////////////
+type ProductDoc = Require_id<InferSchemaType<typeof productSchema>>;
+
+const buildRange = (min?: number, max?: number) =>{
+  if (min === undefined && max === undefined) return undefined;
+
+  return {
+    ...(min !== undefined ? { $gte: min } : {}),
+    ...(max !== undefined ? { $lte: max } : {}),
+  };
+}
+
+function escapeRegex(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+const buildProductListFilter = (query: ListProductsQuery):QueryFilter<ProductDoc>  => {
+
+  const filter: Record<string, unknown> = {
+    isActive: true,
+  };
+
+  const searchWord = query.q?.trim();
+
+  if (searchWord){
+    const words = searchWord.trim().split(/\s+/).filter(Boolean);
+    if (words.length > 0) {
+      filter.$and = words.map((word) => ({
+        name: { $regex: escapeRegex(word), $options: "i" }
+      }));
+    }
+  }
+
+  if (query.category) {
+    filter.category = query.category;
+  }
+
+  if (query.minPrice !== undefined || query.maxPrice !== undefined) {
+    filter.price = buildRange(query.minPrice, query.maxPrice);
+  }
+
+  return filter;
+}
+
+function buildProductSort(query: ListProductsQuery): Record<string, SortOrder> {
+  const sortOrder: SortOrder = query.sortOrder === "asc" ? 1 : -1;
+
+  switch (query.sortBy) {
+    case "price":
+      return { price: sortOrder };
+    case "name":
+      return { name: sortOrder };
+    case "createdAt":
+      return { createdAt: sortOrder };
+    case "relevance":
+    default:
+      return { createdAt: -1 };
+  }
+}
+function serializeProduct(doc: ProductDoc): Product {
+  return {
+    _id: doc._id.toString(),
+    name: doc.name,
+    description: doc.description,
+    price: doc.price,
+    flashSalePrice: doc.flashSalePrice ?? null,
+    category: doc.category,
+    imageUrl: doc.imageUrl,
+    isFlashSale: doc.isFlashSale,
+    isActive: doc.isActive,
+    createdAt: doc.createdAt?.toISOString(),
+  };
+}
 
 export async function listProducts(_query: ListProductsQuery): Promise<ListProductsResult> {
-  // TODO: implement products search/list.
+
+  const page = _query.page ?? 1;
+  const limit = _query.limit ?? 50;
+  const skip = (page - 1) * limit;
+
+  const filter = buildProductListFilter(_query);
+  const sort = buildProductSort(_query);
+  const items = await productModel.find(filter).sort(sort).skip(skip).limit(limit).lean<ProductDoc[]>();
+
+  const total = await productModel.countDocuments(filter)
+
   return listProductsResultSchema.parse({
-    items: [],
-    total: 0,
-    page: 1,
-    limit: 20,
+    items: items.map(serializeProduct),
+    total: total,
+    page: page,
+    limit: limit,
   });
 }
 
+
+
+
+
+//////////////// getProductById and its helpers //////////////////////////
+
+/**
+ * Finds a single active product by id.
+ *
+ * @param productId Product id from the request path.
+ * @returns The matched active product document, or `null` when not found.
+ */
+async function findActiveProductById(productId: string): Promise<ProductDoc | null> {
+  return productModel
+    .findOne({ _id: productId, isActive: true })
+    .lean<ProductDoc | null>();
+}
+
+/**
+ * Converts a product document into the detail response payload.
+ *
+ * @param doc Product document fetched from MongoDB.
+ * @returns Serialized product detail data.
+ */
+function serializeProductDetail(doc: ProductDoc): ProductDetail {
+  
+  return {
+    _id: doc._id.toString(),
+    name: doc.name,
+    description: doc.description,
+    price: doc.price,
+    flashSalePrice: doc.flashSalePrice ?? null,
+    category: doc.category,
+    imageUrl: doc.imageUrl,
+    isFlashSale: doc.isFlashSale,
+    isActive: doc.isActive,
+    createdAt: doc.createdAt?.toISOString(),
+
+    detailedDescription: doc.detailedDescription ?? null,
+    stock: doc.stock,
+    descriptionImages: doc.descriptionImages ?? [],
+    flashSaleStartAt: doc.flashSaleStartAt?.toISOString() ?? null,
+    flashSaleEndAt: doc.flashSaleEndAt?.toISOString() ?? null,
+    productOwnerId: doc.productOwnerId?.toString() ?? null,
+    updatedAt: doc.updatedAt?.toISOString(),
+  };
+
+}
+
+
+
+
 export async function getProductById(_productId: string): Promise<GetProductByIdResult> {
-  // TODO: implement product details.
+
+  if (await !isValidObjectId(_productId)){
+    throw new BadRequestError("Invalid product id");
+  }
+
+  const product = await findActiveProductById(_productId);
+  if (!product) {
+    throw new NotFoundError("Product not found");
+  }
+
 
   return getProductByIdResultSchema.parse({
-    product: {
-      _id: _productId,
-      name: "TBD Product",
-      description: "Not implemented yet",
-      price: 0,
-      category: "uncategorized",
-      stock: 0,
-      imageUrl: "/images/placeholder.jpg",
-      isFlashSale: false,
-      isActive: true,
-    },
+    product: serializeProductDetail(product),
   });
 }

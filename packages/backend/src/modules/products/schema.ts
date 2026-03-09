@@ -4,12 +4,11 @@ import type {
   ListProductsQuery,
   ListProductsResult,
   Product,
+  ProductDetail,
 } from "@seng4640/shared";
 
 export const listProductsQuerySchema = z.object({
   q: z.string().optional(),
-  search: z.string().optional(),
-  str: z.string().optional(),
   category: z.string().optional(),
   minPrice: z.coerce.number().nonnegative().optional(),
   maxPrice: z.coerce.number().nonnegative().optional(),
@@ -19,35 +18,38 @@ export const listProductsQuerySchema = z.object({
   limit: z.coerce.number().int().positive().max(100).optional(),
 }) satisfies z.ZodType<ListProductsQuery>;
 
-export const productSchema = z.object({
+export const productSummarySchema = z.object({
   _id: z.string().min(1).optional(),
   name: z.string().min(1),
   description: z.string().min(1),
-  detailedDescription: z.string().nullable().optional(),
   price: z.number().nonnegative(),
   flashSalePrice: z.number().nonnegative().nullable().optional(),
   category: z.string().min(1),
-  stock: z.number().int().nonnegative(),
   imageUrl: z.string().min(1),
-  descriptionImages: z.array(z.string()).optional(),
   isFlashSale: z.boolean(),
-  flashSaleStartAt: z.string().nullable().optional(),
-  flashSaleEndAt: z.string().nullable().optional(),
   isActive: z.boolean(),
-  productOwnerId: z.string().nullable().optional(),
   createdAt: z.string().optional(),
-  updatedAt: z.string().optional(),
 }) satisfies z.ZodType<Product>;
 
+export const productDetailSchema = productSummarySchema.extend({
+  detailedDescription: z.string().nullable().optional(),
+  stock: z.number().int().nonnegative(),
+  descriptionImages: z.array(z.string()).optional(),
+  flashSaleStartAt: z.string().nullable().optional(),
+  flashSaleEndAt: z.string().nullable().optional(),
+  productOwnerId: z.string().nullable().optional(),
+  updatedAt: z.string().optional(),
+}) satisfies z.ZodType<ProductDetail>;
+
 export const listProductsResultSchema = z.object({
-  items: z.array(productSchema),
+  items: z.array(productSummarySchema),
   total: z.number().int().nonnegative(),
   page: z.number().int().positive(),
   limit: z.number().int().positive(),
 }) satisfies z.ZodType<ListProductsResult>;
 
 export const getProductByIdResultSchema = z.object({
-  product: productSchema,
+  product: productDetailSchema,
 }) satisfies z.ZodType<GetProductByIdResult>;
 
 export type {
@@ -55,4 +57,5 @@ export type {
   ListProductsQuery,
   ListProductsResult,
   Product,
+  ProductDetail,
 };

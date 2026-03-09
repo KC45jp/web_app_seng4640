@@ -39,3 +39,15 @@ export class ServiceUnavailableError extends AppError {
     super(503, message);
   }
 }
+
+export class BadRequestError extends AppError {
+  constructor(message = "Bad request") {
+    super(400, message);
+  }
+}
+
+export class NotFoundError extends AppError {
+  constructor(message = "Not found") {
+    super(404, message);
+  }
+}

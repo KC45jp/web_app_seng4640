@@ -66,26 +66,27 @@ export interface Product {
   _id?: string;
   name: string;
   description: string;
-  detailedDescription?: string | null;
   price: number;
   flashSalePrice?: number | null;
   category: string;
-  stock: number;
   imageUrl: string;
-  descriptionImages?: string[];
   isFlashSale: boolean;
+  isActive: boolean;
+  createdAt?: string;
+}
+
+export interface ProductDetail extends Product {
+  detailedDescription?: string | null;
+  stock: number;
+  descriptionImages?: string[];
   flashSaleStartAt?: string | null;
   flashSaleEndAt?: string | null;
-  isActive: boolean;
   productOwnerId?: string | null;
-  createdAt?: string;
   updatedAt?: string;
 }
 
 export type ListProductsQuery = {
   q?: string;
-  search?: string;
-  str?: string;
   category?: string;
   minPrice?: number;
   maxPrice?: number;
@@ -103,7 +104,7 @@ export type ListProductsResult = {
 };
 
 export type GetProductByIdResult = {
-  product: Product;
+  product: ProductDetail;
 };
 
 // Cart API

@@ -11,14 +11,18 @@
 
 - `GET /api/products`
   - query examples: `q`, `category`, `minPrice`, `maxPrice`
+  - keyword search parameter is `q` (canonical); do not use legacy aliases like `search` or `str`
   - sorting/pagination: `sortBy`, `sortOrder`, `page`, `limit`
+  - response should be a lightweight product summary list for browse/search screens
 - `GET /api/products/:id`
+  - response may include full product detail fields needed by the detail screen
 
 ### Guest visibility rule
 
 - Guest can browse product list/detail only.
 - Guest must not see Flash Sale inventory count.
 - Guest must not purchase (checkout/cart endpoints forbidden).
+- Keep list/detail responses aligned with that rule when exposing public product data.
 
 ## 3) Cart (Customer only)
 
