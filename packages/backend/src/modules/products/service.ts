@@ -1,10 +1,8 @@
-import {isValidObjectId } from "mongoose";
-import type { InferSchemaType, QueryFilter, SortOrder,  Require_id} from "mongoose";
+import { isValidObjectId } from "mongoose";
+import type { InferSchemaType, QueryFilter, Require_id, SortOrder } from "mongoose";
 import {
-
   listProductsResultSchema,
   getProductByIdResultSchema,
-  productDetailSchema,
 } from "./schema";
 import type {
   GetProductByIdResult,
@@ -12,13 +10,10 @@ import type {
   ListProductsResult,
   ProductDetail,
 } from "./schema";
-import { productSchema, productModel} from "@/db/models/product.models";
-import { minLength } from "zod";
-import {
-  type Product
-} from "@seng4640/shared";
-
-import {NotFoundError, BadRequestError} from "@/utils/errors"
+import { productModel, productSchema } from "@/db/models/product.models";
+import { type Product } from "@seng4640/shared";
+import { BadRequestError, NotFoundError } from "@/utils/errors";
+import { logger } from "@/utils/logger";
 
 
 /////////////// listProducts and its helpers //////////////////////////
@@ -168,16 +163,16 @@ function serializeProductDetail(doc: ProductDoc): ProductDetail {
 
 
 export async function getProductById(_productId: string): Promise<GetProductByIdResult> {
-
-  if (await !isValidObjectId(_productId)){
+  if (!isValidObjectId(_productId)) {
+    logger.warn({ productId: _productId }, "Invalid product id");
     throw new BadRequestError("Invalid product id");
   }
 
   const product = await findActiveProductById(_productId);
   if (!product) {
+    logger.info({ productId: _productId }, "Product not found");
     throw new NotFoundError("Product not found");
   }
-
 
   return getProductByIdResultSchema.parse({
     product: serializeProductDetail(product),

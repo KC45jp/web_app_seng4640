@@ -5,7 +5,8 @@ import {
   listProducts as listProductsService,
   getProductById as getProductByIdService,
 } from "./service";
-import {AppError} from "@/utils/errors"
+import { AppError } from "@/utils/errors";
+import { logger } from "@/utils/logger";
 
 export async function listProducts(req: Request, res: Response): Promise<void> {
   const query = validateOrRespond(
@@ -39,6 +40,7 @@ export async function getProductById(
       return;
     }
 
+    logger.error({ error, productId }, "Unhandled error in getProductById");
     res.status(500).json({ message: "Internal server error" });
   }
 }
