@@ -5,6 +5,7 @@ import mongoose from "mongoose";
 import { MongoServerError } from "mongodb";
 import { UserRole } from "@seng4640/shared";
 import { userModel, userSchema  } from "../../db/models/user.models";
+import { logger } from "../../utils/logger";
 import {
   ConflictError,
   ServiceUnavailableError,
@@ -17,6 +18,11 @@ type DbUser = InferSchemaType<typeof userSchema> & { _id: Types.ObjectId };
 type LoginProjection = Pick<DbUser, "name" | "email" | "role" | "passwordHash"> & {
   _id: Types.ObjectId;
 };
+
+const testLogger = logger.child({
+  requestId: "test-request-id",
+  module: "auth-service-test",
+});
 
 
 jest.mock("../../db/models/user.models", () => ({
@@ -80,7 +86,7 @@ async function customerRegisterSuccess(): Promise<void> {
     name: "Alice",
     email: "alice@example.com",
     password: "password123",
-  });
+  }, testLogger);
 
   const decoded = jwt.verify(result.accessToken, "test-secret");
   if (typeof decoded === "string") {
@@ -108,7 +114,7 @@ async function customerRegisterConflictError(): Promise<void> {
       name: "Alice",
       email: "alice@example.com",
       password: "password123",
-    })
+    }, testLogger)
   ).rejects.toBeInstanceOf(ConflictError);
 }
 
@@ -124,7 +130,7 @@ async function customerRegisterServiceUnavailableError(): Promise<void> {
       name: "Alice",
       email: "alice@example.com",
       password: "password123",
-    })
+    }, testLogger)
   ).rejects.toBeInstanceOf(ServiceUnavailableError);
 }
 
@@ -136,7 +142,7 @@ async function customerLoginEmailNotFoundError(): Promise<void> {
     loginCustomer({
       email: "missing@example.com",
       password: "password123",
-    })
+    }, testLogger)
   ).rejects.toMatchObject({
     reason: "email_not_found",
   } satisfies Partial<UnauthorizedError>);
@@ -161,7 +167,7 @@ async function customerLoginInvalidPasswordError(): Promise<void> {
     loginCustomer({
       email: "alice@example.com",
       password: "wrong-password",
-    })
+    }, testLogger)
   ).rejects.toMatchObject({
     reason: "invalid_password",
   } satisfies Partial<UnauthorizedError>);
@@ -187,7 +193,7 @@ async function customerLoginSuccess(): Promise<void> {
   const result = await loginCustomer({
     email: " manager@example.com ",
     password: "password123",
-  });
+  }, testLogger);
 
   expect(mockedFindOne).toHaveBeenCalledWith({ email: "manager@example.com" });
   expect(result.user).toMatchObject({
