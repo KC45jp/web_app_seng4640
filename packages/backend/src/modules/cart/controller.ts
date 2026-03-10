@@ -3,13 +3,21 @@ import { notImplemented } from "../../utils/notImplemented";
 import { addCartItemSchema, updateCartItemSchema } from "./schema";
 import { validateOrRespond } from "../../utils/validation";
 
+import {
+  getCartByUserId,
+  addItemToCart,
+  updateCartItemQuantity,
+  removeItemFromCart,
+} from "./service";
+
 export async function getCart(req: Request, res: Response): Promise<void> {
   if (!req.user) {
     res.status(401).json({ message: "Unauthorized" });
     return;
   }
 
-  notImplemented(res, "GET /api/cart");
+  const result = await getCartByUserId(req.user.id, req.log);
+  res.status(200).json(result)
 }
 
 export async function addCartItem(req: Request, res: Response): Promise<void> {

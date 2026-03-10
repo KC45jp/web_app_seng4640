@@ -12,7 +12,7 @@ export function requireRole(allowedRoles: UserRoleValue[]) {
       res.status(403).json({ message: "Forbidden" });
       return;
     }
-
+    
     next();
   };
 }

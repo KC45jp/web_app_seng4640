@@ -28,7 +28,7 @@ export async function ensureBaseCollectionsAndIndexes(): Promise<void> {
     )
   );
 
-  const requiredCollections = ["users", "products", "orders"];
+  const requiredCollections = ["users", "products", "carts", "orders"];
   for (const collectionName of requiredCollections) {
     if (!existingCollections.has(collectionName)) {
       await db.createCollection(collectionName);
@@ -41,4 +41,8 @@ export async function ensureBaseCollectionsAndIndexes(): Promise<void> {
   await db
     .collection("products")
     .createIndex({ isFlashSale: 1, flashSaleStartAt: 1, flashSaleEndAt: 1 });
+  await db.collection("carts").createIndex({ userId: 1 }, { unique: true });
+  await db.collection("carts").createIndex({ "items.productId": 1 });
+  await db.collection("orders").createIndex({ userId: 1, createdAt: -1 });
+  await db.collection("orders").createIndex({ status: 1, createdAt: -1 });
 }
