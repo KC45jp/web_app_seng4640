@@ -19,12 +19,7 @@ import {
 import { loadEnv } from "../../config/loadEnv";
 
 import { UnauthorizedError, ConflictError, ServiceUnavailableError } from "../../utils/errors";
-
-import {logger} from '@/utils/logger';
-
 import {userModel, type CreateUserInput} from "@/db/models/user.models"
-
-const authServiceLogger = logger.child({ module: "auth-service" });
 
 // PART 1: Database helpers
 /**
@@ -58,7 +53,7 @@ const generateToken = (
  */
 export async function registerCustomer(
   _input: RegisterInput,
-  requestLogger: Logger = authServiceLogger
+  requestLogger: Logger
 ): Promise<RegisterResult> {
   // PART 1: DB checks and write
   requestLogger.debug(
@@ -125,7 +120,7 @@ const findUserByEmailForLogin = async (emailRaw : string) =>{
  */
 export async function login(
   _input: LoginInput,
-  requestLogger: Logger = authServiceLogger
+  requestLogger: Logger
 ): Promise<LoginResult>{
 
   const user = await findUserByEmailForLogin(_input.email)

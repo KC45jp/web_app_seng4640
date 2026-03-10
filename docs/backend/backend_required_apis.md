@@ -49,7 +49,7 @@
 ### Product Manager only
 
 - `GET /api/admin/products/mine` (PO dashboard: own products)
-- `POST /api/admin/products`
+- `POST /api/admin/products`: Post new item
 - `PATCH /api/admin/products/:id`
 - `DELETE /api/admin/products/:id`
 - - soft disable products: set `isActive = false` (recommended default)
