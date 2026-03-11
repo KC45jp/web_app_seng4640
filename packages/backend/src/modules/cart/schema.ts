@@ -7,7 +7,7 @@ export const addCartItemSchema = z.object({
 }) satisfies z.ZodType<AddCartItemInput>;
 
 export const updateCartItemSchema = z.object({
-  quantity: z.number().int().positive(),
+  quantity: z.number().int().nonnegative(),
 }) satisfies z.ZodType<UpdateCartItemInput>;
 
 export type { AddCartItemInput, UpdateCartItemInput };

@@ -77,9 +77,6 @@ export async function addItemToCart(
   const existingIndex = cart.items.findIndex(
     (item) => item.productId.toString() === _input.productId
   )
-
-
-
   if (existingIndex >=0){
     cart.items[existingIndex].quantity += _input.quantity;
   }
@@ -109,13 +106,26 @@ export async function addItemToCart(
 }
 
 
-async function removeItem(userId: string, productId: string): Promise<CartDoc|null> {
+async function removeItem(userId: string, productId: string): Promise<CartDoc> {
   const cart = await findCart(userId);
-  if (!cart) return null;
+  if (!cart) throw new NotFoundError("Cart Not Found");
 
-  
-  // items を消す処理
-  return updatedCart;
+  const existingIndex = cart.items.findIndex(
+    (item) => item.productId.toString() === productId
+  )
+
+  if (existingIndex < 0) return cart;//idempotent respond for in case of non existed
+
+  cart.items.splice(existingIndex, 1)
+
+  const finalcart = await cartModel.findOneAndUpdate(
+    {userId, __v: cart.__v},
+    {$set: { items: cart.items}, $inc: {__v: 1}},
+    {new: true}
+  )
+
+  if(!finalcart) throw new ConflictError("Cart was updated by another request");
+  return finalcart;
 }
 
 
@@ -125,15 +135,49 @@ export async function updateCartItemQuantity(
   _productId: string,
   _input: UpdateCartItemInput
 ): Promise<UpdateCartItemResult> {
-  // TODO: implement update cart item.
+  if (!Types.ObjectId.isValid(_productId)) throw new BadRequestError("invalid product id");
 
+  if (_input.quantity < 0) throw new BadRequestError("cart item quantity must be >0 (should not happen)");//should not happen because zod protect this to happen but just in case...
 
+  if (_input.quantity <= 0){
+    const updatedCart = await removeItem(_userId, _productId);
+    return serializeCart(updatedCart)
+  }
 
+  const cart = await findCart(_userId);
+  if (!cart) throw new NotFoundError("Cart Not Found");
+
+  const existingIndex = cart.items.findIndex(
+    (item) => item.productId.toString() === _productId
+  )
+
+  if (existingIndex < 0) throw new NotFoundError("Item Not Found");
+  
+  cart.items[existingIndex].quantity = _input.quantity;
+  const finalCart = await cartModel.findOneAndUpdate(
+    {
+      userId: _userId,
+      __v : cart.__v,
+    },
+    { 
+      $set: { items: cart.items } ,
+      $inc: { __v: 1 }//for the optimistic lock
+    },
+    {new: true}
+  ).lean<CartDoc|null>();
+
+  if (!finalCart) throw new ConflictError("Cart was updated by another request");
+
+  return serializeCart(finalCart)
 }
 
 export async function removeItemFromCart(
   _userId: string,
   _productId: string
 ): Promise<RemoveCartItemResult> {
-  // TODO: implement remove cart item.
+  if (!Types.ObjectId.isValid(_productId)) throw new BadRequestError("invalid product id");
+
+  const updatedCart = await removeItem(_userId, _productId);
+  
+  return serializeCart(updatedCart)
 }
