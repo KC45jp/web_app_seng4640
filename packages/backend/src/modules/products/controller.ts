@@ -5,8 +5,8 @@ import {
   listProducts as listProductsService,
   getProductById as getProductByIdService,
 } from "./service";
-import { AppError } from "@/utils/errors";
 import { getRequestLogger } from "@/utils/requestLogger";
+import { handleControllerError } from "@/utils/controllerError";
 
 export async function listProducts(req: Request, res: Response): Promise<void> {
   const requestLogger = getRequestLogger(req);
@@ -34,24 +34,14 @@ export async function listProducts(req: Request, res: Response): Promise<void> {
     const data = await listProductsService(query, productServiceLogger);
     res.status(200).json(data);
   } catch (error) {
-    if (error instanceof AppError) {
-      productControllerLogger.warn(
-        {
-          route: "GET /api/products",
-          status: error.status,
-          error: error.message,
-        },
-        "List products request failed"
-      );
-      res.status(error.status).json({ message: error.message });
-      return;
-    }
-
-    productControllerLogger.error(
-      { err: error, route: "GET /api/products" },
-      "Unexpected error while handling list products request"
-    );
-    res.status(500).json({ message: "Internal server error" });
+    handleControllerError({
+      error,
+      res,
+      logger: productControllerLogger,
+      route: "GET /api/products",
+      failureMessage: "List products request failed",
+      unexpectedMessage: "Unexpected error while handling list products request",
+    });
   }
 }
 
@@ -80,24 +70,14 @@ export async function getProductById(
     const data = await getProductByIdService(productId, productServiceLogger);
     res.status(200).json(data);
   } catch (error) {
-    if (error instanceof AppError) {
-      productControllerLogger.warn(
-        {
-          route: "GET /api/products/:id",
-          status: error.status,
-          error: error.message,
-          productId,
-        },
-        "Get product by id request failed"
-      );
-      res.status(error.status).json({ message: error.message });
-      return;
-    }
-
-    productControllerLogger.error(
-      { err: error, route: "GET /api/products/:id", productId },
-      "Unexpected error while handling get product by id request"
-    );
-    res.status(500).json({ message: "Internal server error" });
+    handleControllerError({
+      error,
+      res,
+      logger: productControllerLogger,
+      route: "GET /api/products/:id",
+      failureMessage: "Get product by id request failed",
+      unexpectedMessage: "Unexpected error while handling get product by id request",
+      context: { productId },
+    });
   }
 }

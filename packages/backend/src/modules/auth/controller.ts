@@ -4,9 +4,9 @@ import {
   login as loginCustomer,
   registerCustomer,
 } from "./service";
-import { AppError } from "../../utils/errors";
 import { validateOrRespond } from "../../utils/validation";
 import { getRequestLogger } from "@/utils/requestLogger";
+import { handleControllerError } from "@/utils/controllerError";
 
 export async function register(req: Request, res: Response): Promise<void> {
   const requestLogger = getRequestLogger(req);
@@ -33,23 +33,14 @@ export async function register(req: Request, res: Response): Promise<void> {
     const result = await registerCustomer(input, authServiceLogger);
     res.status(201).json(result);
   } catch (error) {
-    if (error instanceof AppError) {
-      authControllerLogger.warn(
-        {
-          route: "POST /api/auth/register",
-          status: error.status,
-          error: error.message,
-        },
-        "Register request failed"
-      );
-      res.status(error.status).json({ message: error.message });
-      return;
-    }
-    authControllerLogger.error(
-      { err: error, route: "POST /api/auth/register" },
-      "Unexpected error while handling register request"
-    );
-    res.status(500).json({ message: "Internal server error" });
+    handleControllerError({
+      error,
+      res,
+      logger: authControllerLogger,
+      route: "POST /api/auth/register",
+      failureMessage: "Register request failed",
+      unexpectedMessage: "Unexpected error while handling register request",
+    });
   }
 }
 
@@ -77,22 +68,13 @@ export async function login(req: Request, res: Response): Promise<void> {
     const result = await loginCustomer(input, authServiceLogger);
     res.status(200).json(result);
   } catch (error) {
-    if (error instanceof AppError) {
-      authControllerLogger.warn(
-        {
-          route: "POST /api/auth/login",
-          status: error.status,
-          error: error.message,
-        },
-        "Login request failed"
-      );
-      res.status(error.status).json({ message: error.message });
-      return;
-    }
-    authControllerLogger.error(
-      { err: error, route: "POST /api/auth/login" },
-      "Unexpected error while handling login request"
-    );
-    res.status(500).json({ message: "Internal server error" });
+    handleControllerError({
+      error,
+      res,
+      logger: authControllerLogger,
+      route: "POST /api/auth/login",
+      failureMessage: "Login request failed",
+      unexpectedMessage: "Unexpected error while handling login request",
+    });
   }
 }
