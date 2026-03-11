@@ -1,5 +1,4 @@
 import type { Request, Response } from "express";
-import { notImplemented } from "../../utils/notImplemented";
 import { addCartItemSchema, updateCartItemSchema } from "./schema";
 import { validateOrRespond } from "../../utils/validation";
 import { getRequestLogger } from "@/utils/requestLogger";
