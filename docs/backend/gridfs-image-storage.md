@@ -17,9 +17,9 @@ GridFS will be used only for uploaded product images.
 
 To keep database growth and response size under control, uploads should be constrained:
 - Resize images before storage
-- Target maximum display size: `640px` on the longest edge
+- Target maximum display size: `640px` on the longest edge - any file bigger than this will rejected
 - Enforce an upload size limit after processing
-- Limit accepted formats to common web image types such as `image/jpeg`, `image/png`, and optionally `image/webp`
+- Limit accepted formats to `image/jpeg` for simplicity
 
 This design is intended for small product images, not large media files or general-purpose file hosting.
 
