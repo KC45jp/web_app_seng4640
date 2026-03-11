@@ -126,6 +126,36 @@ Example:
 }
 ```
 
+### `carts`
+Purpose: per-customer shopping cart state.
+
+Fields:
+- `_id`: `ObjectId` (auto)
+- `userId`: `ObjectId` (`users._id`, unique)
+- `items`: array of cart items
+  - `productId`: `ObjectId` (`products._id`)
+  - `quantity`: `number`
+- `createdAt`: `Date`
+- `updatedAt`: `Date`
+- `__v`: `number` (Mongoose version key, used for document-level optimistic locking when needed)
+
+Example:
+```json
+{
+  "_id": "ObjectId(...)",
+  "userId": "ObjectId(...)",
+  "items": [
+    {
+      "productId": "ObjectId(...)",
+      "quantity": 2
+    }
+  ],
+  "createdAt": "2026-03-02T00:00:00.000Z",
+  "updatedAt": "2026-03-02T00:00:00.000Z",
+  "__v": 1
+}
+```
+
 ## Indexes
 Defined in `common.ts`:
 - `users`: `{ email: 1 }` with `{ unique: true }`
@@ -152,3 +182,4 @@ For staging:
 ## Notes
 - `.document/` is ignored by git in this repository, so persistent team docs should live under `docs/`.
 - `db/init/*.js` exists for legacy Docker init scripts, but current flow is backend script driven.
+- Cart writes are expected to use document-level optimistic locking rather than item-level locking.

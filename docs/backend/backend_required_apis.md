@@ -31,6 +31,13 @@
 - `PATCH /api/cart/items/:productId`
 - `DELETE /api/cart/items/:productId`
 
+### Cart API notes
+
+- Cart mutations should return the updated cart payload so frontend can trust server state after add/update/remove.
+- Cart storage uses MongoDB via Mongoose with one cart document per customer.
+- Cart mutations may use document-level optimistic locking.
+- If a cart mutation loses a concurrency check, return `409 Conflict`.
+
 ## 4) Checkout / Order (Customer only)
 
 - `POST /api/checkout`
