@@ -1,5 +1,4 @@
 import type { Request, Response } from "express";
-import type { Logger } from "pino";
 import { loginSchema, registerSchema } from "./schema";
 import {
   login as loginCustomer,
@@ -7,18 +6,7 @@ import {
 } from "./service";
 import { AppError } from "../../utils/errors";
 import { validateOrRespond } from "../../utils/validation";
-import { logger } from "@/utils/logger";
-
-function getRequestLogger(req: Request): Logger {
-  return (
-    req.log ??
-    logger.child({
-      requestId: req.requestId,
-      method: req.method,
-      path: req.originalUrl,
-    })
-  );
-}
+import { getRequestLogger } from "@/utils/requestLogger";
 
 export async function register(req: Request, res: Response): Promise<void> {
   const requestLogger = getRequestLogger(req);

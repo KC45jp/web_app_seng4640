@@ -1,4 +1,5 @@
 import { isValidObjectId } from "mongoose";
+import type { Logger } from "pino";
 import type { InferSchemaType, QueryFilter, Require_id, SortOrder } from "mongoose";
 import {
   listProductsResultSchema,
@@ -13,7 +14,6 @@ import type {
 import { productModel, productSchema } from "@/db/models/product.models";
 import { type Product } from "@seng4640/shared";
 import { BadRequestError, NotFoundError } from "@/utils/errors";
-import { logger } from "@/utils/logger";
 
 
 /////////////// listProducts and its helpers //////////////////////////
@@ -90,7 +90,11 @@ function serializeProduct(doc: ProductDoc): Product {
   };
 }
 
-export async function listProducts(_query: ListProductsQuery): Promise<ListProductsResult> {
+export async function listProducts(
+  _query: ListProductsQuery,
+  requestLogger: Logger
+): Promise<ListProductsResult> {
+  requestLogger.debug({ query: _query }, "List products started");
 
   const page = _query.page ?? 1;
   const limit = _query.limit ?? 50;
@@ -101,6 +105,11 @@ export async function listProducts(_query: ListProductsQuery): Promise<ListProdu
   const items = await productModel.find(filter).sort(sort).skip(skip).limit(limit).lean<ProductDoc[]>();
 
   const total = await productModel.countDocuments(filter)
+
+  requestLogger.debug(
+    { page, limit, total, returnedItems: items.length },
+    "List products completed"
+  );
 
   return listProductsResultSchema.parse({
     items: items.map(serializeProduct),
@@ -162,17 +171,23 @@ function serializeProductDetail(doc: ProductDoc): ProductDetail {
 
 
 
-export async function getProductById(_productId: string): Promise<GetProductByIdResult> {
+export async function getProductById(
+  _productId: string,
+  requestLogger: Logger
+): Promise<GetProductByIdResult> {
+  requestLogger.debug({ productId: _productId }, "Get product by id started");
   if (!isValidObjectId(_productId)) {
-    logger.warn({ productId: _productId }, "Invalid product id");
+    requestLogger.warn({ productId: _productId }, "Invalid product id");
     throw new BadRequestError("Invalid product id");
   }
 
   const product = await findActiveProductById(_productId);
   if (!product) {
-    logger.info({ productId: _productId }, "Product not found");
+    requestLogger.info({ productId: _productId }, "Product not found");
     throw new NotFoundError("Product not found");
   }
+
+  requestLogger.debug({ productId: _productId }, "Get product by id completed");
 
   return getProductByIdResultSchema.parse({
     product: serializeProductDetail(product),
