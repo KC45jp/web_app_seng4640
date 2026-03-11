@@ -82,7 +82,15 @@
   - Super Admin handles manager-account lifecycle.
 - If needed, allow only emergency product actions for Super Admin (for example forced deactivation or ownership transfer), not regular product editing.
 
-## 7) Authorization Rules Notes
+## 7) Image APIs
+
+- `POST /api/images` (Manager only — upload product image)
+  - Stores image in GridFS (see `docs/backend/gridfs-image-storage.md`)
+  - Returns `UploadImageResult` (`imageId`, `url`)
+- `GET /api/images/:id` (No auth — public image retrieval)
+  - Streams image binary from GridFS with correct `Content-Type`
+
+## 8) Authorization Rules Notes
 
 - Auth should use JWT (`Authorization: Bearer <token>`), not API key.
 - Customer can manage profile/cart and complete purchase.
