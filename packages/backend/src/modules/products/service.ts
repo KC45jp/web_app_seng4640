@@ -32,6 +32,22 @@ function escapeRegex(value: string): string {
   return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
+/**
+ * Builds the MongoDB filter used by `listProducts`.
+ *
+ * Returned filter shape:
+ * - always includes `{ isActive: true }`
+ * - optionally adds `category`
+ * - optionally adds `price` with `$gte`/`$lte`
+ * - optionally adds `$and`, where each element is a case-insensitive regex
+ *   condition on `name`; when `$and` is present, every search word must match
+ *
+ * Example output:
+ * `{ isActive: true, category: "book", $and: [{ name: { $regex: "foo", $options: "i" } }, { name: { $regex: "bar", $options: "i" } }] }`
+ *
+ * @param query Product list query params from the request.
+ * @returns A MongoDB query filter for active products matching the requested search conditions.
+ */
 const buildProductListFilter = (query: ListProductsQuery):QueryFilter<ProductDoc>  => {
 
   const filter: Record<string, unknown> = {

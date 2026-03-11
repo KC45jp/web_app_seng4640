@@ -172,6 +172,15 @@ export type GetOrderByIdResult = {
   order: Order;
 };
 
+// Images / Uploads API
+export type UploadImageResult = {
+  fileId: string;
+  url: string;
+  contentType: string;
+  width: number;
+  height: number;
+};
+
 // Admin API
 export type AdminCreateProductInput = {
   name: string;
