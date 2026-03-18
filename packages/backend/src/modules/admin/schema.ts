@@ -7,12 +7,12 @@ import type {
 } from "@seng4640/shared";
 
 export const adminCreateProductSchema = z.object({
-  name: z.string().min(1),
-  description: z.string().min(1),
+  name: z.string().trim().min(1),
+  description: z.string().trim().min(1),
   price: z.number().nonnegative(),
   stock: z.number().int().nonnegative(),
-  imageUrl: z.string().min(1),
-  category: z.string().min(1),
+  imageUrl: z.string().trim().min(1),
+  category: z.string().trim().min(1),
   isFlashSale: z.boolean().optional(),
 }) satisfies z.ZodType<AdminCreateProductInput>;
 
@@ -27,7 +27,7 @@ export const adminUpdateFlashSaleSchema = z.object({
 }) satisfies z.ZodType<AdminUpdateFlashSaleInput>;
 
 export const adminCreateManagerSchema = z.object({
-  name: z.string().min(1),
-  email: z.string().email(),
+  name: z.string().trim().min(1),
+  email: z.string().trim().email(),
   password: z.string().min(8),
 }) satisfies z.ZodType<AdminCreateManagerInput>;

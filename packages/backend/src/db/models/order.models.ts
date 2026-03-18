@@ -1,5 +1,5 @@
 import mongoose, { type Types } from "mongoose";
-import type { OrderStatus } from "@seng4640/shared";
+import type { OrderStatus, PaymentMethod } from "@seng4640/shared";
 
 const DB_ORDER_STATUSES = [
   "placed",
@@ -40,6 +40,11 @@ export const orderSchema = new mongoose.Schema(
       },
     },
     totalAmount: { type: Number, required: true, min: 0 },
+    paymentMethod: {
+      type: String,
+      required: true,
+      enum: ["credit_card", "paypal"] satisfies readonly PaymentMethod[],
+    },
     status: {
       type: String,
       required: true,
@@ -67,5 +72,6 @@ export type CreateOrderInput = {
     quantity: number;
   }>;
   totalAmount: number;
+  paymentMethod: PaymentMethod;
   status?: OrderStatus;
 };

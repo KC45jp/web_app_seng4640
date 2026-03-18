@@ -15,6 +15,12 @@ import {
 const adminRouter = Router();
 
 adminRouter.get(
+  "/products/mine",
+  requireAuth,
+  requireRole(["manager"]),
+  listManagedProducts
+);
+adminRouter.get(
   "/products",
   requireAuth,
   requireRole(["manager"]),

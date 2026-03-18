@@ -143,6 +143,11 @@ export type CheckoutInput = {
 
 export type OrderStatus = "placed" | "paid" | "shipped" | "completed" | "cancelled";
 
+export type OrderTimelineEntry = {
+  status: OrderStatus | string;
+  timestamp: string;
+};
+
 export type OrderItem = {
   productId: string;
   name: string;
@@ -156,6 +161,8 @@ export type Order = {
   items: OrderItem[];
   totalAmount: number;
   status: OrderStatus | string;
+  paymentMethod?: PaymentMethod;
+  timeline?: OrderTimelineEntry[];
   createdAt?: string;
   updatedAt?: string;
 };
@@ -175,6 +182,7 @@ export type GetOrderByIdResult = {
 // Images / Uploads API
 export type UploadImageResult = {
   fileId: string;
+  imageId?: string;
   url: string;
   contentType: string;
   width: number;
@@ -220,6 +228,18 @@ export type AdminListManagersResult = {
 
 export type AdminListManagedProductsResult = {
   items: Product[];
+};
+
+export type AdminProductResult = {
+  product: ProductDetail;
+};
+
+export type AdminCreateManagerResult = {
+  manager: AdminManagerSummary;
+};
+
+export type AdminDeleteManagerResult = {
+  managerId: string;
 };
 
 // Generic user shape (for repository/internal mapping when needed)

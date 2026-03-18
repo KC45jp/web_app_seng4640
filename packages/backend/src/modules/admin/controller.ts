@@ -1,5 +1,15 @@
 import type { Request, Response } from "express";
-import { notImplemented } from "../../utils/notImplemented";
+
+import {
+  createManager as createManagerService,
+  createProduct as createProductService,
+  deleteManager as deleteManagerService,
+  deleteProduct as deleteProductService,
+  listManagedProducts as listManagedProductsService,
+  listManagers as listManagersService,
+  updateFlashSale as updateFlashSaleService,
+  updateProduct as updateProductService,
+} from "./service";
 import {
   adminCreateManagerSchema,
   adminCreateProductSchema,
@@ -8,6 +18,17 @@ import {
 } from "./schema";
 import { validateOrRespond } from "../../utils/validation";
 import { getRequestLogger } from "@/utils/requestLogger";
+import { handleControllerError } from "@/utils/controllerError";
+
+function getSingleParam(value: string | string[] | undefined): string | undefined {
+  return Array.isArray(value) ? value[0] : value;
+}
+
+function getManagedProductsRoute(req: Request): string {
+  return req.path.endsWith("/mine")
+    ? "GET /api/admin/products/mine"
+    : "GET /api/admin/products";
+}
 
 export async function listManagedProducts(
   req: Request,
@@ -15,9 +36,45 @@ export async function listManagedProducts(
 ): Promise<void> {
   const requestLogger = getRequestLogger(req);
   const adminControllerLogger = requestLogger.child({ module: "admin-controller" });
+  const route = getManagedProductsRoute(req);
+
+  if (!req.user) {
+    adminControllerLogger.warn({ route }, "Unauthorized admin request");
+    res.status(401).json({ message: "Unauthorized" });
+    return;
+  }
+
+  adminControllerLogger.debug(
+    { route, userId: req.user.id },
+    "List managed products request received"
+  );
+
+  try {
+    const result = await listManagedProductsService(
+      req.user.id,
+      requestLogger.child({ module: "admin-service" })
+    );
+    res.status(200).json(result);
+  } catch (error) {
+    handleControllerError({
+      error,
+      res,
+      logger: adminControllerLogger,
+      route,
+      failureMessage: "List managed products request failed",
+      unexpectedMessage: "Unexpected error while handling list managed products request",
+      context: { userId: req.user.id },
+    });
+  }
+}
+
+export async function createProduct(req: Request, res: Response): Promise<void> {
+  const requestLogger = getRequestLogger(req);
+  const adminControllerLogger = requestLogger.child({ module: "admin-controller" });
+
   if (!req.user) {
     adminControllerLogger.warn(
-      { route: "GET /api/admin/products" },
+      { route: "POST /api/admin/products" },
       "Unauthorized admin request"
     );
     res.status(401).json({ message: "Unauthorized" });
@@ -25,100 +82,163 @@ export async function listManagedProducts(
   }
 
   adminControllerLogger.debug(
-    { route: "GET /api/admin/products", userId: req.user.id },
-    "List managed products request received"
-  );
-  notImplemented(res, "GET /api/admin/products");
-}
-
-export async function createProduct(req: Request, res: Response): Promise<void> {
-  const requestLogger = getRequestLogger(req);
-  const adminControllerLogger = requestLogger.child({ module: "admin-controller" });
-  adminControllerLogger.debug(
-    { route: "POST /api/admin/products", userId: req.user?.id },
+    { route: "POST /api/admin/products", userId: req.user.id },
     "Create product request received"
   );
-  if (
-    validateOrRespond(
-      adminCreateProductSchema,
-      req.body,
-      res,
-      "POST /api/admin/products"
-    ) === null
-  ) {
+
+  const input = validateOrRespond(
+    adminCreateProductSchema,
+    req.body,
+    res,
+    "POST /api/admin/products"
+  );
+  if (input === null) {
     adminControllerLogger.debug(
-      { route: "POST /api/admin/products", userId: req.user?.id },
+      { route: "POST /api/admin/products", userId: req.user.id },
       "Create product request rejected due to invalid input"
     );
     return;
   }
 
-  notImplemented(res, "POST /api/admin/products");
+  try {
+    const result = await createProductService(
+      req.user.id,
+      input,
+      requestLogger.child({ module: "admin-service" })
+    );
+    res.status(201).json(result);
+  } catch (error) {
+    handleControllerError({
+      error,
+      res,
+      logger: adminControllerLogger,
+      route: "POST /api/admin/products",
+      failureMessage: "Create product request failed",
+      unexpectedMessage: "Unexpected error while handling create product request",
+      context: { userId: req.user.id },
+    });
+  }
 }
 
 export async function updateProduct(req: Request, res: Response): Promise<void> {
   const requestLogger = getRequestLogger(req);
   const adminControllerLogger = requestLogger.child({ module: "admin-controller" });
+  const productId = getSingleParam(req.params.id);
+
+  if (!req.user) {
+    adminControllerLogger.warn(
+      { route: "PATCH /api/admin/products/:id" },
+      "Unauthorized admin request"
+    );
+    res.status(401).json({ message: "Unauthorized" });
+    return;
+  }
+
   adminControllerLogger.debug(
     {
       route: "PATCH /api/admin/products/:id",
-      userId: req.user?.id,
-      productId: req.params.id,
+      userId: req.user.id,
+      productId,
     },
     "Update product request received"
   );
-  if (!req.params.id) {
+  if (!productId) {
     adminControllerLogger.warn(
-      { route: "PATCH /api/admin/products/:id", userId: req.user?.id },
+      { route: "PATCH /api/admin/products/:id", userId: req.user.id },
       "Update product request failed because product id was missing"
     );
     res.status(400).json({ message: "Product id is required" });
     return;
   }
 
-  if (
-    validateOrRespond(
-      adminUpdateProductSchema,
-      req.body,
-      res,
-      "PATCH /api/admin/products/:id"
-    ) === null
-  ) {
+  const input = validateOrRespond(
+    adminUpdateProductSchema,
+    req.body,
+    res,
+    "PATCH /api/admin/products/:id"
+  );
+  if (input === null) {
     adminControllerLogger.debug(
       {
         route: "PATCH /api/admin/products/:id",
-        userId: req.user?.id,
-        productId: req.params.id,
+        userId: req.user.id,
+        productId,
       },
       "Update product request rejected due to invalid input"
     );
     return;
   }
 
-  notImplemented(res, "PATCH /api/admin/products/:id");
+  try {
+    const result = await updateProductService(
+      req.user.id,
+      productId,
+      input,
+      requestLogger.child({ module: "admin-service" })
+    );
+    res.status(200).json(result);
+  } catch (error) {
+    handleControllerError({
+      error,
+      res,
+      logger: adminControllerLogger,
+      route: "PATCH /api/admin/products/:id",
+      failureMessage: "Update product request failed",
+      unexpectedMessage: "Unexpected error while handling update product request",
+      context: { userId: req.user.id, productId },
+    });
+  }
 }
 
 export async function deleteProduct(req: Request, res: Response): Promise<void> {
   const requestLogger = getRequestLogger(req);
   const adminControllerLogger = requestLogger.child({ module: "admin-controller" });
+  const productId = getSingleParam(req.params.id);
+
+  if (!req.user) {
+    adminControllerLogger.warn(
+      { route: "DELETE /api/admin/products/:id" },
+      "Unauthorized admin request"
+    );
+    res.status(401).json({ message: "Unauthorized" });
+    return;
+  }
+
   adminControllerLogger.debug(
     {
       route: "DELETE /api/admin/products/:id",
-      userId: req.user?.id,
-      productId: req.params.id,
+      userId: req.user.id,
+      productId,
     },
     "Delete product request received"
   );
-  if (!req.params.id) {
+  if (!productId) {
     adminControllerLogger.warn(
-      { route: "DELETE /api/admin/products/:id", userId: req.user?.id },
+      { route: "DELETE /api/admin/products/:id", userId: req.user.id },
       "Delete product request failed because product id was missing"
     );
     res.status(400).json({ message: "Product id is required" });
     return;
   }
 
-  notImplemented(res, "DELETE /api/admin/products/:id");
+  try {
+    const result = await deleteProductService(
+      req.user.id,
+      productId,
+      requestLogger.child({ module: "admin-service" })
+    );
+    res.status(200).json(result);
+  } catch (error) {
+    handleControllerError({
+      error,
+      res,
+      logger: adminControllerLogger,
+      route: "DELETE /api/admin/products/:id",
+      failureMessage: "Delete product request failed",
+      unexpectedMessage: "Unexpected error while handling delete product request",
+      context: { userId: req.user.id, productId },
+    });
+  }
 }
 
 export async function updateFlashSale(
@@ -127,99 +247,209 @@ export async function updateFlashSale(
 ): Promise<void> {
   const requestLogger = getRequestLogger(req);
   const adminControllerLogger = requestLogger.child({ module: "admin-controller" });
+  const productId = getSingleParam(req.params.id);
+
+  if (!req.user) {
+    adminControllerLogger.warn(
+      { route: "PATCH /api/admin/products/:id/flash-sale" },
+      "Unauthorized admin request"
+    );
+    res.status(401).json({ message: "Unauthorized" });
+    return;
+  }
+
   adminControllerLogger.debug(
     {
       route: "PATCH /api/admin/products/:id/flash-sale",
-      userId: req.user?.id,
-      productId: req.params.id,
+      userId: req.user.id,
+      productId,
     },
     "Update flash sale request received"
   );
-  if (!req.params.id) {
+  if (!productId) {
     adminControllerLogger.warn(
-      { route: "PATCH /api/admin/products/:id/flash-sale", userId: req.user?.id },
+      {
+        route: "PATCH /api/admin/products/:id/flash-sale",
+        userId: req.user.id,
+      },
       "Update flash sale request failed because product id was missing"
     );
     res.status(400).json({ message: "Product id is required" });
     return;
   }
 
-  if (
-    validateOrRespond(
-      adminUpdateFlashSaleSchema,
-      req.body,
-      res,
-      "PATCH /api/admin/products/:id/flash-sale"
-    ) === null
-  ) {
+  const input = validateOrRespond(
+    adminUpdateFlashSaleSchema,
+    req.body,
+    res,
+    "PATCH /api/admin/products/:id/flash-sale"
+  );
+  if (input === null) {
     adminControllerLogger.debug(
       {
         route: "PATCH /api/admin/products/:id/flash-sale",
-        userId: req.user?.id,
-        productId: req.params.id,
+        userId: req.user.id,
+        productId,
       },
       "Update flash sale request rejected due to invalid input"
     );
     return;
   }
 
-  notImplemented(res, "PATCH /api/admin/products/:id/flash-sale");
+  try {
+    const result = await updateFlashSaleService(
+      req.user.id,
+      productId,
+      input,
+      requestLogger.child({ module: "admin-service" })
+    );
+    res.status(200).json(result);
+  } catch (error) {
+    handleControllerError({
+      error,
+      res,
+      logger: adminControllerLogger,
+      route: "PATCH /api/admin/products/:id/flash-sale",
+      failureMessage: "Update flash sale request failed",
+      unexpectedMessage: "Unexpected error while handling update flash sale request",
+      context: { userId: req.user.id, productId },
+    });
+  }
 }
 
 export async function createManager(req: Request, res: Response): Promise<void> {
   const requestLogger = getRequestLogger(req);
   const adminControllerLogger = requestLogger.child({ module: "admin-controller" });
+
+  if (!req.user) {
+    adminControllerLogger.warn(
+      { route: "POST /api/admin/managers" },
+      "Unauthorized admin request"
+    );
+    res.status(401).json({ message: "Unauthorized" });
+    return;
+  }
+
   adminControllerLogger.debug(
-    { route: "POST /api/admin/managers", userId: req.user?.id },
+    { route: "POST /api/admin/managers", userId: req.user.id },
     "Create manager request received"
   );
-  if (
-    validateOrRespond(
-      adminCreateManagerSchema,
-      req.body,
-      res,
-      "POST /api/admin/managers"
-    ) === null
-  ) {
+
+  const input = validateOrRespond(
+    adminCreateManagerSchema,
+    req.body,
+    res,
+    "POST /api/admin/managers"
+  );
+  if (input === null) {
     adminControllerLogger.debug(
-      { route: "POST /api/admin/managers", userId: req.user?.id },
+      { route: "POST /api/admin/managers", userId: req.user.id },
       "Create manager request rejected due to invalid input"
     );
     return;
   }
 
-  notImplemented(res, "POST /api/admin/managers");
+  try {
+    const result = await createManagerService(
+      input,
+      requestLogger.child({ module: "admin-service" })
+    );
+    res.status(201).json(result);
+  } catch (error) {
+    handleControllerError({
+      error,
+      res,
+      logger: adminControllerLogger,
+      route: "POST /api/admin/managers",
+      failureMessage: "Create manager request failed",
+      unexpectedMessage: "Unexpected error while handling create manager request",
+      context: { userId: req.user.id },
+    });
+  }
 }
 
 export async function deleteManager(req: Request, res: Response): Promise<void> {
   const requestLogger = getRequestLogger(req);
   const adminControllerLogger = requestLogger.child({ module: "admin-controller" });
+  const managerId = getSingleParam(req.params.id);
+
+  if (!req.user) {
+    adminControllerLogger.warn(
+      { route: "DELETE /api/admin/managers/:id" },
+      "Unauthorized admin request"
+    );
+    res.status(401).json({ message: "Unauthorized" });
+    return;
+  }
+
   adminControllerLogger.debug(
     {
       route: "DELETE /api/admin/managers/:id",
-      userId: req.user?.id,
-      managerId: req.params.id,
+      userId: req.user.id,
+      managerId,
     },
     "Delete manager request received"
   );
-  if (!req.params.id) {
+  if (!managerId) {
     adminControllerLogger.warn(
-      { route: "DELETE /api/admin/managers/:id", userId: req.user?.id },
+      { route: "DELETE /api/admin/managers/:id", userId: req.user.id },
       "Delete manager request failed because manager id was missing"
     );
     res.status(400).json({ message: "Manager id is required" });
     return;
   }
 
-  notImplemented(res, "DELETE /api/admin/managers/:id");
+  try {
+    const result = await deleteManagerService(
+      managerId,
+      requestLogger.child({ module: "admin-service" })
+    );
+    res.status(200).json(result);
+  } catch (error) {
+    handleControllerError({
+      error,
+      res,
+      logger: adminControllerLogger,
+      route: "DELETE /api/admin/managers/:id",
+      failureMessage: "Delete manager request failed",
+      unexpectedMessage: "Unexpected error while handling delete manager request",
+      context: { userId: req.user.id, managerId },
+    });
+  }
 }
 
 export async function listManagers(req: Request, res: Response): Promise<void> {
   const requestLogger = getRequestLogger(req);
   const adminControllerLogger = requestLogger.child({ module: "admin-controller" });
+
+  if (!req.user) {
+    adminControllerLogger.warn(
+      { route: "GET /api/admin/managers" },
+      "Unauthorized admin request"
+    );
+    res.status(401).json({ message: "Unauthorized" });
+    return;
+  }
+
   adminControllerLogger.debug(
-    { route: "GET /api/admin/managers", userId: req.user?.id },
+    { route: "GET /api/admin/managers", userId: req.user.id },
     "List managers request received"
   );
-  notImplemented(res, "GET /api/admin/managers");
+
+  try {
+    const result = await listManagersService(
+      requestLogger.child({ module: "admin-service" })
+    );
+    res.status(200).json(result);
+  } catch (error) {
+    handleControllerError({
+      error,
+      res,
+      logger: adminControllerLogger,
+      route: "GET /api/admin/managers",
+      failureMessage: "List managers request failed",
+      unexpectedMessage: "Unexpected error while handling list managers request",
+      context: { userId: req.user.id },
+    });
+  }
 }

@@ -1,8 +1,9 @@
 import type { Request, Response } from "express";
-import { notImplemented } from "../../utils/notImplemented";
 import { checkoutSchema } from "./schema";
 import { validateOrRespond } from "../../utils/validation";
 import { getRequestLogger } from "@/utils/requestLogger";
+import { handleControllerError } from "@/utils/controllerError";
+import { checkout as checkoutService } from "./service";
 
 export async function checkout(req: Request, res: Response): Promise<void> {
   const requestLogger = getRequestLogger(req);
@@ -20,7 +21,8 @@ export async function checkout(req: Request, res: Response): Promise<void> {
     { route: "POST /api/checkout", userId: req.user.id },
     "Checkout request received"
   );
-  if (validateOrRespond(checkoutSchema, req.body, res, "POST /api/checkout") === null) {
+  const input = validateOrRespond(checkoutSchema, req.body, res, "POST /api/checkout");
+  if (input === null) {
     checkoutControllerLogger.debug(
       { route: "POST /api/checkout", userId: req.user.id },
       "Checkout request rejected due to invalid input"
@@ -28,5 +30,22 @@ export async function checkout(req: Request, res: Response): Promise<void> {
     return;
   }
 
-  notImplemented(res, "POST /api/checkout");
+  try {
+    const result = await checkoutService(
+      req.user.id,
+      input,
+      requestLogger.child({ module: "checkout-service" })
+    );
+    res.status(200).json(result);
+  } catch (error) {
+    handleControllerError({
+      error,
+      res,
+      logger: checkoutControllerLogger,
+      route: "POST /api/checkout",
+      failureMessage: "Checkout request failed",
+      unexpectedMessage: "Unexpected error while handling checkout request",
+      context: { userId: req.user.id, paymentMethod: input.paymentMethod },
+    });
+  }
 }
