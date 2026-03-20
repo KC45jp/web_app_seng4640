@@ -15,7 +15,8 @@ import {
 const GRIDFS_BUCKET_NAME = "product-images";
 const MAX_IMAGE_DIMENSION_PX = 640;
 const MAX_PROCESSED_IMAGE_BYTES = 512 * 1024;
-const SUPPORTED_CONTENT_TYPE = "image/jpeg";
+const OUTPUT_CONTENT_TYPES = new Set(["image/jpeg", "image/png"]);
+const OUTPUT_CONTENT_TYPE = "image/jpeg";
 
 type UploadImageInput = {
   buffer: Buffer;
@@ -113,12 +114,12 @@ export async function uploadImage(
     "Upload image service started"
   );
 
-  if (input.contentType !== SUPPORTED_CONTENT_TYPE) {
+  if (!OUTPUT_CONTENT_TYPES.has(input.contentType)) {
     requestLogger.warn(
       { contentType: input.contentType },
       "Upload image failed because content type was unsupported"
     );
-    throw new BadRequestError("Only JPEG images are supported");
+    throw new BadRequestError("Only JPEG and PNG images are supported");
   }
 
   if (input.buffer.length === 0) {
@@ -130,7 +131,7 @@ export async function uploadImage(
   const bucket = getImagesBucket();
   const uploadStream = bucket.openUploadStream(buildUploadFilename(input.originalName), {
     metadata: {
-      contentType: SUPPORTED_CONTENT_TYPE,
+      contentType: OUTPUT_CONTENT_TYPE,
       uploaderId: input.uploaderId,
       width: processedImage.width,
       height: processedImage.height,
@@ -162,7 +163,7 @@ export async function uploadImage(
     fileId,
     imageId: fileId,
     url: `/api/images/${fileId}`,
-    contentType: SUPPORTED_CONTENT_TYPE,
+    contentType: OUTPUT_CONTENT_TYPE,
     width: processedImage.width,
     height: processedImage.height,
   };

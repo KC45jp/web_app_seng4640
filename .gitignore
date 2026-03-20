@@ -31,3 +31,6 @@ Thumbs.db
 
 # unnesessary document
 /.document/*
+
+
+/db/.images/*
