@@ -1,14 +1,33 @@
 services:
   mongodb:
-      image: mongo:latest
-      container_name: mongodb_seng4640
-      ports:
-        - "27017:27017"
-      volumes:
-        - ./db/data:/data/db
-      environment:
-        - MONGO_INITDB_DATABASE=seng4640
-      restart: always
+    image: mongo:latest
+    container_name: mongodb_seng4640
+    command: ["mongod", "--replSet", "rs0", "--bind_ip_all"]
+    ports:
+      - "27017:27017"
+    volumes:
+      - ./db/data:/data/db
+    environment:
+      - MONGO_INITDB_DATABASE=seng4640
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+    restart: always
+
+  mongo-init-replica:
+    image: mongo:latest
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    entrypoint:
+      - bash
+      - -lc
+      - >
+        mongosh --host mongodb:27017 --quiet --eval
+        "try { rs.status(); } catch (error) { rs.initiate({ _id: 'rs0', members: [{ _id: 0, host: 'mongodb:27017' }] }); }"
+    restart: "no"
 
   mongo-express:
     image: mongo-express
@@ -18,6 +37,6 @@ services:
       - "8081:8081"
     environment:
       - ME_CONFIG_MONGODB_SERVER=mongodb
-      - ME_CONFIG_MONGODB_URL=mongodb://mongodb:27017/
+      - ME_CONFIG_MONGODB_URL=mongodb://mongodb:27017/?replicaSet=rs0&directConnection=true
     depends_on:
       - mongodb

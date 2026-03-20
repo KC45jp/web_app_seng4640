@@ -1,10 +1,10 @@
-import { Types, isValidObjectId, type InferSchemaType, type Require_id } from "mongoose";
+import mongoose, { Types, isValidObjectId, type InferSchemaType, type Require_id } from "mongoose";
 import type { CheckoutInput } from "./schema";
 import type { Logger } from "pino";
 import type { CheckoutResult, Order, OrderTimelineEntry } from "@seng4640/shared";
 
 import { cartModel, cartSchema } from "@/db/models/cart.models";
-import { orderModel, orderSchema } from "@/db/models/order.models";
+import { orderModel, orderSchema, type CreateOrderInput } from "@/db/models/order.models";
 import { productModel, productSchema } from "@/db/models/product.models";
 import {
   BadRequestError,
@@ -59,28 +59,6 @@ function resolveUnitPrice(product: ProductDoc, now: Date): number {
   return flashSaleIsActive ? flashSalePrice : product.price;
 }
 
-async function rollbackStock(
-  restoredItems: Array<{ productId: Types.ObjectId; quantity: number }>,
-  requestLogger: Logger
-): Promise<void> {
-  if (restoredItems.length === 0) {
-    return;
-  }
-
-  const operations = restoredItems.map((item) => ({
-    updateOne: {
-      filter: { _id: item.productId },
-      update: { $inc: { stock: item.quantity } },
-    },
-  }));
-
-  await productModel.bulkWrite(operations, { ordered: false });
-  requestLogger.warn(
-    { restoredItemCount: restoredItems.length },
-    "Checkout rollback restored product stock"
-  );
-}
-
 export async function checkout(
   _userId: string,
   _input: CheckoutInput,
@@ -95,147 +73,141 @@ export async function checkout(
     throw new BadRequestError("Invalid user id");
   }
 
-  const cart = await cartModel.findOne({ userId: _userId }).lean<CartDoc | null>();
-  if (!cart || cart.items.length === 0) {
-    requestLogger.info({ userId: _userId }, "Checkout failed because cart was empty");
-    throw new BadRequestError("Cart is empty");
-  }
-
-  const now = new Date();
-  const decrementedProducts: Array<{ productId: Types.ObjectId; quantity: number }> = [];
-  let createdOrder: OrderDoc | null = null;
+  const session = await mongoose.connection.startSession();
 
   try {
-    const orderItems = [];
-    let totalAmount = 0;
-
-    for (const cartItem of cart.items) {
-      const productId = cartItem.productId.toString();
-      if (!Types.ObjectId.isValid(productId)) {
-        requestLogger.warn({ userId: _userId, productId }, "Cart contains invalid product id");
-        throw new BadRequestError("Cart contains invalid product id");
+    const checkoutResult = await session.withTransaction(async (): Promise<CheckoutResult> => {
+      const cart = await cartModel
+        .findOne({ userId: _userId })
+        .session(session)
+        .lean<CartDoc | null>();
+      if (!cart || cart.items.length === 0) {
+        requestLogger.info({ userId: _userId }, "Checkout failed because cart was empty");
+        throw new BadRequestError("Cart is empty");
       }
 
-      const product = await productModel
-        .findOneAndUpdate(
-          {
-            _id: cartItem.productId,
-            isActive: true,
-            stock: { $gte: cartItem.quantity },
-          },
-          {
-            $inc: { stock: -cartItem.quantity },
-          },
-          {
-            new: true,
-          }
-        )
-        .lean<ProductDoc | null>();
+      const now = new Date();
+      const orderItems: CreateOrderInput["items"] = [];
+      let totalAmount = 0;
 
-      if (!product) {
-        const existingProduct = await productModel
-          .findById(cartItem.productId)
-          .select("_id isActive stock")
-          .lean<{ _id: Types.ObjectId; isActive: boolean; stock: number } | null>();
-
-        if (!existingProduct || !existingProduct.isActive) {
-          requestLogger.info(
-            { userId: _userId, productId },
-            "Checkout failed because product was not found"
-          );
-          throw new NotFoundError("Product not found");
+      for (const cartItem of cart.items) {
+        const productId = cartItem.productId.toString();
+        if (!Types.ObjectId.isValid(productId)) {
+          requestLogger.warn({ userId: _userId, productId }, "Cart contains invalid product id");
+          throw new BadRequestError("Cart contains invalid product id");
         }
 
-        requestLogger.info(
+        const product = await productModel
+          .findOneAndUpdate(
+            {
+              _id: cartItem.productId,
+              isActive: true,
+              stock: { $gte: cartItem.quantity },
+            },
+            {
+              $inc: { stock: -cartItem.quantity },
+            },
+            {
+              new: true,
+              session,
+            }
+          )
+          .lean<ProductDoc | null>();
+
+        if (!product) {
+          const existingProduct = await productModel
+            .findById(cartItem.productId)
+            .session(session)
+            .select("_id isActive stock")
+            .lean<{ _id: Types.ObjectId; isActive: boolean; stock: number } | null>();
+
+          if (!existingProduct || !existingProduct.isActive) {
+            requestLogger.info(
+              { userId: _userId, productId },
+              "Checkout failed because product was not found"
+            );
+            throw new NotFoundError("Product not found");
+          }
+
+          requestLogger.info(
+            {
+              userId: _userId,
+              productId,
+              requestedQuantity: cartItem.quantity,
+              stock: existingProduct.stock,
+            },
+            "Checkout failed because stock was insufficient"
+          );
+          throw new ConflictError("Insufficient stock");
+        }
+
+        const unitPrice = resolveUnitPrice(product, now);
+        orderItems.push({
+          productId: product._id,
+          name: product.name,
+          price: unitPrice,
+          quantity: cartItem.quantity,
+        });
+        totalAmount += unitPrice * cartItem.quantity;
+      }
+
+      const [createdOrderDoc] = await orderModel.create(
+        [
           {
-            userId: _userId,
-            productId,
-            requestedQuantity: cartItem.quantity,
-            stock: existingProduct.stock,
+            userId: new Types.ObjectId(_userId),
+            items: orderItems,
+            totalAmount: Number(totalAmount.toFixed(2)),
+            paymentMethod: _input.paymentMethod,
+            status: "placed",
           },
-          "Checkout failed because stock was insufficient"
-        );
-        throw new ConflictError("Insufficient stock");
-      }
-
-      decrementedProducts.push({
-        productId: product._id,
-        quantity: cartItem.quantity,
-      });
-
-      const unitPrice = resolveUnitPrice(product, now);
-      orderItems.push({
-        productId: product._id,
-        name: product.name,
-        price: unitPrice,
-        quantity: cartItem.quantity,
-      });
-      totalAmount += unitPrice * cartItem.quantity;
-    }
-
-    createdOrder = (
-      await orderModel.create({
-        userId: new Types.ObjectId(_userId),
-        items: orderItems,
-        totalAmount: Number(totalAmount.toFixed(2)),
-        paymentMethod: _input.paymentMethod,
-        status: "placed",
-      })
-    ).toObject() as OrderDoc;
-
-    await cartModel.updateOne(
-      { _id: cart._id },
-      {
-        $set: { items: [] },
-        $inc: { __v: 1 },
-      }
-    );
-
-    requestLogger.debug(
-      {
-        userId: _userId,
-        orderId: createdOrder._id.toString(),
-        itemCount: createdOrder.items.length,
-      },
-      "Checkout service completed"
-    );
-
-    return {
-      order: serializeOrder(createdOrder),
-    };
-  } catch (error) {
-    if (createdOrder) {
-      try {
-        await orderModel.deleteOne({ _id: createdOrder._id });
-        requestLogger.warn(
-          { userId: _userId, orderId: createdOrder._id.toString() },
-          "Checkout rollback removed created order"
-        );
-      } catch (rollbackError) {
-        requestLogger.error(
-          {
-            err: rollbackError,
-            userId: _userId,
-            orderId: createdOrder._id.toString(),
-          },
-          "Checkout rollback failed to remove created order"
-        );
-      }
-    }
-
-    try {
-      await rollbackStock(decrementedProducts, requestLogger);
-    } catch (rollbackError) {
-      requestLogger.error(
-        { err: rollbackError, userId: _userId },
-        "Checkout rollback failed to restore product stock"
+        ],
+        { session }
       );
+      const createdOrder = createdOrderDoc.toObject() as OrderDoc;
+
+      const clearedCart = await cartModel.updateOne(
+        { _id: cart._id, __v: cart.__v },
+        {
+          $set: { items: [] },
+          $inc: { __v: 1 },
+        },
+        { session }
+      );
+
+      if (clearedCart.matchedCount === 0) {
+        requestLogger.info(
+          { userId: _userId, cartId: cart._id.toString() },
+          "Checkout failed because cart changed during checkout"
+        );
+        throw new ConflictError("Cart was updated by another request");
+      }
+
+      requestLogger.debug(
+        {
+          userId: _userId,
+          orderId: createdOrder._id.toString(),
+          itemCount: createdOrder.items.length,
+        },
+        "Checkout service completed"
+      );
+
+      return {
+        order: serializeOrder(createdOrder),
+      };
+    });
+
+    if (!checkoutResult) {
+      throw new ServiceUnavailableError("Checkout failed");
     }
 
+    return checkoutResult;
+  } catch (error) {
     if (error instanceof Error) {
       throw error;
     }
 
     throw new ServiceUnavailableError("Checkout failed");
+  } finally {
+    await session.endSession();
   }
 }

@@ -1,9 +1,12 @@
-import mongoose, { Types } from "mongoose";
+import type { AdminCreateProductInput } from "@seng4640/shared";
+
+import { createSeedProduct } from "@/modules/admin/service";
 import {
   connectForDbScript,
   disconnectDbScript,
   ensureBaseCollectionsAndIndexes,
 } from "./common";
+import { logger } from "@/utils/logger";
 
 type ProductCategory =
   | "apparel"
@@ -11,34 +14,6 @@ type ProductCategory =
   | "home"
   | "outdoor"
   | "books";
-
-type ProductSeed = {
-  name: string;
-  description: string;
-  detailedDescription: string | null;
-  price: number;
-  flashSalePrice: number | null;
-  stock: number;
-  imageUrl: string;
-  descriptionImages: string[];
-  category: ProductCategory;
-  productOwnerId: Types.ObjectId | null;
-  specs: {
-    sizeCm: {
-      depth: number;
-      width: number;
-      height: number;
-    } | null;
-    weightG: number | null;
-    extra: Record<string, string | number | boolean | null>;
-  };
-  isFlashSale: boolean;
-  isActive: boolean;
-  flashSaleStartAt: Date | null;
-  flashSaleEndAt: Date | null;
-  createdAt: Date;
-  updatedAt: Date;
-};
 
 const categories: ProductCategory[] = [
   "apparel",
@@ -48,48 +23,20 @@ const categories: ProductCategory[] = [
   "books",
 ];
 
-function buildProducts(count: number): ProductSeed[] {
-  const now = new Date();
-  const products: ProductSeed[] = [];
+function buildProducts(count: number): AdminCreateProductInput[] {
+  const products: AdminCreateProductInput[] = [];
 
   for (let i = 1; i <= count; i += 1) {
     const category = categories[(i - 1) % categories.length];
-    const isFlashSale = i % 7 === 0;
-    const price = Number((9.99 + i * 1.75).toFixed(2));
-    const flashSalePrice = isFlashSale ? Number((price * 0.85).toFixed(2)) : null;
-    const stock = 10 + ((i * 3) % 90);
-    const flashSaleStartAt = isFlashSale
-      ? new Date(now.getTime() - 60 * 60 * 1000)
-      : null;
-    const flashSaleEndAt = isFlashSale
-      ? new Date(now.getTime() + 24 * 60 * 60 * 1000)
-      : null;
 
     products.push({
       name: `Product ${i}`,
       description: `Development seed product ${i} in ${category} category.`,
-      detailedDescription:
-        i % 4 === 0
-          ? null
-          : `Detailed info for Product ${i}. Materials, care instructions, and usage notes.`,
-      price,
-      flashSalePrice,
-      stock,
+      price: Number((9.99 + i * 1.75).toFixed(2)),
+      stock: 10 + ((i * 3) % 90),
       imageUrl: `/images/p${i}.jpg`,
-      descriptionImages: [`/images/p${i}.jpg`, `/images/p${(i % count) + 1}.jpg`],
       category,
-      productOwnerId: null,
-      specs: {
-        sizeCm: null,
-        weightG: null,
-        extra: {},
-      },
-      isFlashSale,
-      isActive: true,
-      flashSaleStartAt,
-      flashSaleEndAt,
-      createdAt: now,
-      updatedAt: now,
+      isFlashSale: i % 7 === 0,
     });
   }
 
@@ -97,47 +44,19 @@ function buildProducts(count: number): ProductSeed[] {
 }
 
 async function run(): Promise<void> {
+  const scriptLogger = logger.child({ module: "seed-products-script" });
+
   try {
     await connectForDbScript("seed:products");
     await ensureBaseCollectionsAndIndexes();
 
     const products = buildProducts(50);
-    const collection = mongoose.connection.collection("products");
 
-    const operations = products.map((product) => ({
-      updateOne: {
-        filter: { name: product.name },
-        update: {
-          $set: {
-            description: product.description,
-            detailedDescription: product.detailedDescription,
-            price: product.price,
-            flashSalePrice: product.flashSalePrice,
-            stock: product.stock,
-            imageUrl: product.imageUrl,
-            descriptionImages: product.descriptionImages,
-            category: product.category,
-            productOwnerId: product.productOwnerId,
-            specs: product.specs,
-            isFlashSale: product.isFlashSale,
-            isActive: product.isActive,
-            flashSaleStartAt: product.flashSaleStartAt,
-            flashSaleEndAt: product.flashSaleEndAt,
-            updatedAt: product.updatedAt,
-          },
-          $setOnInsert: {
-            name: product.name,
-            createdAt: product.createdAt,
-          },
-        },
-        upsert: true,
-      },
-    }));
+    for (const product of products) {
+      await createSeedProduct(product, scriptLogger);
+    }
 
-    const result = await collection.bulkWrite(operations, { ordered: false });
-    console.log(
-      `🌱 Product seed completed: inserted=${result.upsertedCount}, modified=${result.modifiedCount}, matched=${result.matchedCount}`
-    );
+    console.log(`🌱 Product seed completed: processed=${products.length}`);
   } catch (error) {
     console.error("❌ Product seed failed:", error);
     process.exitCode = 1;

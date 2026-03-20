@@ -11,6 +11,10 @@ import { BadRequestError, ConflictError, NotFoundError } from "@/utils/errors";
 type ProductDoc = Require_id<InferSchemaType<typeof productSchema>>;
 type UserDoc = Require_id<InferSchemaType<typeof userSchema>>;
 
+type CreateProductRecordOptions = {
+  productOwnerId: Types.ObjectId | null;
+};
+
 function serializeManagedProduct(doc: ProductDoc): Product {
   return {
     _id: doc._id.toString(),
@@ -64,6 +68,51 @@ async function findManagedProduct(
     .lean<ProductDoc | null>();
 }
 
+function buildCreateProductPayload(
+  input: AdminCreateProductInput,
+  options: CreateProductRecordOptions
+) {
+  return {
+    name: input.name.trim(),
+    description: input.description.trim(),
+    price: input.price,
+    stock: input.stock,
+    imageUrl: input.imageUrl.trim(),
+    category: input.category.trim(),
+    productOwnerId: options.productOwnerId,
+    isFlashSale: input.isFlashSale ?? false,
+    flashSalePrice: null,
+    flashSaleStartAt: null,
+    flashSaleEndAt: null,
+    isActive: true,
+  };
+}
+
+async function createProductRecord(
+  input: AdminCreateProductInput,
+  options: CreateProductRecordOptions
+): Promise<ProductDoc> {
+  return (
+    await productModel.create(buildCreateProductPayload(input, options))
+  ).toObject() as ProductDoc;
+}
+
+export async function createSeedProduct(
+  input: AdminCreateProductInput,
+  requestLogger: Logger
+): Promise<void> {
+  requestLogger.debug({ productName: input.name }, "Seed product create started");
+
+  const product = await createProductRecord(input, {
+    productOwnerId: null,
+  });
+
+  requestLogger.debug(
+    { productName: product.name, productId: product._id.toString() },
+    "Seed product create completed"
+  );
+}
+
 export async function listManagedProducts(
   managerId: string,
   requestLogger: Logger
@@ -94,22 +143,9 @@ export async function createProduct(
   requestLogger.debug({ managerId, input }, "Create product service started");
   assertValidObjectId(managerId, "managerId", requestLogger);
 
-  const product = (
-    await productModel.create({
-      name: input.name.trim(),
-      description: input.description.trim(),
-      price: input.price,
-      stock: input.stock,
-      imageUrl: input.imageUrl.trim(),
-      category: input.category.trim(),
-      productOwnerId: new Types.ObjectId(managerId),
-      isFlashSale: input.isFlashSale ?? false,
-      flashSalePrice: null,
-      flashSaleStartAt: null,
-      flashSaleEndAt: null,
-      isActive: true,
-    })
-  ).toObject() as ProductDoc;
+  const product = await createProductRecord(input, {
+    productOwnerId: new Types.ObjectId(managerId),
+  });
 
   requestLogger.debug(
     { managerId, productId: product._id.toString() },
