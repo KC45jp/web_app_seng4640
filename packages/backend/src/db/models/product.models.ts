@@ -32,7 +32,7 @@ export const productSchema = new mongoose.Schema(
     productOwnerId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
-      default: null,
+      required: true,
     },
     specs: {
       type: productSpecsSchema,
@@ -67,7 +67,7 @@ export type CreateProductInput = {
   imageUrl: string;
   descriptionImages?: string[];
   category: string;
-  productOwnerId?: Types.ObjectId | null;
+  productOwnerId: Types.ObjectId;
   specs?: {
     sizeCm?: {
       depth: number;

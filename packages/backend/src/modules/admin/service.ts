@@ -12,7 +12,7 @@ type ProductDoc = Require_id<InferSchemaType<typeof productSchema>>;
 type UserDoc = Require_id<InferSchemaType<typeof userSchema>>;
 
 type CreateProductRecordOptions = {
-  productOwnerId: Types.ObjectId | null;
+  productOwnerId: Types.ObjectId;
 };
 
 function serializeManagedProduct(doc: ProductDoc): Product {
@@ -97,21 +97,6 @@ async function createProductRecord(
   ).toObject() as ProductDoc;
 }
 
-export async function createSeedProduct(
-  input: AdminCreateProductInput,
-  requestLogger: Logger
-): Promise<void> {
-  requestLogger.debug({ productName: input.name }, "Seed product create started");
-
-  const product = await createProductRecord(input, {
-    productOwnerId: null,
-  });
-
-  requestLogger.debug(
-    { productName: product.name, productId: product._id.toString() },
-    "Seed product create completed"
-  );
-}
 
 export async function listManagedProducts(
   managerId: string,

@@ -1,12 +1,3 @@
-export function CartPage() {
-  return (
-    <section className="page-card">
-      <h1>Cart</h1>
-      <p>Customer cart page shell.</p>
-    </section>
-  );
-}
-
 export function CheckoutPage() {
   return (
     <section className="page-card">

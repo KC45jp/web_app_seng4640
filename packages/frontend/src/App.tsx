@@ -2,8 +2,10 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { MainLayout } from "@/components/MainLayout";
 import { NotFoundPage } from "@/components/NotFoundPage";
 import { RequireRole } from "@/components/RequireRole";
-import { CartPage, CheckoutPage, MyPage } from "@/components/CustomerPages";
+import { CartPage } from "@/components/Cart";
+import { CheckoutPage, MyPage } from "@/components/CustomerPages";
 import { HomePage } from "@/components/Main";
+import { SearchPage } from "@/components/Search";
 import { LoginPage, ManagerLoginPage, SignupPage, AdminLoginPage } from "@/components/AuthPages";
 import {
   ManagerDashboardPage,
@@ -19,6 +21,7 @@ const router = createBrowserRouter([
     element: <MainLayout />,
     children: [
       { path: "/", element: <HomePage /> },
+      { path: "/search", element: <SearchPage /> },
       { path: "/products/:id", element: <ProductDetailPage /> },
       { path: "/login", element: <LoginPage /> },
       { path: "/signup", element: <SignupPage /> },

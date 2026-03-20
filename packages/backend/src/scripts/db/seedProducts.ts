@@ -4,7 +4,7 @@ import { join } from "node:path";
 import type { AdminCreateProductInput } from "@seng4640/shared";
 import type { Logger } from "pino";
 
-import { createSeedProduct } from "@/modules/admin/service";
+import { createProduct, createManager } from "@/modules/admin/service";
 import { uploadImage } from "@/modules/images/service";
 import { logger } from "@/utils/logger";
 
@@ -95,11 +95,18 @@ async function run(): Promise<void> {
     await connectForDbScript("seed:products");
     await ensureBaseCollectionsAndIndexes();
 
+    const { manager } = await createManager(
+      { name: "Seed Manager", email: "seed-manager@example.com", password: "manager123" },
+      scriptLogger
+    );
+    const managerId = manager.id;
+    scriptLogger.info({ managerId }, "Seed manager created");
+
     const imageUrls = await uploadSeedImages(scriptLogger);
     const products = buildProducts(50, imageUrls);
 
     for (const product of products) {
-      await createSeedProduct(product, scriptLogger);
+      await createProduct(managerId, product, scriptLogger);
     }
 
     console.log(`🌱 Product seed completed: processed=${products.length}`);

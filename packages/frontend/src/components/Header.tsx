@@ -68,6 +68,7 @@ export function Header() {
 
           {role === ROLE.CUSTOMER && (
             <>
+              <Link to="/cart">Cart</Link>
               <Link to="/mypage">My Page</Link>
               <button onClick={logout} type="button">
                 Logout
