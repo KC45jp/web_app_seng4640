@@ -1,7 +1,14 @@
 import mongoose from "mongoose";
 import { connectForDbScript, disconnectDbScript } from "./common";
 
-const TARGET_COLLECTIONS = ["carts", "orders", "products", "users"] as const;
+const TARGET_COLLECTIONS = [
+  "carts",
+  "orders",
+  "products",
+  "users",
+  "product-images.files",
+  "product-images.chunks",
+] as const;
 
 async function run(): Promise<void> {
   try {

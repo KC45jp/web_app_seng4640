@@ -171,7 +171,8 @@ Run under `packages/backend`:
 - `APP_ENV=dev npm run db:seed:dev`
   - Seeds dev users, sample products, and one sample order
 - `APP_ENV=dev npm run db:clean`
-  - Deletes all documents from `orders`, `products`, and `users`
+  - Deletes all documents from `carts`, `orders`, `products`, and `users`
+  - Deletes uploaded product image data from GridFS collections `product-images.files` and `product-images.chunks`
   - Collections and indexes remain
 
 For staging:
