@@ -793,6 +793,233 @@
   margin-top: 1rem;
 }
 
+/* ── My Page / Orders ── */
+.mypage-layout {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.mypage-profile-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.mypage-profile-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 0.85rem;
+  margin-top: 0.75rem;
+}
+
+.mypage-stat-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  padding: 0.9rem 1rem;
+  border: 1px solid #d6dfec;
+  border-radius: 10px;
+  background: #f8fafc;
+}
+
+.mypage-stat-label,
+.order-card-label {
+  margin: 0;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #64748b;
+}
+
+.mypage-orders-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+}
+
+.mypage-toolbar {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 220px;
+  gap: 0.85rem;
+  margin-bottom: 1rem;
+}
+
+.mypage-filter {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.mypage-filter-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #475569;
+}
+
+.mypage-input,
+.mypage-select {
+  height: 2.25rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  padding: 0 0.75rem;
+  background: #f8fafc;
+  color: #0f172a;
+}
+
+.mypage-results-meta {
+  margin-bottom: 1rem;
+}
+
+.mypage-empty {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  align-items: flex-start;
+  padding: 1rem 0 0.25rem;
+}
+
+.mypage-order-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.order-card {
+  padding: 1rem 1.1rem;
+}
+
+.order-card-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+.order-card-id {
+  margin: 0.25rem 0 0.35rem;
+  font-size: 1.2rem;
+}
+
+.order-card-header-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.45rem;
+}
+
+.order-card-total {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.order-card-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.2rem;
+  margin-top: 0.9rem;
+}
+
+.order-card-summary-line {
+  margin: 0;
+  color: #334155;
+}
+
+.order-status-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.25rem 0.65rem;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.order-status-placed {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.order-status-paid,
+.order-status-completed {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.order-status-shipped {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.order-status-cancelled {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.order-card-toggle {
+  margin-top: 1rem;
+  padding: 0;
+  border: none;
+  background: none;
+  color: #2563eb;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.order-card-toggle:hover {
+  color: #1d4ed8;
+  text-decoration: underline;
+}
+
+.order-card-details {
+  display: grid;
+  gap: 1rem;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e2e8f0;
+}
+
+.order-card-section-title {
+  margin: 0 0 0.65rem;
+  font-size: 0.95rem;
+  color: #0f172a;
+}
+
+.order-card-items,
+.order-card-timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.order-card-item-row,
+.order-card-timeline-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+.order-card-item-name,
+.order-card-timeline-status {
+  margin: 0;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.order-card-item-subtotal {
+  margin: 0;
+  min-width: 4.75rem;
+  text-align: right;
+  font-weight: 700;
+  color: #0f172a;
+}
+
 @media (max-width: 720px) {
   .cart-layout {
     grid-template-columns: 1fr;
@@ -844,6 +1071,25 @@
 
   .checkout-review-subtotal {
     grid-column: 2;
+    text-align: left;
+  }
+
+  .mypage-orders-header,
+  .order-card-header,
+  .order-card-item-row,
+  .order-card-timeline-row {
+    flex-direction: column;
+  }
+
+  .mypage-toolbar {
+    grid-template-columns: 1fr;
+  }
+
+  .order-card-header-meta {
+    align-items: flex-start;
+  }
+
+  .order-card-item-subtotal {
     text-align: left;
   }
 }

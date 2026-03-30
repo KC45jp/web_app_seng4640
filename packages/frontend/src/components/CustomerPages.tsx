@@ -1,10 +1,13 @@
-import { useState } from "react";
+import { useDeferredValue, useState } from "react";
 import { useMutation, useQueries, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
-import type { CartItem, Order, PaymentMethod, ProductDetail } from "@seng4640/shared";
+import type { AuthResponseUser, CartItem, Order, PaymentMethod, ProductDetail } from "@seng4640/shared";
 import { getCart } from "@/api/cart";
 import { checkout as submitCheckout } from "@/api/checkout";
+import { getMe } from "@/api/me";
+import { listOrders } from "@/api/orders";
 import { getProductById, resolveImageUrl } from "@/api/search";
+import { OrderCard } from "@/components/OrderCard";
 import { useAuthStore } from "@/store/authStore";
 import { getApiErrorMessage } from "@/utils/apiError";
 
@@ -273,10 +276,229 @@ export function CheckoutPage() {
 }
 
 export function MyPage() {
+  const token = useAuthStore((state) => state.token);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [sortBy, setSortBy] = useState<"newest" | "oldest" | "highest" | "lowest">("newest");
+  const deferredSearchTerm = useDeferredValue(searchTerm);
+
+  const {
+    data: meData,
+    isPending: mePending,
+    isError: meIsError,
+    error: meError,
+  } = useQuery({
+    queryKey: ["me"],
+    queryFn: () => getMe(token),
+    enabled: Boolean(token),
+  });
+
+  const {
+    data: ordersData,
+    isPending: ordersPending,
+    isError: ordersIsError,
+    error: ordersError,
+  } = useQuery({
+    queryKey: ["orders"],
+    queryFn: () => listOrders(token),
+    enabled: Boolean(token),
+  });
+
+  if (!token) {
+    return (
+      <section className="page-card">
+        <h1>My Page</h1>
+        <p className="search-error">Your session has expired. Please log in again.</p>
+        <Link to="/login">Back to Login</Link>
+      </section>
+    );
+  }
+
+  if (mePending || ordersPending) {
+    return (
+      <section className="page-card">
+        <h1>My Page</h1>
+        <p>Loading...</p>
+      </section>
+    );
+  }
+
+  if (meIsError || ordersIsError) {
+    return (
+      <section className="page-card">
+        <h1>My Page</h1>
+        <p className="search-error">
+          {meIsError
+            ? getApiErrorMessage(meError, "Failed to load profile.")
+            : getApiErrorMessage(ordersError, "Failed to load orders.")}
+        </p>
+      </section>
+    );
+  }
+
+  if (!meData || !ordersData) {
+    return (
+      <section className="page-card">
+        <h1>My Page</h1>
+        <p className="search-error">Profile data is temporarily unavailable.</p>
+      </section>
+    );
+  }
+
+  const user = meData.user;
+  const orders = applyOrderSort(
+    filterOrders(ordersData.items, deferredSearchTerm),
+    sortBy,
+  );
+  const latestOrder = ordersData.items[0];
+
   return (
-    <section className="page-card">
-      <h1>My Page</h1>
-      <p>User profile and order history shell.</p>
+    <div className="mypage-layout">
+      <ProfileSummary user={user} orderCount={ordersData.items.length} latestOrder={latestOrder} />
+
+      <section className="page-card">
+        <div className="mypage-orders-header">
+          <div>
+            <h1>My Orders</h1>
+            <p>Search by order id, product name, status, or payment method.</p>
+          </div>
+          <Link to="/search" className="product-detail-secondary-link">
+            Continue Shopping
+          </Link>
+        </div>
+
+        <div className="mypage-toolbar">
+          <label className="mypage-filter">
+            <span className="mypage-filter-label">Search</span>
+            <input
+              className="mypage-input"
+              type="search"
+              value={searchTerm}
+              placeholder="Search orders"
+              onChange={(event) => setSearchTerm(event.target.value)}
+            />
+          </label>
+
+          <label className="mypage-filter">
+            <span className="mypage-filter-label">Sort</span>
+            <select
+              className="mypage-select"
+              value={sortBy}
+              onChange={(event) =>
+                setSortBy(event.target.value as "newest" | "oldest" | "highest" | "lowest")
+              }
+            >
+              <option value="newest">Newest first</option>
+              <option value="oldest">Oldest first</option>
+              <option value="highest">Highest total</option>
+              <option value="lowest">Lowest total</option>
+            </select>
+          </label>
+        </div>
+
+        <div className="mypage-results-meta">
+          <p className="muted">
+            Showing {orders.length} of {ordersData.items.length} orders
+          </p>
+        </div>
+
+        {orders.length === 0 ? (
+          <div className="mypage-empty">
+            {ordersData.items.length === 0 ? (
+              <>
+                <p>You have not placed any orders yet.</p>
+                <Link to="/search" className="btn-primary cart-shop-link">
+                  Browse products
+                </Link>
+              </>
+            ) : (
+              <p className="muted">No orders match your search.</p>
+            )}
+          </div>
+        ) : (
+          <div className="mypage-order-list">
+            {orders.map((order) => (
+              <OrderCard key={order._id ?? `${order.createdAt}-${order.totalAmount}`} order={order} />
+            ))}
+          </div>
+        )}
+      </section>
+    </div>
+  );
+}
+
+function ProfileSummary({
+  user,
+  orderCount,
+  latestOrder,
+}: {
+  user: AuthResponseUser;
+  orderCount: number;
+  latestOrder?: Order;
+}) {
+  return (
+    <section className="page-card mypage-profile-card">
+      <p className="order-card-label">Profile</p>
+      <h1>{user.name}</h1>
+      <p>{user.email}</p>
+      <div className="mypage-profile-stats">
+        <div className="mypage-stat-card">
+          <span className="mypage-stat-label">Orders</span>
+          <strong>{orderCount}</strong>
+        </div>
+        <div className="mypage-stat-card">
+          <span className="mypage-stat-label">Latest order</span>
+          <strong>
+            {latestOrder?.createdAt
+              ? new Date(latestOrder.createdAt).toLocaleDateString()
+              : "No orders yet"}
+          </strong>
+        </div>
+      </div>
     </section>
   );
+}
+
+function filterOrders(orders: Order[], searchTerm: string) {
+  const normalized = searchTerm.trim().toLowerCase();
+  if (!normalized) {
+    return orders;
+  }
+
+  return orders.filter((order) => {
+    const haystack = [
+      order._id,
+      order.status,
+      order.paymentMethod,
+      ...order.items.map((item) => item.name),
+    ]
+      .filter(Boolean)
+      .join(" ")
+      .toLowerCase();
+
+    return haystack.includes(normalized);
+  });
+}
+
+function applyOrderSort(
+  orders: Order[],
+  sortBy: "newest" | "oldest" | "highest" | "lowest",
+) {
+  const next = [...orders];
+
+  next.sort((a, b) => {
+    if (sortBy === "highest") {
+      return b.totalAmount - a.totalAmount;
+    }
+
+    if (sortBy === "lowest") {
+      return a.totalAmount - b.totalAmount;
+    }
+
+    const left = new Date(a.createdAt ?? 0).getTime();
+    const right = new Date(b.createdAt ?? 0).getTime();
+
+    return sortBy === "oldest" ? left - right : right - left;
+  });
+
+  return next;
 }
