@@ -427,6 +427,11 @@
   background: #1d4ed8;
 }
 
+.btn-primary:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
 .product-detail-login-hint {
   margin: 0.25rem 0 0;
 }
@@ -434,6 +439,56 @@
 .product-detail-meta {
   margin: 0.25rem 0 0;
   font-size: 0.8rem;
+}
+
+.product-quantity-block {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.product-quantity-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #334155;
+}
+
+.product-quantity-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.product-quantity-input {
+  width: 5rem;
+  height: 1.9rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  background: #f8fafc;
+  color: #0f172a;
+  padding: 0 0.55rem;
+}
+
+.product-detail-secondary-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.35rem;
+  padding: 0.55rem 1rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  background: #f8fafc;
+  color: #0f172a;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.product-detail-secondary-link:hover {
+  background: #e2e8f0;
+}
+
+.product-detail-success {
+  color: #15803d;
 }
 
 /* ── Cart ── */
@@ -493,6 +548,10 @@
   object-fit: cover;
   border-radius: 8px;
   background: #f1f5f9;
+}
+
+.cart-item-image-placeholder {
+  border: 1px dashed #cbd5e1;
 }
 
 .cart-item-info {
@@ -598,12 +657,156 @@
   text-decoration: none;
 }
 
+/* ── Checkout ── */
+.checkout-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: 1.25rem;
+  align-items: start;
+}
+
+.checkout-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+}
+
+.checkout-review-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.checkout-review-item,
+.checkout-success-item {
+  display: grid;
+  grid-template-columns: 72px minmax(0, 1fr) auto;
+  gap: 0.85rem;
+  align-items: center;
+  padding: 0.9rem 0;
+  border-top: 1px solid #e2e8f0;
+}
+
+.checkout-review-item:first-child,
+.checkout-success-item:first-child {
+  border-top: none;
+  padding-top: 0;
+}
+
+.checkout-review-image {
+  width: 72px;
+  height: 72px;
+  object-fit: cover;
+  border-radius: 8px;
+  background: #f1f5f9;
+}
+
+.checkout-review-image-placeholder {
+  border: 1px dashed #cbd5e1;
+}
+
+.checkout-review-info {
+  min-width: 0;
+}
+
+.checkout-review-name {
+  margin: 0;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.checkout-review-subtotal {
+  margin: 0;
+  font-weight: 700;
+  color: #0f172a;
+  text-align: right;
+}
+
+.checkout-review-skeleton {
+  height: 88px;
+  border-radius: 8px;
+  background: #f1f5f9;
+  animation: pulse 1.2s ease-in-out infinite;
+}
+
+.checkout-sidebar {
+  position: sticky;
+  top: 4.5rem;
+}
+
+.checkout-sidebar-title {
+  margin: 0 0 1rem;
+  font-size: 1.1rem;
+  color: #0f172a;
+}
+
+.checkout-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.checkout-payment-option {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.8rem 0.9rem;
+  border: 1px solid #d6dfec;
+  border-radius: 8px;
+  background: #f8fafc;
+  color: #0f172a;
+  font-weight: 600;
+}
+
+.checkout-payment-option input {
+  margin: 0;
+}
+
+.checkout-totals {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid #e2e8f0;
+}
+
+.checkout-total-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  color: #334155;
+}
+
+.checkout-success-card {
+  max-width: 760px;
+}
+
+.checkout-success-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin-top: 1rem;
+}
+
+.checkout-success-items {
+  margin-top: 1rem;
+}
+
 @media (max-width: 720px) {
   .cart-layout {
     grid-template-columns: 1fr;
   }
 
   .cart-summary {
+    position: static;
+  }
+
+  .checkout-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .checkout-sidebar {
     position: static;
   }
 
@@ -628,6 +831,20 @@
     grid-row: 1;
     grid-column: 3;
     align-self: start;
+  }
+
+  .checkout-header {
+    flex-direction: column;
+  }
+
+  .checkout-review-item,
+  .checkout-success-item {
+    grid-template-columns: 60px minmax(0, 1fr);
+  }
+
+  .checkout-review-subtotal {
+    grid-column: 2;
+    text-align: left;
   }
 }
 

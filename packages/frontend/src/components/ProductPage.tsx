@@ -1,9 +1,12 @@
-import { useQuery } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useParams, Link } from "react-router-dom";
 import type { ProductDetail } from "@seng4640/shared";
+import { addCartItem } from "@/api/cart";
 import { getProductById, resolveImageUrl } from "@/api/search";
 import { useAuthStore } from "@/store/authStore";
 import { ROLE } from "@/constants/roles";
+import { getApiErrorMessage } from "@/utils/apiError";
 
 function ProductImageGallery({ product }: { product: ProductDetail }) {
   return (
@@ -72,16 +75,85 @@ function ProductStockInfo({
 function ProductActions({
   isGuest,
   isCustomer,
+  quantity,
+  maxQuantity,
+  isAdding,
+  feedback,
+  disabled,
+  onQuantityChange,
+  onAddToCart,
 }: {
   isGuest: boolean;
   isCustomer: boolean;
+  quantity: number;
+  maxQuantity: number;
+  isAdding: boolean;
+  disabled: boolean;
+  feedback: { tone: "success" | "error"; message: string } | null;
+  onQuantityChange: (value: number) => void;
+  onAddToCart: () => void;
 }) {
   if (isCustomer) {
     return (
-      <div className="button-row product-detail-actions">
-        <button className="btn-primary" type="button">
-          Add to Cart
-        </button>
+      <div className="product-detail-actions">
+        <div className="product-quantity-block">
+          <label className="product-quantity-label" htmlFor="product-quantity">
+            Quantity
+          </label>
+          <div className="product-quantity-controls">
+            <button
+              className="cart-qty-btn"
+              type="button"
+              disabled={disabled || quantity <= 1}
+              onClick={() => onQuantityChange(quantity - 1)}
+            >
+              −
+            </button>
+            <input
+              id="product-quantity"
+              className="product-quantity-input"
+              type="number"
+              min="1"
+              max={maxQuantity}
+              value={quantity}
+              disabled={disabled}
+              onChange={(event) => {
+                const nextValue = Number(event.target.value);
+                if (!Number.isFinite(nextValue)) {
+                  onQuantityChange(1);
+                  return;
+                }
+                onQuantityChange(nextValue);
+              }}
+            />
+            <button
+              className="cart-qty-btn"
+              type="button"
+              disabled={disabled || quantity >= maxQuantity}
+              onClick={() => onQuantityChange(quantity + 1)}
+            >
+              +
+            </button>
+          </div>
+        </div>
+        <div className="button-row">
+          <button
+            className="btn-primary"
+            type="button"
+            disabled={disabled}
+            onClick={onAddToCart}
+          >
+            {isAdding ? "Adding..." : "Add to Cart"}
+          </button>
+          <Link className="product-detail-secondary-link" to="/cart">
+            View Cart
+          </Link>
+        </div>
+        {feedback ? (
+          <p className={feedback.tone === "error" ? "search-error" : "product-detail-success"}>
+            {feedback.message}
+          </p>
+        ) : null}
       </div>
     );
   }
@@ -99,10 +171,24 @@ function ProductInfoPanel({
   product,
   isGuest,
   isCustomer,
+  quantity,
+  maxQuantity,
+  isAdding,
+  disabled,
+  feedback,
+  onQuantityChange,
+  onAddToCart,
 }: {
   product: ProductDetail;
   isGuest: boolean;
   isCustomer: boolean;
+  quantity: number;
+  maxQuantity: number;
+  isAdding: boolean;
+  disabled: boolean;
+  feedback: { tone: "success" | "error"; message: string } | null;
+  onQuantityChange: (value: number) => void;
+  onAddToCart: () => void;
 }) {
   const showStock = product.isFlashSale ? !isGuest : true;
 
@@ -121,7 +207,17 @@ function ProductInfoPanel({
       {product.detailedDescription && (
         <p className="product-detail-long-description">{product.detailedDescription}</p>
       )}
-      <ProductActions isGuest={isGuest} isCustomer={isCustomer} />
+      <ProductActions
+        isGuest={isGuest}
+        isCustomer={isCustomer}
+        quantity={quantity}
+        maxQuantity={maxQuantity}
+        isAdding={isAdding}
+        disabled={disabled}
+        feedback={feedback}
+        onQuantityChange={onQuantityChange}
+        onAddToCart={onAddToCart}
+      />
       <p className="muted product-detail-meta">
         Added: {product.createdAt ? new Date(product.createdAt).toLocaleDateString() : "—"}
       </p>
@@ -132,12 +228,58 @@ function ProductInfoPanel({
 export function ProductDetailPage() {
   const { id } = useParams();
   const role = useAuthStore((state) => state.role);
+  const token = useAuthStore((state) => state.token);
+  const queryClient = useQueryClient();
+  const [quantity, setQuantity] = useState(1);
+  const [feedback, setFeedback] = useState<{
+    tone: "success" | "error";
+    message: string;
+  } | null>(null);
 
   const { data: product, isPending, isError } = useQuery({
     queryKey: ["product", id],
     queryFn: () => getProductById(id!).then(({ product }) => product),
     enabled: !!id,
   });
+
+  const addToCartMutation = useMutation({
+    mutationFn: (nextQuantity: number) => {
+      const productId = product?._id;
+      if (!productId) {
+        throw new Error("Product id is missing.");
+      }
+
+      return addCartItem(token, { productId, quantity: nextQuantity });
+    },
+    onSuccess: (data, nextQuantity) => {
+      queryClient.setQueryData(["cart"], data);
+      setFeedback({
+        tone: "success",
+        message: `${product?.name ?? "Item"} x${nextQuantity} added to cart.`,
+      });
+    },
+    onError: (error) => {
+      setFeedback({
+        tone: "error",
+        message: getApiErrorMessage(error, "Failed to add item to cart."),
+      });
+    },
+  });
+
+  useEffect(() => {
+    if (!product) {
+      return;
+    }
+
+    setQuantity((current) => {
+      if (product.stock <= 0) {
+        return 1;
+      }
+
+      return Math.min(Math.max(1, current), product.stock);
+    });
+    setFeedback(null);
+  }, [product]);
 
   if (isPending) {
     return (
@@ -156,6 +298,9 @@ export function ProductDetailPage() {
     );
   }
 
+  const maxQuantity = Math.max(product.stock, 1);
+  const disablePurchase = addToCartMutation.isPending || product.stock <= 0 || !token;
+
   return (
     <div className="product-detail-layout">
       <ProductImageGallery product={product} />
@@ -163,6 +308,22 @@ export function ProductDetailPage() {
         product={product}
         isGuest={role === ROLE.GUEST}
         isCustomer={role === ROLE.CUSTOMER}
+        quantity={quantity}
+        maxQuantity={maxQuantity}
+        isAdding={addToCartMutation.isPending}
+        disabled={disablePurchase}
+        feedback={feedback}
+        onQuantityChange={(value) => {
+          const nextValue = Math.min(Math.max(1, value), maxQuantity);
+          setQuantity(nextValue);
+          if (feedback) {
+            setFeedback(null);
+          }
+        }}
+        onAddToCart={() => {
+          setFeedback(null);
+          addToCartMutation.mutate(quantity);
+        }}
       />
     </div>
   );
