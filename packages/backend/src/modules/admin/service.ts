@@ -15,6 +15,13 @@ type CreateProductRecordOptions = {
   productOwnerId: Types.ObjectId;
 };
 
+type ManagedProductContext = {
+  managerId: string;
+  productId: string;
+  requestLogger: Logger;
+  operation: string;
+};
+
 function serializeManagedProduct(doc: ProductDoc): Product {
   return {
     _id: doc._id.toString(),
@@ -68,6 +75,21 @@ async function findManagedProduct(
     .lean<ProductDoc | null>();
 }
 
+function requireManagedProduct(
+  product: ProductDoc | null,
+  context: ManagedProductContext
+): ProductDoc {
+  if (product) {
+    return product;
+  }
+
+  context.requestLogger.info(
+    { managerId: context.managerId, productId: context.productId },
+    `${context.operation} failed because managed product was not found`
+  );
+  throw new NotFoundError("Product not found");
+}
+
 function buildCreateProductPayload(
   input: AdminCreateProductInput,
   options: CreateProductRecordOptions
@@ -117,6 +139,38 @@ export async function listManagedProducts(
 
   return {
     items: products.map(serializeManagedProduct),
+  };
+}
+
+export async function getManagedProductById(
+  managerId: string,
+  productId: string,
+  requestLogger: Logger
+): Promise<AdminProductResult> {
+  requestLogger.debug(
+    { managerId, productId },
+    "Get managed product by id service started"
+  );
+  assertValidObjectId(managerId, "managerId", requestLogger);
+  assertValidObjectId(productId, "productId", requestLogger);
+
+  const product = requireManagedProduct(
+    await findManagedProduct(managerId, productId),
+    {
+      managerId,
+      productId,
+      requestLogger,
+      operation: "Get managed product by id",
+    }
+  );
+
+  requestLogger.debug(
+    { managerId, productId },
+    "Get managed product by id service completed"
+  );
+
+  return {
+    product: serializeManagedProductDetail(product),
   };
 }
 
@@ -183,13 +237,12 @@ export async function updateProduct(
           )
           .lean<ProductDoc | null>();
 
-  if (!product) {
-    requestLogger.info(
-      { managerId, productId },
-      "Update product failed because managed product was not found"
-    );
-    throw new NotFoundError("Product not found");
-  }
+  const managedProduct = requireManagedProduct(product, {
+    managerId,
+    productId,
+    requestLogger,
+    operation: "Update product",
+  });
 
   requestLogger.debug(
     { managerId, productId },
@@ -197,7 +250,7 @@ export async function updateProduct(
   );
 
   return {
-    product: serializeManagedProductDetail(product),
+    product: serializeManagedProductDetail(managedProduct),
   };
 }
 
@@ -230,13 +283,12 @@ export async function deleteProduct(
     )
     .lean<ProductDoc | null>();
 
-  if (!product) {
-    requestLogger.info(
-      { managerId, productId },
-      "Delete product failed because managed product was not found"
-    );
-    throw new NotFoundError("Product not found");
-  }
+  const managedProduct = requireManagedProduct(product, {
+    managerId,
+    productId,
+    requestLogger,
+    operation: "Delete product",
+  });
 
   requestLogger.debug(
     { managerId, productId },
@@ -244,7 +296,7 @@ export async function deleteProduct(
   );
 
   return {
-    product: serializeManagedProductDetail(product),
+    product: serializeManagedProductDetail(managedProduct),
   };
 }
 
@@ -312,13 +364,12 @@ export async function updateFlashSale(
     )
     .lean<ProductDoc | null>();
 
-  if (!product) {
-    requestLogger.info(
-      { managerId, productId },
-      "Update flash sale failed because managed product was not found"
-    );
-    throw new NotFoundError("Product not found");
-  }
+  const managedProduct = requireManagedProduct(product, {
+    managerId,
+    productId,
+    requestLogger,
+    operation: "Update flash sale",
+  });
 
   requestLogger.debug(
     { managerId, productId },
@@ -326,7 +377,7 @@ export async function updateFlashSale(
   );
 
   return {
-    product: serializeManagedProductDetail(product),
+    product: serializeManagedProductDetail(managedProduct),
   };
 }
 

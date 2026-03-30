@@ -5,6 +5,7 @@ import {
   createProduct as createProductService,
   deleteManager as deleteManagerService,
   deleteProduct as deleteProductService,
+  getManagedProductById as getManagedProductByIdService,
   listManagedProducts as listManagedProductsService,
   listManagers as listManagersService,
   updateFlashSale as updateFlashSaleService,
@@ -29,6 +30,8 @@ function getManagedProductsRoute(req: Request): string {
     ? "GET /api/admin/products/mine"
     : "GET /api/admin/products";
 }
+
+const MANAGED_PRODUCT_DETAIL_ROUTE = "GET /api/admin/products/:id";
 
 export async function listManagedProducts(
   req: Request,
@@ -64,6 +67,60 @@ export async function listManagedProducts(
       failureMessage: "List managed products request failed",
       unexpectedMessage: "Unexpected error while handling list managed products request",
       context: { userId: req.user.id },
+    });
+  }
+}
+
+export async function getManagedProductById(
+  req: Request,
+  res: Response
+): Promise<void> {
+  const requestLogger = getRequestLogger(req);
+  const adminControllerLogger = requestLogger.child({ module: "admin-controller" });
+  const productId = getSingleParam(req.params.id);
+
+  if (!req.user) {
+    adminControllerLogger.warn(
+      { route: MANAGED_PRODUCT_DETAIL_ROUTE },
+      "Unauthorized admin request"
+    );
+    res.status(401).json({ message: "Unauthorized" });
+    return;
+  }
+
+  adminControllerLogger.debug(
+    {
+      route: MANAGED_PRODUCT_DETAIL_ROUTE,
+      userId: req.user.id,
+      productId,
+    },
+    "Get managed product by id request received"
+  );
+  if (!productId) {
+    adminControllerLogger.warn(
+      { route: MANAGED_PRODUCT_DETAIL_ROUTE, userId: req.user.id },
+      "Get managed product by id request failed because product id was missing"
+    );
+    res.status(400).json({ message: "Product id is required" });
+    return;
+  }
+
+  try {
+    const result = await getManagedProductByIdService(
+      req.user.id,
+      productId,
+      requestLogger.child({ module: "admin-service" })
+    );
+    res.status(200).json(result);
+  } catch (error) {
+    handleControllerError({
+      error,
+      res,
+      logger: adminControllerLogger,
+      route: MANAGED_PRODUCT_DETAIL_ROUTE,
+      failureMessage: "Get managed product by id request failed",
+      unexpectedMessage: "Unexpected error while handling get managed product by id request",
+      context: { userId: req.user.id, productId },
     });
   }
 }

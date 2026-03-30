@@ -6,6 +6,7 @@ import {
   createProduct,
   deleteManager,
   deleteProduct,
+  getManagedProductById,
   listManagedProducts,
   listManagers,
   updateFlashSale,
@@ -25,6 +26,12 @@ adminRouter.get(
   requireAuth,
   requireRole(["manager"]),
   listManagedProducts
+);
+adminRouter.get(
+  "/products/:id",
+  requireAuth,
+  requireRole(["manager"]),
+  getManagedProductById
 );
 adminRouter.post(
   "/products",

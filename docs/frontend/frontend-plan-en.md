@@ -61,6 +61,7 @@ If you keep the following four rules fixed during implementation, there will be 
 ### Product Manager APIs
 
 - `GET /api/admin/products/mine`
+- `GET /api/admin/products/:id`
 - `POST /api/admin/products`
 - `PATCH /api/admin/products/:id`
 - `DELETE /api/admin/products/:id`

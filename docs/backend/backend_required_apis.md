@@ -56,6 +56,7 @@
 ### Product Manager only
 
 - `GET /api/admin/products/mine` (PO dashboard: own products)
+- `GET /api/admin/products/:id` (PO edit screen: own product detail)
 - `POST /api/admin/products`: Post new item
 - `PATCH /api/admin/products/:id`
 - `DELETE /api/admin/products/:id`
