@@ -4,18 +4,13 @@
 
 ## 結論
 
-フロントエンドのルーティング上は存在するものの、実体がページシェルのままで未実装と判断できるページは現在 4 件です。
+フロントエンドのルーティング上は存在するものの、実体がページシェルのままで未実装と判断できるページは現在 0 件です。
 
 対象ルートは `packages/frontend/src/App.tsx` で定義されています。
 
 ## 未実装ページ一覧
 
-| Route | 状態 | 根拠 |
-| --- | --- | --- |
-| `/pm/dashboard` | 未実装 | `Owned products list page shell.` のみを表示しています。参照: `packages/frontend/src/components/PM.tsx:3` |
-| `/pm/products/new` | 未実装 | `Product creation page shell.` のみを表示しています。参照: `packages/frontend/src/components/PM.tsx:12` |
-| `/pm/products/:id` | 未実装 | `Edit/delete/flash-sale setup page shell.` のみを表示しています。参照: `packages/frontend/src/components/PM.tsx:21` |
-| `/admin/managers` | 未実装 | `Product Manager account management page shell.` のみを表示しています。参照: `packages/frontend/src/components/Admin.tsx:1` |
+現在、ページシェルのまま残っているルートはありません。
 
 ## 今回実装済み
 
@@ -25,6 +20,10 @@
 - `/cart` で数量更新、削除、エラー表示に対応
 - `/checkout` で支払い方法選択、注文送信、成功画面表示に対応
 - `/mypage` でプロフィール表示、注文履歴の検索・並び替え・詳細表示に対応
+- `/pm/dashboard` で担当商品の一覧表示と edit/public 導線に対応
+- `/pm/products/new` で商品作成に対応
+- `/pm/products/:id` で商品更新、flash sale 更新、無効化に対応
+- `/admin/managers` で Product Manager 一覧表示、検索、新規作成、削除に対応
 
 ## 実装済みと判断できるページ
 
@@ -37,26 +36,23 @@
 - `/cart` `packages/frontend/src/components/Cart.tsx`
 - `/checkout` `packages/frontend/src/components/CustomerPages.tsx`
 - `/mypage` `packages/frontend/src/components/CustomerPages.tsx`
+- `/pm/dashboard` `/pm/products/new` `/pm/products/:id` `packages/frontend/src/components/PM.tsx`
+- `/admin/managers` `packages/frontend/src/components/Admin.tsx`
 
 ## API 接続状況
 
-フロントエンド側の API モジュールは現状、`auth` `cart` `checkout` `me` `orders` `search` の 6 系統です。
+フロントエンド側の API モジュールは現状、`admin` `auth` `cart` `checkout` `images` `me` `orders` `search` の 8 系統です。
 
+- `packages/frontend/src/api/admin.ts`
 - `packages/frontend/src/api/auth.ts`
 - `packages/frontend/src/api/cart.ts`
 - `packages/frontend/src/api/checkout.ts`
+- `packages/frontend/src/api/images.ts`
 - `packages/frontend/src/api/me.ts`
 - `packages/frontend/src/api/orders.ts`
 - `packages/frontend/src/api/search.ts`
 
-そのため、未実装ページに対応する以下の API は、backend 側に受け口がある一方で frontend 側は未接続です。
-
-- `POST /api/admin/products`
-- `PATCH /api/admin/products/:id`
-- `DELETE /api/admin/products/:id`
-- `PATCH /api/admin/products/:id/flash-sale`
-- `POST /api/admin/managers`
-- `DELETE /api/admin/managers/:id`
+ルーティング済みページに必要な主要 API は frontend から接続済みです。
 
 backend 側のルート定義:
 

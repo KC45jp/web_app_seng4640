@@ -1,10 +1,12 @@
+import bcrypt from "bcryptjs";
 import { readdir, readFile } from "node:fs/promises";
 import { join } from "node:path";
 
-import type { AdminCreateProductInput } from "@seng4640/shared";
+import { UserRole, type AdminCreateProductInput } from "@seng4640/shared";
 import type { Logger } from "pino";
 
-import { createProduct, createManager } from "@/modules/admin/service";
+import { userModel } from "@/db/models/user.models";
+import { createProduct } from "@/modules/admin/service";
 import { uploadImage } from "@/modules/images/service";
 import { logger } from "@/utils/logger";
 
@@ -31,6 +33,71 @@ const categories: ProductCategory[] = [
 
 const IMAGES_DIR = join(__dirname, "../../../../../db/.images");
 const SEED_UPLOADER_ID = "seed-script";
+const SEED_PASSWORD_SALT_ROUNDS = 10;
+
+type SeedUserAccount = {
+  name: string;
+  email: string;
+  password: string;
+  role: typeof UserRole.MANAGER | typeof UserRole.ADMIN;
+};
+
+const seedManagerAccount: SeedUserAccount = {
+  name: "Seed Manager",
+  email: "seed-manager@example.com",
+  password: "manager123",
+  role: UserRole.MANAGER,
+};
+
+const seedAdminAccount: SeedUserAccount = {
+  name: "Seed Admin",
+  email: "admin@example.com",
+  password: "admin123",
+  role: UserRole.ADMIN,
+};
+
+async function seedUserAccount(
+  account: SeedUserAccount,
+  scriptLogger: Logger
+): Promise<{ id: string; email: string }> {
+  const email = account.email.trim().toLowerCase();
+  const passwordHash = await bcrypt.hash(account.password, SEED_PASSWORD_SALT_ROUNDS);
+
+  const user = await userModel
+    .findOneAndUpdate(
+      { email },
+      {
+        $set: {
+          name: account.name.trim(),
+          email,
+          passwordHash,
+          role: account.role,
+        },
+      },
+      {
+        new: true,
+        upsert: true,
+        runValidators: true,
+        setDefaultsOnInsert: true,
+      }
+    )
+    .lean();
+
+  if (!user?._id) {
+    throw new Error(`Failed to seed user account for ${email}`);
+  }
+
+  const userId = user._id.toString();
+  scriptLogger.info(
+    { userId, email, role: account.role },
+    "Seed user account ensured"
+  );
+
+  return {
+    id: userId,
+    email,
+  };
+}
 
 async function uploadSeedImages(scriptLogger: Logger): Promise<string[]> {
   let files: string[];
@@ -95,12 +162,11 @@ async function run(): Promise<void> {
     await connectForDbScript("seed:products");
     await ensureBaseCollectionsAndIndexes();
 
-    const { manager } = await createManager(
-      { name: "Seed Manager", email: "seed-manager@example.com", password: "manager123" },
-      scriptLogger
-    );
+    const manager = await seedUserAccount(seedManagerAccount, scriptLogger);
+    const admin = await seedUserAccount(seedAdminAccount, scriptLogger);
     const managerId = manager.id;
-    scriptLogger.info({ managerId }, "Seed manager created");
+    scriptLogger.info({ managerId }, "Seed manager ensured");
+    scriptLogger.info({ adminId: admin.id, email: admin.email }, "Seed admin ensured");
 
     const imageUrls = await uploadSeedImages(scriptLogger);
     const products = buildProducts(50, imageUrls);
@@ -109,7 +175,9 @@ async function run(): Promise<void> {
       await createProduct(managerId, product, scriptLogger);
     }
 
-    console.log(`🌱 Product seed completed: processed=${products.length}`);
+    console.log(
+      `🌱 Product seed completed: processed=${products.length}, manager=${manager.email}, admin=${admin.email}`
+    );
   } catch (error) {
     console.error("❌ Product seed failed:", error);
     process.exitCode = 1;

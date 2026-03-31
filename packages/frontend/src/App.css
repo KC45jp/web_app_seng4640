@@ -793,6 +793,431 @@
   margin-top: 1rem;
 }
 
+/* ── Manager pages ── */
+.manager-page-layout {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.manager-hero-card {
+  background: linear-gradient(135deg, #eff6ff 0%, #ffffff 55%, #ecfeff 100%);
+}
+
+.manager-page-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+.manager-toolbar {
+  display: grid;
+  grid-template-columns: minmax(0, 1.7fr) repeat(3, minmax(0, 190px));
+  gap: 0.85rem;
+}
+
+.manager-results-meta {
+  margin-top: 0.85rem;
+}
+
+.manager-product-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.manager-product-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 1rem;
+  padding: 1rem 0;
+  border-top: 1px solid #e2e8f0;
+}
+
+.manager-product-row:first-child {
+  border-top: none;
+  padding-top: 0;
+}
+
+.manager-product-row:last-child {
+  padding-bottom: 0;
+}
+
+.manager-product-row-main {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  min-width: 0;
+}
+
+.manager-product-row-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+.manager-product-row-name {
+  margin: 0.2rem 0 0;
+  font-size: 1.05rem;
+  color: #0f172a;
+}
+
+.manager-product-row-description {
+  margin: 0;
+  color: #475569;
+  line-height: 1.55;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.manager-product-row-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem 1rem;
+}
+
+.manager-product-row-meta-item {
+  margin: 0;
+  color: #334155;
+}
+
+.manager-badge-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  justify-content: flex-end;
+}
+
+.manager-inline-badge {
+  position: static;
+}
+
+.manager-status-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.25rem 0.7rem;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.manager-status-badge.is-live {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.manager-status-badge.is-inactive {
+  background: #e2e8f0;
+  color: #475569;
+}
+
+.manager-product-row-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  min-width: 160px;
+}
+
+.manager-empty-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  align-items: flex-start;
+}
+
+.manager-editor-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(280px, 0.9fr);
+  gap: 1.25rem;
+  align-items: start;
+}
+
+.manager-side-column {
+  display: grid;
+  gap: 1rem;
+}
+
+.manager-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.9rem;
+}
+
+.manager-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  color: #334155;
+  font-weight: 600;
+}
+
+.manager-field-full {
+  grid-column: 1 / -1;
+}
+
+.manager-image-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  margin-bottom: 1rem;
+}
+
+.manager-field-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+.manager-input,
+.manager-textarea {
+  width: 100%;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  background: #f8fafc;
+  color: #0f172a;
+  font: inherit;
+}
+
+.manager-input {
+  height: 2.5rem;
+  padding: 0 0.75rem;
+}
+
+.manager-textarea {
+  padding: 0.75rem;
+  resize: vertical;
+  min-height: 8rem;
+}
+
+.manager-upload-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.manager-file-input {
+  max-width: 100%;
+  color: #334155;
+}
+
+.manager-upload-button {
+  border: 1px solid #cbd5e1;
+}
+
+.manager-upload-success {
+  margin: 0;
+  color: #15803d;
+  font-weight: 700;
+}
+
+.manager-preview-card {
+  display: grid;
+  grid-template-columns: 160px minmax(0, 1fr);
+  gap: 1rem;
+  padding: 0.95rem;
+  border: 1px solid #d6dfec;
+  border-radius: 10px;
+  background: #f8fafc;
+}
+
+.manager-preview-image {
+  width: 160px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 8px;
+  background: #e2e8f0;
+}
+
+.manager-preview-meta {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.manager-preview-label {
+  margin: 0;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #64748b;
+}
+
+.manager-preview-url {
+  margin: 0;
+  color: #0f172a;
+  word-break: break-all;
+}
+
+.manager-help-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.manager-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 0.85rem;
+  margin-bottom: 1rem;
+}
+
+.manager-summary-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0.9rem 1rem;
+  border: 1px solid #d6dfec;
+  border-radius: 10px;
+  background: #f8fafc;
+}
+
+.manager-summary-label {
+  margin: 0;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #64748b;
+}
+
+.manager-section-title {
+  margin: 0 0 0.9rem;
+  font-size: 1.05rem;
+  color: #0f172a;
+}
+
+.manager-checkbox-row {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  margin-bottom: 1rem;
+  color: #0f172a;
+  font-weight: 600;
+}
+
+.manager-checkbox-row input {
+  margin: 0;
+}
+
+.manager-danger-button {
+  min-height: 2.5rem;
+  padding: 0.55rem 1rem;
+  border: none;
+  border-radius: 8px;
+  background: #dc2626;
+  color: #fff;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.manager-danger-button:hover {
+  background: #b91c1c;
+}
+
+.manager-danger-button:disabled {
+  opacity: 0.65;
+  cursor: default;
+}
+
+/* ── Admin pages ── */
+.admin-page-layout {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.admin-hero-card {
+  background: linear-gradient(135deg, #fff7ed 0%, #ffffff 55%, #fef2f2 100%);
+}
+
+.admin-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 0.85rem;
+}
+
+.admin-content-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(280px, 0.9fr);
+  gap: 1.25rem;
+  align-items: start;
+}
+
+.admin-toolbar {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.85rem;
+  margin-bottom: 1rem;
+}
+
+.admin-manager-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.admin-manager-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 1rem;
+  align-items: center;
+  padding: 1rem 0;
+  border-top: 1px solid #e2e8f0;
+}
+
+.admin-manager-row:first-child {
+  border-top: none;
+  padding-top: 0;
+}
+
+.admin-manager-row:last-child {
+  padding-bottom: 0;
+}
+
+.admin-manager-main {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  min-width: 0;
+}
+
+.admin-manager-name {
+  margin: 0.2rem 0 0;
+  font-size: 1.05rem;
+  color: #0f172a;
+}
+
+.admin-manager-email {
+  margin: 0;
+  color: #334155;
+  word-break: break-word;
+}
+
+.admin-form-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.admin-create-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.admin-empty-state {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  padding-top: 0.35rem;
+}
+
 /* ── My Page / Orders ── */
 .mypage-layout {
   display: grid;
@@ -1075,18 +1500,50 @@
   }
 
   .mypage-orders-header,
+  .manager-page-header,
+  .manager-field-header,
+  .manager-product-row-header,
   .order-card-header,
   .order-card-item-row,
   .order-card-timeline-row {
     flex-direction: column;
   }
 
+  .manager-toolbar,
+  .manager-editor-layout,
+  .admin-content-layout,
   .mypage-toolbar {
+    grid-template-columns: 1fr;
+  }
+
+  .manager-product-row {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-manager-row {
+    grid-template-columns: 1fr;
+  }
+
+  .manager-form-grid {
     grid-template-columns: 1fr;
   }
 
   .order-card-header-meta {
     align-items: flex-start;
+  }
+
+  .manager-product-row-actions {
+    min-width: 0;
+  }
+
+  .manager-preview-card {
+    grid-template-columns: 1fr;
+  }
+
+  .manager-preview-image {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 4 / 3;
   }
 
   .order-card-item-subtotal {

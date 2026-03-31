@@ -2,6 +2,9 @@ import type { NextFunction, Request, Response } from "express";
 import { AppError } from "../utils/errors";
 import {authValidation} from "./auth/authorization"
 
+function applyAuthenticatedNoStoreHeaders(res: Response): void {
+  res.setHeader("Cache-Control", "no-store");
+}
 
 export function requireAuth(
   req: Request,
@@ -11,6 +14,7 @@ export function requireAuth(
   const authorization = req.header("authorization");
   try {
     req.user = authValidation(authorization);
+    applyAuthenticatedNoStoreHeaders(res);
     next();
   } catch (error) {
     if (error instanceof AppError) {
@@ -20,5 +24,4 @@ export function requireAuth(
     res.status(500).json({ message: "Internal server error" });
   }
 }
-
 

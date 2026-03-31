@@ -7,6 +7,7 @@ const makeRes = () => {
   const res: any = {};
   res.status = jest.fn().mockReturnValue(res);
   res.json = jest.fn().mockReturnValue(res);
+  res.setHeader = jest.fn();
   return res;
 };
 
@@ -33,6 +34,7 @@ afterEach(() => {
 });
 
 it("sets req.user and calls next on valid token", setsReqUserAndCallsNextOnValidToken);
+it("sets no-store cache header on authenticated requests", setsNoStoreCacheHeaderOnAuthenticatedRequests);
 it("returns 401 when authorization header is missing", returns401WhenAuthorizationHeaderIsMissing);
 it("returns 503 when JWT secret is missing", returns503WhenJwtSecretMissing);
 it("returns 401 when token is invalid", returns401WhenTokenIsInvalid);
@@ -44,8 +46,16 @@ function setsReqUserAndCallsNextOnValidToken(): void {
 
   expect(next).toHaveBeenCalled();
   expect(req.user).toEqual({ id: "u1", role: "customer" });
+  expect(res.setHeader).toHaveBeenCalledWith("Cache-Control", "no-store");
   expect(res.status).not.toHaveBeenCalled();
   expect(res.json).not.toHaveBeenCalled();
+}
+
+function setsNoStoreCacheHeaderOnAuthenticatedRequests(): void {
+  const token = jwt.sign({ id: "u1", role: "customer" }, "test-secret");
+  const { res } = runRequireAuth(`Bearer ${token}`);
+
+  expect(res.setHeader).toHaveBeenCalledWith("Cache-Control", "no-store");
 }
 
 function returns401WhenAuthorizationHeaderIsMissing(): void {
