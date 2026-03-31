@@ -8,8 +8,11 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsc -p tsconfig.json || ../backend/node_modules/.bin/tsc -p tsconfig.json",
+    "build": "tsc -p tsconfig.json",
     "clean": "rm -rf dist"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3"
   },
   "exports": {
     ".": {
