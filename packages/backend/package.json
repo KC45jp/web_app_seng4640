@@ -4,15 +4,15 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "node --env-file=.env --env-file=.env.dev --import tsx --watch src/index.ts",
-    "stg": "node --env-file=.env --env-file=.env.stg --import tsx src/index.ts",
+    "dev": "node --env-file=.env.dev --import tsx --watch src/index.ts",
+    "stg": "node --env-file=.env.stg --import tsx src/index.ts",
     "build": "tsc",
     "test": "LOG_LEVEL=silent jest",
-    "db:clean:dev": "node --env-file=.env --env-file=.env.dev --import tsx src/scripts/db/clean.ts",
-    "db:clean:stg": "node --env-file=.env --env-file=.env.stg --import tsx src/scripts/db/clean.ts",
-    "db:seed:customer:dev": "node --env-file=.env --env-file=.env.dev --import tsx src/scripts/db/customerSeed.ts",
-    "db:seed:products:dev": "node --env-file=.env --env-file=.env.dev --import tsx src/scripts/db/seedProducts.ts",
-    "db:seed:products:stg": "node --env-file=.env --env-file=.env.stg --import tsx src/scripts/db/seedProducts.ts"
+    "db:clean:dev": "node --env-file=.env.dev --import tsx src/scripts/db/clean.ts",
+    "db:clean:stg": "node --env-file=.env.stg --import tsx src/scripts/db/clean.ts",
+    "db:seed:customer:dev": "node --env-file=.env.dev --import tsx src/scripts/db/customerSeed.ts",
+    "db:seed:products:dev": "node --env-file=.env.dev --import tsx src/scripts/db/seedProducts.ts",
+    "db:seed:products:stg": "node --env-file=.env.stg --import tsx src/scripts/db/seedProducts.ts"
   },
   "keywords": [],
   "author": "",

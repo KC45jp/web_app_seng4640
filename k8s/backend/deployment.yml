@@ -23,7 +23,7 @@ spec:
             - name: PORT
               value: "5000"
             - name: MONGO_URI
-              value: "mongodb://<NODE_IP>:27017/seng4640?replicaSet=rs0&directConnection=true"
+              value: "mongodb://172.27.202.96:27017/seng4640?replicaSet=rs0&directConnection=true"
             - name: JWT_SECRET
               valueFrom:
                 secretKeyRef:

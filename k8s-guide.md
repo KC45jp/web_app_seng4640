@@ -82,7 +82,7 @@ backend は Pod の中で動きます。
 ノード IP の取得:
 
 ```bash
-NODE_IP=$(kubectl get nodes -o jsonpath='{.items[0].status.addresses[?(@.type=="InternalIP")].address}')
+NODE_IP=$(sudo kubectl get nodes -o jsonpath='{.items[0].status.addresses[?(@.type=="InternalIP")].address}')
 echo "$NODE_IP"
 ```
 
@@ -91,6 +91,17 @@ backend 用の `MONGO_URI` はこうなります。
 ```text
 mongodb://<NODE_IP>:27017/seng4640?replicaSet=rs0&directConnection=true
 ```
+
+`<NODE_IP>` はプレースホルダです。
+[`k8s/backend/deployment.yml`](/home/keishi/tru/web_seng4640/web_app_seng4640/k8s/backend/deployment.yml) の `MONGO_URI` に、そのまま `<NODE_IP>` を残さず実際の IP へ置き換えてから保存し、`kubectl apply` してください。
+
+例:
+
+```text
+mongodb://172.27.202.96:27017/seng4640?replicaSet=rs0&directConnection=true
+```
+
+もし `<NODE_IP>` のまま apply すると、backend ログに `Unable to parse <NODE_IP>:27017 with URL` が出て、`/api/products` など DB を使う API が 500 になります。
 
 ### 注意: replica set の host 名
 
@@ -110,13 +121,14 @@ frontend は今回は k3s に載せません。
 backend が k3s の NodePort `30500` で見える前提なら、frontend は次のように起動できます。
 
 ```bash
-NODE_IP=$(kubectl get nodes -o jsonpath='{.items[0].status.addresses[?(@.type=="InternalIP")].address}')
+NODE_IP=$(sudo kubectl get nodes -o jsonpath='{.items[0].status.addresses[?(@.type=="InternalIP")].address}')
 
 cd packages/frontend
-VITE_API_BASE_URL=http://${NODE_IP}:30500 npm run dev
+VITE_API_BASE_URL=http://${NODE_IP}:30500 npm run dev -- --host 0.0.0.0
 ```
 
 これで frontend は browser から backend の NodePort を叩きます。
+同じマシンからなら `http://localhost:5173/`、LAN 内の別端末からなら `http://<FRONTEND_HOST_IP>:5173/` で開けます。
 
 ---
 
@@ -232,7 +244,16 @@ spec:
 ```
 
 `<NODE_IP>` はプレースホルダです。
-apply 前に、自分のノード IP に置き換えてください。
+apply 前に、自分のノード IP に置き換え、ファイルを保存してから反映してください。
+
+反映確認:
+
+```bash
+sudo kubectl apply -f k8s/backend/deployment.yml
+sudo kubectl exec -n seng4640 deploy/backend -- printenv MONGO_URI
+```
+
+ここで `mongodb://<NODE_IP>:27017/...` のままなら、manifest の保存漏れか apply 漏れです。
 
 ### Service
 
@@ -307,15 +328,21 @@ VITE_API_BASE_URL=http://${NODE_IP}:30500 npm run dev
 ## よく使うデバッグコマンド
 
 ```bash
-kubectl get all -n seng4640
+sudo kubectl get all -n seng4640
 
-kubectl logs -n seng4640 deployment/backend
-kubectl describe pod -n seng4640 -l app=backend
-kubectl exec -it -n seng4640 deployment/backend -- sh
+sudo kubectl logs -n seng4640 deployment/backend
+sudo kubectl describe pod -n seng4640 -l app=backend
+sudo kubectl exec -it -n seng4640 deployment/backend -- sh
+sudo kubectl exec -n seng4640 deploy/backend -- printenv MONGO_URI
 
 docker compose -f db/docker-compose.yml logs mongodb
 docker compose -f db/docker-compose.yml logs mongo-init-replica
 ```
+
+既知のハマりどころ:
+
+- `kubectl` で `/etc/rancher/k3s/k3s.yaml: permission denied` が出る場合は、この環境では `sudo kubectl ...` が必要です。
+- `/api/health` は通るのに `/api/products` だけ 500 の場合、まず backend ログと `printenv MONGO_URI` を確認してください。MongoDB 接続失敗でも health check は通る作りです。
 
 全部消す:
 
