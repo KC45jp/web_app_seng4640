@@ -1,0 +1,15 @@
+.git
+.DS_Store
+
+**/node_modules
+**/dist
+**/coverage
+**/*.log
+
+packages/backend/.env
+packages/backend/.env.*
+packages/frontend/.env
+packages/frontend/.env.*
+
+db/data
+db/db/data

@@ -1,0 +1,19 @@
+# Root build context for frontend/backend Dockerfiles.
+.git
+.DS_Store
+
+# Local install/build artifacts should never be sent to Docker.
+**/node_modules
+**/dist
+**/coverage
+**/*.log
+
+# Local env files are runtime concerns, not build inputs.
+packages/backend/.env
+packages/backend/.env.*
+packages/frontend/.env
+packages/frontend/.env.*
+
+# MongoDB local data should not be part of the image context.
+db/data
+db/db/data
