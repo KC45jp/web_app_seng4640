@@ -15,14 +15,29 @@ app.use(express.json());
 
 const PORT = appConfig.PORT;
 const MONGO_URI = appConfig.MONGO_URI;
+const MONGO_MAX_POOL_SIZE = appConfig.MONGO_MAX_POOL_SIZE;
+
+const mongooseConnectOptions =
+  MONGO_MAX_POOL_SIZE === undefined
+    ? undefined
+    : { maxPoolSize: MONGO_MAX_POOL_SIZE };
 
 // MongoDB connection (Req_5.1)
-mongoose.connect(MONGO_URI)
+mongoose.connect(MONGO_URI, mongooseConnectOptions)
   .then(() => {
-    logger.info({ appEnv: appConfig.APP_ENV }, "MongoDB connected");
+    logger.info(
+      {
+        appEnv: appConfig.APP_ENV,
+        mongoMaxPoolSize: MONGO_MAX_POOL_SIZE,
+      },
+      "MongoDB connected"
+    );
   })
   .catch((err) => {
-    logger.error({ err }, "MongoDB connection failed");
+    logger.error(
+      { err, mongoMaxPoolSize: MONGO_MAX_POOL_SIZE },
+      "MongoDB connection failed"
+    );
   });
 
 // Health Req_11.1

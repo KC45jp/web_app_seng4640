@@ -24,6 +24,8 @@ spec:
               value: "5000"
             - name: MONGO_URI
               value: "mongodb://172.27.202.96:27017/seng4640?replicaSet=rs0&directConnection=true"
+            - name: MONGO_MAX_POOL_SIZE
+              value: "20"
             - name: JWT_SECRET
               valueFrom:
                 secretKeyRef:

@@ -3,6 +3,7 @@ import { loadEnv, resetEnvCacheForTest } from "./loadEnv";
 const originalAppEnv = process.env.APP_ENV;
 const originalPort = process.env.PORT;
 const originalMongoUri = process.env.MONGO_URI;
+const originalMongoMaxPoolSize = process.env.MONGO_MAX_POOL_SIZE;
 const originalJwtSecret = process.env.JWT_SECRET;
 const originalProductListLimitMax = process.env.PRODUCT_LIST_LIMIT_MAX;
 
@@ -11,6 +12,7 @@ beforeEach(() => {
   delete process.env.APP_ENV;
   delete process.env.PORT;
   delete process.env.MONGO_URI;
+  delete process.env.MONGO_MAX_POOL_SIZE;
   delete process.env.JWT_SECRET;
   delete process.env.PRODUCT_LIST_LIMIT_MAX;
 });
@@ -19,6 +21,7 @@ afterEach(() => {
   process.env.APP_ENV = originalAppEnv;
   process.env.PORT = originalPort;
   process.env.MONGO_URI = originalMongoUri;
+  process.env.MONGO_MAX_POOL_SIZE = originalMongoMaxPoolSize;
   process.env.JWT_SECRET = originalJwtSecret;
   process.env.PRODUCT_LIST_LIMIT_MAX = originalProductListLimitMax;
   resetEnvCacheForTest();
@@ -33,9 +36,11 @@ describe("loadEnv", () => {
   it("builds config from an explicit source", buildsConfigFromExplicitSource);
   it("reads process.env and normalizes APP_ENV", readsProcessEnvAndNormalizesAppEnv);
   it("defaults APP_ENV to dev for unsupported values", defaultsAppEnvToDev);
+  it("treats blank MONGO_MAX_POOL_SIZE as undefined", treatsBlankMongoMaxPoolSizeAsUndefined);
   it("treats blank JWT_SECRET as undefined", treatsBlankJwtSecretAsUndefined);
   it("throws when a required env value is missing", throwsForMissingRequiredValue);
   it("throws when a positive integer env value is invalid", throwsForInvalidPositiveInt);
+  it("throws when an optional positive integer env value is invalid", throwsForInvalidOptionalPositiveInt);
 });
 
 /**
@@ -47,6 +52,7 @@ function buildsConfigFromExplicitSource(): void {
     APP_ENV: "stg",
     PORT: "3001",
     MONGO_URI: "mongodb://localhost:27017/seng4640_test",
+    MONGO_MAX_POOL_SIZE: "25",
     JWT_SECRET: " test-secret ",
     PRODUCT_LIST_LIMIT_MAX: "25",
   });
@@ -55,6 +61,7 @@ function buildsConfigFromExplicitSource(): void {
     APP_ENV: "stg",
     PORT: 3001,
     MONGO_URI: "mongodb://localhost:27017/seng4640_test",
+    MONGO_MAX_POOL_SIZE: 25,
     JWT_SECRET: "test-secret",
     PRODUCT_LIST_LIMIT_MAX: 25,
   });
@@ -68,6 +75,7 @@ function readsProcessEnvAndNormalizesAppEnv(): void {
   process.env.APP_ENV = " STG ";
   process.env.PORT = "5000";
   process.env.MONGO_URI = "mongodb://localhost:27017/seng4640_test";
+  process.env.MONGO_MAX_POOL_SIZE = "20";
   process.env.JWT_SECRET = "secret";
   process.env.PRODUCT_LIST_LIMIT_MAX = "100";
 
@@ -75,6 +83,7 @@ function readsProcessEnvAndNormalizesAppEnv(): void {
 
   expect(config.APP_ENV).toBe("stg");
   expect(config.PORT).toBe(5000);
+  expect(config.MONGO_MAX_POOL_SIZE).toBe(20);
   expect(process.env.APP_ENV).toBe("stg");
 }
 
@@ -91,6 +100,22 @@ function defaultsAppEnvToDev(): void {
   });
 
   expect(config.APP_ENV).toBe("dev");
+}
+
+/**
+ * Ensures blank optional numeric config is normalized away instead of being
+ * treated as a real limit.
+ */
+function treatsBlankMongoMaxPoolSizeAsUndefined(): void {
+  const config = loadEnv({
+    APP_ENV: "dev",
+    PORT: "3000",
+    MONGO_URI: "mongodb://localhost:27017/seng4640_dev",
+    MONGO_MAX_POOL_SIZE: "   ",
+    PRODUCT_LIST_LIMIT_MAX: "10",
+  });
+
+  expect(config.MONGO_MAX_POOL_SIZE).toBeUndefined();
 }
 
 /**
@@ -136,4 +161,19 @@ function throwsForInvalidPositiveInt(): void {
       PRODUCT_LIST_LIMIT_MAX: "10",
     })
   ).toThrow("[loadEnv] Invalid positive integer env value: PORT");
+}
+
+/**
+ * Verifies optional numeric env values are still validated when provided.
+ */
+function throwsForInvalidOptionalPositiveInt(): void {
+  expect(() =>
+    loadEnv({
+      APP_ENV: "dev",
+      PORT: "3000",
+      MONGO_URI: "mongodb://localhost:27017/seng4640_dev",
+      MONGO_MAX_POOL_SIZE: "0",
+      PRODUCT_LIST_LIMIT_MAX: "10",
+    })
+  ).toThrow("[loadEnv] Invalid positive integer env value: MONGO_MAX_POOL_SIZE");
 }

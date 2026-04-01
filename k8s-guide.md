@@ -92,6 +92,9 @@ backend 用の `MONGO_URI` はこうなります。
 mongodb://<NODE_IP>:27017/seng4640?replicaSet=rs0&directConnection=true
 ```
 
+必要なら接続プール上限も env で明示できます。
+Atlas free を使う場合は、backend の `.env` または Kubernetes env に `MONGO_MAX_POOL_SIZE=20` のように入れておくと扱いやすいです。
+
 `<NODE_IP>` はプレースホルダです。
 [`k8s/backend/deployment.yml`](/home/keishi/tru/web_seng4640/web_app_seng4640/k8s/backend/deployment.yml) の `MONGO_URI` に、そのまま `<NODE_IP>` を残さず実際の IP へ置き換えてから保存し、`kubectl apply` してください。
 
@@ -218,6 +221,8 @@ spec:
               value: "5000"
             - name: MONGO_URI
               value: "mongodb://<NODE_IP>:27017/seng4640?replicaSet=rs0&directConnection=true"
+            - name: MONGO_MAX_POOL_SIZE
+              value: "20"
             - name: JWT_SECRET
               valueFrom:
                 secretKeyRef:

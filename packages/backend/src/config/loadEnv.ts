@@ -5,6 +5,7 @@ export const EnvKeys = {
   APP_ENV: "APP_ENV",
   PORT: "PORT",
   MONGO_URI: "MONGO_URI",
+  MONGO_MAX_POOL_SIZE: "MONGO_MAX_POOL_SIZE",
   JWT_SECRET: "JWT_SECRET",
   LOG_LEVEL: "LOG_LEVEL",
   PRODUCT_LIST_LIMIT_MAX: "PRODUCT_LIST_LIMIT_MAX",
@@ -17,6 +18,7 @@ export type AppConfig = {
   readonly APP_ENV: AppEnv;
   readonly PORT: number;
   readonly MONGO_URI: string;
+  readonly MONGO_MAX_POOL_SIZE: number | undefined;
   readonly JWT_SECRET: string | undefined;
   readonly PRODUCT_LIST_LIMIT_MAX: number;
 };
@@ -82,6 +84,29 @@ function readRequiredPositiveInt(source: EnvSource, key: EnvKey): number {
 }
 
 /**
+ * Reads an optional positive integer env value.
+ *
+ * Returns `undefined` for missing or blank values. Throws when the value is
+ * provided but not a positive integer.
+ */
+function readOptionalPositiveInt(
+  source: EnvSource,
+  key: EnvKey
+): number | undefined {
+  const raw = readOptionalString(source, key);
+  if (raw === undefined) {
+    return undefined;
+  }
+
+  const parsed = Number(raw);
+  if (!Number.isInteger(parsed) || parsed < 1) {
+    throw new Error(`[loadEnv] Invalid positive integer env value: ${key}`);
+  }
+
+  return parsed;
+}
+
+/**
  * Builds the runtime application config from a provided env source after
  * normalizing and validating each field.
  */
@@ -92,6 +117,10 @@ function buildAppConfigFromSource(source: EnvSource): AppConfig {
     APP_ENV: appEnv,
     PORT: readRequiredPositiveInt(source, EnvKeys.PORT),
     MONGO_URI: readRequiredString(source, EnvKeys.MONGO_URI),
+    MONGO_MAX_POOL_SIZE: readOptionalPositiveInt(
+      source,
+      EnvKeys.MONGO_MAX_POOL_SIZE
+    ),
     JWT_SECRET: readOptionalString(source, EnvKeys.JWT_SECRET),
     PRODUCT_LIST_LIMIT_MAX: readRequiredPositiveInt(
       source,
