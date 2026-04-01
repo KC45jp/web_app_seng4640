@@ -35,3 +35,5 @@ Thumbs.db
 
 
 /db/.images/*
+
+/k8s_operation/

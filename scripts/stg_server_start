@@ -1,0 +1,175 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ROOT_DIR="$(cd "${SCRIPT_DIR}/.." && pwd)"
+BACKEND_IMAGE="seng4640-backend:latest"
+FRONTEND_IMAGE="seng4640-frontend:latest"
+FRONTEND_CONTAINER="seng4640-frontend"
+K8S_NAMESPACE="seng4640"
+
+usage() {
+  cat <<'EOF' >&2
+Usage: ./scripts/stg_server_start [ec2_public_ip]
+
+If ec2_public_ip is omitted, the script tries to detect it from EC2 metadata.
+EOF
+  exit 1
+}
+
+require_command() {
+  local command_name="$1"
+
+  if ! command -v "${command_name}" >/dev/null 2>&1; then
+    echo "${command_name} is required but was not found in PATH." >&2
+    exit 1
+  fi
+}
+
+resolve_public_ip() {
+  local metadata_token
+  local public_ip
+
+  require_command curl
+
+  metadata_token="$(
+    curl -fsS -m 5 -X PUT \
+      -H "X-aws-ec2-metadata-token-ttl-seconds: 21600" \
+      "http://169.254.169.254/latest/api/token" 2>/dev/null || true
+  )"
+
+  if [[ -n "${metadata_token}" ]]; then
+    public_ip="$(
+      curl -fsS -m 5 \
+        -H "X-aws-ec2-metadata-token: ${metadata_token}" \
+        "http://169.254.169.254/latest/meta-data/public-ipv4" 2>/dev/null || true
+    )"
+  else
+    public_ip="$(
+      curl -fsS -m 5 \
+        "http://169.254.169.254/latest/meta-data/public-ipv4" 2>/dev/null || true
+    )"
+  fi
+
+  if [[ -z "${public_ip}" ]]; then
+    echo "Could not determine EC2 public IP automatically. Pass it as: ./scripts/stg_server_start <ec2_public_ip>" >&2
+    exit 1
+  fi
+
+  printf '%s\n' "${public_ip}"
+}
+
+resolve_k8s_dir() {
+  local operation_dir="${ROOT_DIR}/k8s_operation"
+
+  if [[ -d "${operation_dir}" ]]; then
+    [[ -f "${operation_dir}/namespace.yml" ]] || {
+      echo "Missing ${operation_dir}/namespace.yml" >&2
+      exit 1
+    }
+    [[ -f "${operation_dir}/backend/secret.yml" ]] || {
+      echo "Missing ${operation_dir}/backend/secret.yml" >&2
+      exit 1
+    }
+    [[ -f "${operation_dir}/backend/deployment.yml" ]] || {
+      echo "Missing ${operation_dir}/backend/deployment.yml" >&2
+      exit 1
+    }
+    [[ -f "${operation_dir}/backend/service.yml" ]] || {
+      echo "Missing ${operation_dir}/backend/service.yml" >&2
+      exit 1
+    }
+
+    printf '%s\n' "${operation_dir}"
+    return
+  fi
+
+  printf '%s\n' "${ROOT_DIR}/k8s"
+}
+
+if [[ $# -gt 1 ]]; then
+  usage
+fi
+
+require_command docker
+require_command kubectl
+require_command k3s
+require_command systemctl
+
+if [[ $# -eq 1 ]]; then
+  EC2_PUBLIC_IP="$1"
+else
+  EC2_PUBLIC_IP="$(resolve_public_ip)"
+fi
+
+K8S_DIR="$(resolve_k8s_dir)"
+
+if docker info >/dev/null 2>&1; then
+  DOCKER=(docker)
+else
+  DOCKER=(sudo docker)
+fi
+
+KUBECTL=(sudo kubectl)
+K3S=(sudo k3s)
+
+echo "Using public IP: ${EC2_PUBLIC_IP}"
+echo "Using Kubernetes manifests from: ${K8S_DIR}"
+
+echo "Starting docker and k3s services..."
+sudo systemctl start docker
+sudo systemctl start k3s
+
+cd "${ROOT_DIR}"
+
+echo "Building backend image..."
+"${DOCKER[@]}" build -f packages/backend/Dockerfile -t "${BACKEND_IMAGE}" .
+
+echo "Importing backend image into k3s..."
+"${DOCKER[@]}" save "${BACKEND_IMAGE}" | "${K3S[@]}" ctr images import -
+
+echo "Applying backend Kubernetes manifests..."
+"${KUBECTL[@]}" apply -f "${K8S_DIR}/namespace.yml"
+"${KUBECTL[@]}" apply -f "${K8S_DIR}/backend/secret.yml"
+"${KUBECTL[@]}" apply -f "${K8S_DIR}/backend/deployment.yml"
+"${KUBECTL[@]}" apply -f "${K8S_DIR}/backend/service.yml"
+
+echo "Restarting backend rollout..."
+"${KUBECTL[@]}" rollout restart deployment/backend -n "${K8S_NAMESPACE}"
+"${KUBECTL[@]}" rollout status deployment/backend -n "${K8S_NAMESPACE}"
+
+echo "Building frontend image..."
+"${DOCKER[@]}" build \
+  -f packages/frontend/Dockerfile \
+  -t "${FRONTEND_IMAGE}" \
+  --build-arg "VITE_API_BASE_URL=http://${EC2_PUBLIC_IP}:30500" \
+  .
+
+if "${DOCKER[@]}" ps -a --format '{{.Names}}' | grep -qx "${FRONTEND_CONTAINER}"; then
+  echo "Replacing existing frontend container..."
+  "${DOCKER[@]}" rm -f "${FRONTEND_CONTAINER}" >/dev/null
+fi
+
+echo "Starting frontend container..."
+"${DOCKER[@]}" run -d \
+  --name "${FRONTEND_CONTAINER}" \
+  --restart unless-stopped \
+  -p 80:80 \
+  "${FRONTEND_IMAGE}"
+
+echo
+echo "=== Backend status ==="
+"${KUBECTL[@]}" get pods -n "${K8S_NAMESPACE}"
+"${KUBECTL[@]}" get svc -n "${K8S_NAMESPACE}"
+
+echo
+echo "=== Frontend status ==="
+"${DOCKER[@]}" ps --filter "name=${FRONTEND_CONTAINER}"
+
+echo
+echo "Open:"
+echo "  Frontend: http://${EC2_PUBLIC_IP}/"
+echo "  Backend : http://${EC2_PUBLIC_IP}:30500/api/health"
+echo
+echo "This script expects staging-ready manifests in ${K8S_DIR}."
