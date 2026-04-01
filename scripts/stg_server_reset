@@ -1,0 +1,84 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ROOT_DIR="$(cd "${SCRIPT_DIR}/.." && pwd)"
+BACKEND_IMAGE="seng4640-backend:latest"
+BACKEND_IMAGE_IMPORTED="docker.io/library/seng4640-backend:latest"
+FRONTEND_IMAGE="seng4640-frontend:latest"
+FRONTEND_CONTAINER="seng4640-frontend"
+K8S_NAMESPACE="seng4640"
+
+has_command() {
+  command -v "$1" >/dev/null 2>&1
+}
+
+log() {
+  echo "[stg_server_reset] $*"
+}
+
+resolve_docker_cmd() {
+  if ! has_command docker; then
+    return 1
+  fi
+
+  if docker info >/dev/null 2>&1; then
+    printf 'docker\n'
+  else
+    printf 'sudo docker\n'
+  fi
+}
+
+cleanup_docker() {
+  local docker_cmd="$1"
+
+  log "Cleaning Docker frontend container and images..."
+
+  if ${docker_cmd} ps -a --format '{{.Names}}' | grep -qx "${FRONTEND_CONTAINER}"; then
+    ${docker_cmd} rm -f "${FRONTEND_CONTAINER}" >/dev/null || true
+  fi
+
+  ${docker_cmd} image rm -f "${FRONTEND_IMAGE}" >/dev/null 2>&1 || true
+  ${docker_cmd} image rm -f "${BACKEND_IMAGE}" >/dev/null 2>&1 || true
+}
+
+cleanup_k3s() {
+  if ! has_command kubectl || ! has_command k3s || ! has_command systemctl; then
+    log "kubectl/k3s/systemctl is not fully available. Skipping Kubernetes cleanup."
+    return
+  fi
+
+  if ! sudo systemctl cat k3s >/dev/null 2>&1; then
+    log "k3s service is not installed on this host. Skipping Kubernetes cleanup."
+    return
+  fi
+
+  if ! sudo systemctl is-active --quiet k3s; then
+    log "k3s service exists but is not running. Starting it temporarily for cleanup..."
+    sudo systemctl start k3s
+  fi
+
+  log "Deleting Kubernetes namespace ${K8S_NAMESPACE} if it exists..."
+  sudo kubectl delete namespace "${K8S_NAMESPACE}" --ignore-not-found=true --wait=true >/dev/null || true
+
+  log "Removing imported backend image from k3s cache if present..."
+  sudo k3s ctr images rm "${BACKEND_IMAGE_IMPORTED}" >/dev/null 2>&1 || true
+  sudo k3s ctr images rm "${BACKEND_IMAGE}" >/dev/null 2>&1 || true
+}
+
+main() {
+  local docker_cmd=""
+
+  if docker_cmd="$(resolve_docker_cmd)"; then
+    cleanup_docker "${docker_cmd}"
+  else
+    log "Docker is not installed. Skipping Docker cleanup."
+  fi
+
+  cleanup_k3s
+
+  log "Reset complete."
+}
+
+main "$@"

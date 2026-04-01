@@ -260,6 +260,16 @@ sudo kubectl exec -n seng4640 deploy/backend -- printenv MONGO_URI
 
 ここで `mongodb://<NODE_IP>:27017/...` のままなら、manifest の保存漏れか apply 漏れです。
 
+### replicas を増やすとき
+
+backend Pod を 2 個にしたいときは、`spec.replicas` を `2` にして apply すれば増やせます。
+
+ただし今の readinessProbe / livenessProbe は `/api/health` を見ています。
+この endpoint は MongoDB 接続失敗でも `ok` を返すので、DB につながっていない Pod でも Ready 扱いになる可能性があります。
+
+そのため multi-pod にするときは、`/api/health` が通っていても `/api/products` など DB を使う API の疎通も確認してください。
+本番寄りにするなら、readinessProbe で DB 接続状態も反映する health check に寄せるのが安全です。
+
 ### Service
 
 [`k8s/backend/service.yml`](/home/keishi/tru/web_seng4640/web_app_seng4640/k8s/backend/service.yml)
@@ -348,6 +358,7 @@ docker compose -f db/docker-compose.yml logs mongo-init-replica
 
 - `kubectl` で `/etc/rancher/k3s/k3s.yaml: permission denied` が出る場合は、この環境では `sudo kubectl ...` が必要です。
 - `/api/health` は通るのに `/api/products` だけ 500 の場合、まず backend ログと `printenv MONGO_URI` を確認してください。MongoDB 接続失敗でも health check は通る作りです。
+- `replicas` を増やした場合も、今の `/api/health` だけでは DB 未接続 Pod を弾けません。multi-pod では products など DB 利用 API でも確認すると安心です。
 
 全部消す:
 

@@ -7,13 +7,16 @@ ROOT_DIR="$(cd "${SCRIPT_DIR}/.." && pwd)"
 BACKEND_IMAGE="seng4640-backend:latest"
 FRONTEND_IMAGE="seng4640-frontend:latest"
 FRONTEND_CONTAINER="seng4640-frontend"
+FRONTEND_HOST_PORT="${FRONTEND_HOST_PORT:-8080}"
 K8S_NAMESPACE="seng4640"
+RESET_SCRIPT="${SCRIPT_DIR}/stg_server_reset"
 
 usage() {
   cat <<'EOF' >&2
 Usage: ./scripts/stg_server_start [ec2_public_ip]
 
 If ec2_public_ip is omitted, the script tries to detect it from EC2 metadata.
+Set FRONTEND_HOST_PORT to override the default frontend port (8080).
 EOF
   exit 1
 }
@@ -96,6 +99,10 @@ require_command docker
 require_command kubectl
 require_command k3s
 require_command systemctl
+[[ -x "${RESET_SCRIPT}" ]] || {
+  echo "Missing executable reset script: ${RESET_SCRIPT}" >&2
+  exit 1
+}
 
 if [[ $# -eq 1 ]]; then
   EC2_PUBLIC_IP="$1"
@@ -116,12 +123,16 @@ K3S=(sudo k3s)
 
 echo "Using public IP: ${EC2_PUBLIC_IP}"
 echo "Using Kubernetes manifests from: ${K8S_DIR}"
+echo "Using frontend host port: ${FRONTEND_HOST_PORT}"
 
 echo "Starting docker and k3s services..."
 sudo systemctl start docker
 sudo systemctl start k3s
 
 cd "${ROOT_DIR}"
+
+echo "Resetting staging resources before deploy..."
+"${RESET_SCRIPT}"
 
 echo "Building backend image..."
 "${DOCKER[@]}" build -f packages/backend/Dockerfile -t "${BACKEND_IMAGE}" .
@@ -155,7 +166,7 @@ echo "Starting frontend container..."
 "${DOCKER[@]}" run -d \
   --name "${FRONTEND_CONTAINER}" \
   --restart unless-stopped \
-  -p 80:80 \
+  -p "${FRONTEND_HOST_PORT}:80" \
   "${FRONTEND_IMAGE}"
 
 echo
@@ -169,7 +180,7 @@ echo "=== Frontend status ==="
 
 echo
 echo "Open:"
-echo "  Frontend: http://${EC2_PUBLIC_IP}/"
+echo "  Frontend: http://${EC2_PUBLIC_IP}:${FRONTEND_HOST_PORT}/"
 echo "  Backend : http://${EC2_PUBLIC_IP}:30500/api/health"
 echo
 echo "This script expects staging-ready manifests in ${K8S_DIR}."
