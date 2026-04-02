@@ -2,6 +2,7 @@ import express from 'express';
 import mongoose from 'mongoose';
 import cors from 'cors';
 import { loadEnv } from './config/loadEnv';
+import { registerHealthRoutes } from './app/health';
 import { registerRoutes } from './app/registerRoutes';
 import { logger } from './utils/logger';
 import { requestContext } from './middlewares/requestContext';
@@ -40,11 +41,7 @@ mongoose.connect(MONGO_URI, mongooseConnectOptions)
     );
   });
 
-// Health Req_11.1
-app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok', timestamp: new Date() });
-});
-
+registerHealthRoutes(app);
 registerRoutes(app);
 
 app.listen(PORT, () => {

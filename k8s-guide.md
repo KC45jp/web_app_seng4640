@@ -236,7 +236,7 @@ spec:
               value: "stg"
           readinessProbe:
             httpGet:
-              path: /api/health
+              path: /api/ready
               port: 5000
             initialDelaySeconds: 5
             periodSeconds: 5
@@ -247,6 +247,9 @@ spec:
             initialDelaySeconds: 15
             periodSeconds: 10
 ```
+
+`/api/health` は liveness 用で、アプリ自体が応答できるかだけを見ます。
+`/api/ready` は readiness 用で、MongoDB 接続が落ちていると `503` と `db: "down"` を返します。
 
 `<NODE_IP>` はプレースホルダです。
 apply 前に、自分のノード IP に置き換え、ファイルを保存してから反映してください。
@@ -264,11 +267,10 @@ sudo kubectl exec -n seng4640 deploy/backend -- printenv MONGO_URI
 
 backend Pod を 2 個にしたいときは、`spec.replicas` を `2` にして apply すれば増やせます。
 
-ただし今の readinessProbe / livenessProbe は `/api/health` を見ています。
-この endpoint は MongoDB 接続失敗でも `ok` を返すので、DB につながっていない Pod でも Ready 扱いになる可能性があります。
+今は readinessProbe が `/api/ready` を見るので、MongoDB 接続に失敗した Pod は `Running` のままでも `Ready` にはなりません。
 
-そのため multi-pod にするときは、`/api/health` が通っていても `/api/products` など DB を使う API の疎通も確認してください。
-本番寄りにするなら、readinessProbe で DB 接続状態も反映する health check に寄せるのが安全です。
+それでも multi-pod にするときは、`/api/products` など DB を使う API の疎通も確認してください。
+本番寄りにするなら、liveness は軽く保ちつつ readiness で依存先の状態を反映するのが安全です。
 
 ### Service
 
@@ -329,6 +331,7 @@ kubectl get svc -n seng4640
 NODE_IP=$(kubectl get nodes -o jsonpath='{.items[0].status.addresses[?(@.type=="InternalIP")].address}')
 
 curl http://${NODE_IP}:30500/api/health
+curl -i http://${NODE_IP}:30500/api/ready
 ```
 
 frontend も起動していれば、browser から frontend 経由でも backend を叩けます。
@@ -357,8 +360,8 @@ docker compose -f db/docker-compose.yml logs mongo-init-replica
 既知のハマりどころ:
 
 - `kubectl` で `/etc/rancher/k3s/k3s.yaml: permission denied` が出る場合は、この環境では `sudo kubectl ...` が必要です。
-- `/api/health` は通るのに `/api/products` だけ 500 の場合、まず backend ログと `printenv MONGO_URI` を確認してください。MongoDB 接続失敗でも health check は通る作りです。
-- `replicas` を増やした場合も、今の `/api/health` だけでは DB 未接続 Pod を弾けません。multi-pod では products など DB 利用 API でも確認すると安心です。
+- `/api/health` は通るのに `/api/ready` が `503` の場合、backend 自体は生きているけれど MongoDB 接続が落ちています。まず backend ログと `printenv MONGO_URI` を確認してください。
+- `replicas` を増やした場合も、DB 未接続 Pod は `/api/ready` で弾けます。multi-pod では products など DB 利用 API でも確認すると安心です。
 
 全部消す:
 

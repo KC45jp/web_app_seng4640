@@ -39,7 +39,7 @@ spec:
               value: "stg"
           readinessProbe:
             httpGet:
-              path: /api/health
+              path: /api/ready
               port: 5000
             initialDelaySeconds: 5
             periodSeconds: 5
