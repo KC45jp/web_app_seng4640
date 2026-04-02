@@ -41,7 +41,10 @@ mongoose.connect(MONGO_URI, mongooseConnectOptions)
     );
   });
 
-registerHealthRoutes(app);
+registerHealthRoutes(app, {
+  appEnv: appConfig.APP_ENV,
+  mongoUri: appConfig.MONGO_URI,
+});
 registerRoutes(app);
 
 app.listen(PORT, () => {

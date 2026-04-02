@@ -272,6 +272,20 @@ backend Pod を 2 個にしたいときは、`spec.replicas` を `2` にして a
 それでも multi-pod にするときは、`/api/products` など DB を使う API の疎通も確認してください。
 本番寄りにするなら、liveness は軽く保ちつつ readiness で依存先の状態を反映するのが安全です。
 
+2 Pod が本当に立っているかの確認:
+
+```bash
+sudo kubectl get deployment backend -n seng4640
+sudo kubectl get pods -n seng4640 -l app=backend -o wide
+sudo kubectl get endpoints backend -n seng4640
+```
+
+見方:
+
+- `deployment/backend` の `READY` が `2/2` なら、2 Pod が Ready です。
+- `kubectl get pods` で backend Pod が 2 行あり、どちらも `Running` かつ `READY 1/1` なら OK です。
+- `kubectl get endpoints` に Pod IP が 2 個出ていれば、Service の配下にも 2 Pod が載っています。
+
 ### Service
 
 [`k8s/backend/service.yml`](/home/keishi/tru/web_seng4640/web_app_seng4640/k8s/backend/service.yml)
@@ -362,6 +376,14 @@ docker compose -f db/docker-compose.yml logs mongo-init-replica
 - `kubectl` で `/etc/rancher/k3s/k3s.yaml: permission denied` が出る場合は、この環境では `sudo kubectl ...` が必要です。
 - `/api/health` は通るのに `/api/ready` が `503` の場合、backend 自体は生きているけれど MongoDB 接続が落ちています。まず backend ログと `printenv MONGO_URI` を確認してください。
 - `replicas` を増やした場合も、DB 未接続 Pod は `/api/ready` で弾けます。multi-pod では products など DB 利用 API でも確認すると安心です。
+- EC2 から Atlas へつながらない場合、Atlas の IP Access List だけでなく AWS Security Group の `Outbound` も確認してください。今回の構成では `TCP 27017` への外向き通信が必要です。
+- Atlas 疎通確認には次が便利です。
+
+```bash
+timeout 5 bash -lc '</dev/tcp/ac-kewwpqf-shard-00-00.uyodlg6.mongodb.net/27017' && echo ok || echo fail
+timeout 5 bash -lc '</dev/tcp/ac-kewwpqf-shard-00-01.uyodlg6.mongodb.net/27017' && echo ok || echo fail
+timeout 5 bash -lc '</dev/tcp/ac-kewwpqf-shard-00-02.uyodlg6.mongodb.net/27017' && echo ok || echo fail
+```
 
 全部消す:
 
