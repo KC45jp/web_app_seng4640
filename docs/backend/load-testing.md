@@ -147,17 +147,21 @@ Relevant routes for the simplified flash-sale test:
 Because each seeded customer already has a cart with quantity `1`, the JMeter plan only needs:
 
 1. Read a row from `loadtest/stg-loadtest-users.csv`
-2. `POST /api/auth/login`
-3. Extract `$.accessToken`
-4. Add `Authorization: Bearer ${accessToken}`
-5. Use a `Synchronizing Timer`
-6. `POST /api/checkout` with:
+2. Use a `Synchronizing Timer` for the login burst
+3. `POST /api/auth/login`
+4. Extract `$.accessToken`
+5. Add `Authorization: Bearer ${accessToken}`
+6. Use a second `Synchronizing Timer` for the checkout burst
+7. `POST /api/checkout` with:
 
 ```json
 {
   "paymentMethod": "credit_card"
 }
 ```
+
+When you omit `--setup-flash-sale`, the measurement phase only issues `login` and
+`checkout` requests. That is the recommended mode for clean contention numbers.
 
 The repo now includes a starter plan here:
 
@@ -249,8 +253,22 @@ cd packages/backend
 LOADTEST_USER_COUNT=55 LOADTEST_PRODUCT_STOCK=50 npm run db:reset:loadtest:stg
 ```
 
-Then run JMeter with the same `55` customers and let the seed manager re-assert
-flash sale state before the checkout burst:
+Then run JMeter with the same `55` customers. In the default measurement mode,
+JMeter does a synchronized login burst first, then a synchronized checkout burst:
+
+```bash
+./run_jmeter_flash_sale \
+  --host 13.57.223.9 \
+  --port 30500 \
+  --csv loadtest/stg-loadtest-users.csv \
+  --threads 55 \
+  --sync 55 \
+  --response-timeout-ms 60000 \
+  --label stg-55v50
+```
+
+If you explicitly want JMeter to create a dedicated product and rewrite carts for
+the run, enable the setup flow separately:
 
 ```bash
 ./run_jmeter_flash_sale \
@@ -268,7 +286,7 @@ flash sale state before the checkout burst:
   --label stg-55v50
 ```
 
-That setup flow now does four things:
+That optional setup flow does four extra things:
 
 - manager login
 - create one dedicated product for this run
@@ -280,6 +298,10 @@ The manager-side API calls are:
 - `POST /api/auth/login`
 - `POST /api/admin/products`
 - `PATCH /api/admin/products/:id/flash-sale`
+
+It also adds customer-side cart rewrite requests, so use it only when you need a
+JMeter-created dedicated product. For pure oversell measurement, leave
+`--setup-flash-sale` off.
 
 For local backend testing, the same command becomes:
 

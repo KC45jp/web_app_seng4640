@@ -379,6 +379,11 @@ if (productId &amp;&amp; productId != 'MISSING_CREATED_PRODUCT_ID') {&#xd;
           </collectionProp>
         </HeaderManager>
         <hashTree/>
+        <SyncTimer guiclass="TestBeanGUI" testclass="SyncTimer" testname="Synchronize Login Burst" enabled="true">
+          <stringProp name="groupSize">${sync_group_size}</stringProp>
+          <stringProp name="timeoutInMs">${sync_timeout_ms}</stringProp>
+        </SyncTimer>
+        <hashTree/>
         <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Login" enabled="true">
           <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="Login Body" enabled="true">
             <collectionProp name="Arguments.arguments">

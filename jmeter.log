@@ -1,80 +1,488 @@
-2026-04-04 03:26:28,629 INFO o.a.j.u.JMeterUtils: Setting Locale to en_EN
-2026-04-04 03:26:28,649 INFO o.a.j.JMeter: Loading user properties from: /opt/jmeter/bin/user.properties
-2026-04-04 03:26:28,649 INFO o.a.j.JMeter: Loading system properties from: /opt/jmeter/bin/system.properties
-2026-04-04 03:26:28,649 INFO o.a.j.JMeter: Setting JMeter property: host=127.0.0.1
-2026-04-04 03:26:28,649 INFO o.a.j.JMeter: Setting JMeter property: port=9
-2026-04-04 03:26:28,650 INFO o.a.j.JMeter: Setting JMeter property: thread_count=1
-2026-04-04 03:26:28,650 INFO o.a.j.JMeter: Setting JMeter property: sync_group_size=1
-2026-04-04 03:26:28,650 INFO o.a.j.JMeter: Setting JMeter property: connect_timeout_ms=1
-2026-04-04 03:26:28,650 INFO o.a.j.JMeter: Setting JMeter property: response_timeout_ms=1
-2026-04-04 03:26:28,650 INFO o.a.j.JMeter: Setting JMeter property: csv_path=/tmp/jmeter-template-check.csv
-2026-04-04 03:26:28,650 INFO o.a.j.JMeter: Setting JMeter property: setup_flash_sale=true
-2026-04-04 03:26:28,650 INFO o.a.j.JMeter: Setting JMeter property: manager_email=seed-manager@example.com
-2026-04-04 03:26:28,650 INFO o.a.j.JMeter: Setting JMeter property: manager_password=manager123
-2026-04-04 03:26:28,650 INFO o.a.j.JMeter: Setting JMeter property: target_flash_sale_price=19.99
-2026-04-04 03:26:28,650 INFO o.a.j.JMeter: Setting JMeter property: target_product_name=test-product
-2026-04-04 03:26:28,650 INFO o.a.j.JMeter: Setting JMeter property: target_product_stock=50
-2026-04-04 03:26:28,658 INFO o.a.j.JMeter: Copyright (c) 1998-2024 The Apache Software Foundation
-2026-04-04 03:26:28,658 INFO o.a.j.JMeter: Version 5.6.3
-2026-04-04 03:26:28,659 INFO o.a.j.JMeter: java.version=17.0.18
-2026-04-04 03:26:28,659 INFO o.a.j.JMeter: java.vm.name=OpenJDK 64-Bit Server VM
-2026-04-04 03:26:28,659 INFO o.a.j.JMeter: os.name=Linux
-2026-04-04 03:26:28,659 INFO o.a.j.JMeter: os.arch=amd64
-2026-04-04 03:26:28,659 INFO o.a.j.JMeter: os.version=6.6.87.2-microsoft-standard-WSL2
-2026-04-04 03:26:28,659 INFO o.a.j.JMeter: file.encoding=UTF-8
-2026-04-04 03:26:28,659 INFO o.a.j.JMeter: java.awt.headless=true
-2026-04-04 03:26:28,659 INFO o.a.j.JMeter: Max memory     =1073741824
-2026-04-04 03:26:28,660 INFO o.a.j.JMeter: Available Processors =24
-2026-04-04 03:26:28,667 INFO o.a.j.JMeter: Default Locale=English (EN)
-2026-04-04 03:26:28,668 INFO o.a.j.JMeter: JMeter  Locale=English (EN)
-2026-04-04 03:26:28,668 INFO o.a.j.JMeter: JMeterHome=/opt/jmeter
-2026-04-04 03:26:28,668 INFO o.a.j.JMeter: user.dir  =/home/keishi/tru/web_seng4640/w2026-04-04 03:26:28,798 INFO o.a.j.s.SaveService: Testplan (JMX) version: 2.2. Testlog (JTL) version: 2.2
-2026-04-04 03:26:28,831 INFO o.a.j.s.SaveService: Using SaveService properties version 5.0
-2026-04-04 03:26:28,834 INFO o.a.j.s.SaveService: Using SaveService properties file encoding UTF-8
-2026-04-04 03:26:28,840 INFO o.a.j.s.SaveService: Loading file: docs/backend/jmeter-flash-sale-checkout-template.jmx
-2026-04-04 03:26:28,893 INFO o.a.j.p.h.c.CookieManager: Settings: Delete null: true Check: true Allow variable: true Save: false Prefix: COOKIE_
-2026-04-04 03:26:28,896 INFO o.a.j.p.h.c.2026-04-04 03:26:28,897 INFO o.a.j.s.SaveService: Using Sav2026-04-04 03:26:28,911 INFO o.a.j.p.h.s.HTTPSamplerBase: Parser for text/html is org.apache.jmeter.protocol.http.parser.LagartoBasedHtmlParser
-2026-04-04 03:26:28,912 INFO o.a.j.p.h.s.HTTPSamplerBase: Parser for application/xhtml+xml is org.apache2026-04-04 03:26:28,953 INFO o.a.j.p.h.c.CookieManager: Settings: Delete null: true Check: true Allow variable: true Save: false Prefix: COOKIE_
-2026-04-04 03:26:28,957 INFO o.a.j.p.h.c.CacheManager: Will only cache the following methods: [GET]
-2026-04-04 03:26:28,970 INFO o.a.j.p.h.s.HTTPSamplerBase: Parser for text/html is org.apache.jmeter.protocol.http.parser.LagartoBasedHtmlParser
-2026-04-04 03:26:28,970 INFO o.a.j.p.h.s.HTTPSamplerBase: Parser for application/xhtml+xml is org.apache.jmeter.protocol.http.parser.LagartoBasedHtmlParser
-2026-04-04 03:26:28,970 INFO o.a.j.p.h.s.HTTPSamplerBase: Parser for application/xml is org.apache.jmeter.protocol.http.parser.LagartoBasedHtmlParse2026-04-04 03:26:28,983 INFO o.a.j.e.StandardJMeterEngine: Running the test!
-2026-04-04 03:26:28,983 INFO o.a.j.s.SampleEvent: List of sample_variables: []
-2026-04-04 03:26:28,983 INFO o.a.j.s.SampleEvent: List of sample_variables: []
-2026-04-04 03:26:28,986 INFO o.a.j.e.u.CompoundVariable: Note: Function class names must contain the string: '.functions.'
-2026-04-04 03:26:28,986 INFO o.a.j.e.u.CompoundVariable: Note:2026-04-04 03:26:29,016 INFO o.a.j.JMeter: Creating summari2026-04-04 03:26:29,284 INFO o.a.j.JMeter: Running test (1775298389283)
-2026-04-04 03:26:29,286 INFO o.a.j.e.StandardJMeterEngine: Starting setUp thread groups
-2026-04-04 03:26:29,286 INFO o.a.j.e.StandardJMeterEngine: Starting setUp ThreadGroup: 1 : Manager Dedicated Product Setup 
-2026-04-04 03:26:29,286 INFO o.a.j.e.StandardJMeterEngine: Starting 1 threads for group Manager Dedicated Product Setup.
-2026-04-04 03:26:29,286 INFO o.a.j.e.StandardJMeterEngine: Thread will continue on error2026-04-04 03:26:29,349 INFO o.a.j.JMeter: Running test (1775298389349)
-2026-04-04 03:26:29,351 INFO o.a.j.e.StandardJMeterEngine: Starting setUp thread groups
-2026-04-04 03:26:29,352 INFO o.a.j.e.StandardJMeterEngine: Starting setUp ThreadGroup: 1 : Manager Dedicated Product Setup 
-2026-04-04 03:26:29,353 INFO o.a.j.e.StandardJMeterEngine: Starting 1 threads for group Manager Dedicated Product Setup.
-2026-2026-04-04 03:26:30,007 INFO o.a.j.t.JMeterThread: Thread is done: Manager Dedicated Product Setup 1-1
-2026-04-04 03:26:30,008 INFO o.a.j.t.JMeterThread: Thread finished: Manager Dedicated Product Setup 1-1
-2026-04-04 03:26:30,008 INFO o.a.j.e.StandardJMeterEngine: All Setup Threads have ended
-2026-04-04 03:26:30,043 INFO o.a.j.e.StandardJMeterEngine: Starting ThreadGroup: 1 : Checkout Contention Users
-2026-04-04 03:26:30,044 INFO o.a.j.e.StandardJMeterEngine: Starting 1 threads for group2026-04-04 03:26:30,091 INFO o.a.j.p.h.s.HTTPHCAbstractImpl: Local host = ProartP16-2024-RESET-202603
-2026-04-04 03:26:30,096 INFO o.a.j.p.h.s.HTTPHC4Impl: HTTP request retry count = 0
-2026-04-04 03:26:30,098 INFO o.a.j.s.SampleResult: Note: Sample TimeStamps are START times
-2026-04-04 03:26:30,098 INFO o.a.j.s.SampleResult: sampleresult.default.encoding is set to UTF-8
-2026-04-04 03:26:30,098 INFO o.a.j.s.SampleResult: sampleresult.useNanoTime=true
-2026-04-04 03:26:30,099 INFO o.a.j.s.SampleResult: sampleresult.nanoThreadSleep=5000
-2026-04-04 03:26:30,179 INFO o.a.j.r.Summariser: summary +      1 in 00:00:01 =    1.2/s Avg:    19 Min:    19 Max:    19 Err:     1 (100.00%) Active: 1 Started: 1 Finished: 0
-2026-04-04 03:26:30,315 INFO o.a.j.t.JMeterThread: Thread is done: Manager Dedicated Product Setup 1-1
-2026-04-04 03:26:30,315 INFO o.a.j.t.JMeterThread: Thread finished: Manager Dedicated Product Setup 1-1
-2026-04-04 03:26:30,316 INFO o.a.j.e.StandardJMeterEngine: All Setup Threads have ended
-2026-04-04 03:26:30,340 INFO o.a.j.e.StandardJMeterEngine: Starting ThreadGroup: 1 : Checkout Contention Users
-2026-04-04 03:26:30,340 INFO o.a.j.e.StandardJMeterEngine: Starting 1 threads for group Checkout Contention Users.
-2026-04-04 03:26:30,340 INFO o.a.j.e.StandardJMeterEngine: Thread will continue on error
-2026-04-04 03:26:30,341 INFO o.a.j.t.ThreadGroup: Starting thread group... number=1 threads=1 ramp-up=5 delayedStart=false
-2026-04-04 03:26:30,343 INFO o.a.j.t.ThreadGroup: Started thread group number 1
-2026-04-04 03:26:30,343 INFO o.a.j.e.StandardJMeterEngine: All thread groups have been started
-2026-04-04 03:26:30,349 INFO o.a.j.t.JMeterThread: Thread started: Checkout Contention Users 1-1
-2026-04-04 03:26:30,350 INFO o.a.j.s.FileServer: Stored: /tmp/jmeter-template-check.csv
-2026-04-04 03:26:30,376 INFO o.a.j.t.JMeterThread: Thread is done: Checkout Contention Users 1-1
-2026-04-04 03:26:30,376 INFO o.a.j.t.JMeterThread: Thread finished: Checkout Contention Users 1-1
-2026-04-04 03:26:30,376 INFO o.a.j.e.StandardJMeterEngine: Notifying test listeners of end of test
-2026-04-04 03:26:30,377 INFO o.a.j.s.FileServer: Close: /tmp/jmeter-template-check.csv
-2026-04-04 03:26:30,381 INFO o.a.j.r.Summariser: summary +      3 in 00:00:00 =   14.9/s Avg:     1 Min:     1 Max:     1 Err:     3 (100.00%) Active: 0 Started: 1 Finished: 1
-2026-04-04 03:26:30,382 INFO o.a.j.r.Summariser: summary =      4 in 00:00:01 =    3.9/s Avg:     5 Min:     1 Max:    19 Err:     4 (100.00%)
+2026-04-04 04:08:52,299 INFO o.a.j.u.JMeterUtils: Setting Locale to en_EN
+2026-04-04 04:08:52,316 INFO o.a.j.JMeter: Loading user properties from: /opt/jmeter/bin/user.properties
+2026-04-04 04:08:52,316 INFO o.a.j.JMeter: Loading system properties from: /opt/jmeter/bin/system.properties
+2026-04-04 04:08:52,316 INFO o.a.j.JMeter: Setting JMeter property: protocol=http
+2026-04-04 04:08:52,316 INFO o.a.j.JMeter: Setting JMeter property: host=13.57.223.9
+2026-04-04 04:08:52,316 INFO o.a.j.JMeter: Setting JMeter property: port=30500
+2026-04-04 04:08:52,316 INFO o.a.j.JMeter: Setting JMeter property: base_path=/api
+2026-04-04 04:08:52,316 INFO o.a.j.JMeter: Setting JMeter property: thread_count=110
+2026-04-04 04:08:52,317 INFO o.a.j.JMeter: Setting JMeter property: sync_group_size=110
+2026-04-04 04:08:52,317 INFO o.a.j.JMeter: Setting JMeter property: ramp_seconds=5
+2026-04-04 04:08:52,317 INFO o.a.j.JMeter: Setting JMeter property: connect_timeout_ms=5000
+2026-04-04 04:08:52,317 INFO o.a.j.JMeter: Setting JMeter property: response_timeout_ms=60000
+2026-04-04 04:08:52,317 INFO o.a.j.JMeter: Setting JMeter property: sync_timeout_ms=15000
+2026-04-04 04:08:52,317 INFO o.a.j.JMeter: Setting JMeter property: setup_flash_sale=false
+2026-04-04 04:08:52,317 INFO o.a.j.JMeter: Setting JMeter property: csv_path=/home/keishi/tru/web_seng4640/web_app_seng4640/loadtest/stg-loadtest-users.csv
+2026-04-04 04:08:52,324 INFO o.a.j.JMeter: Copyright (c) 1998-2024 The Apache Software Foundation
+2026-04-04 04:08:52,324 INFO o.a.j.JMeter: Version 5.6.3
+2026-04-04 04:08:52,325 INFO o.a.j.JMeter: java.version=17.0.18
+2026-04-04 04:08:52,325 INFO o.a.j.JMeter: java.vm.name=OpenJDK 64-Bit Server VM
+2026-04-04 04:08:52,325 INFO o.a.j.JMeter: os.name=Linux
+2026-04-04 04:08:52,325 INFO o.a.j.JMeter: os.arch=amd64
+2026-04-04 04:08:52,325 INFO o.a.j.JMeter: os.version=6.6.87.2-microsoft-standard-WSL2
+2026-04-04 04:08:52,325 INFO o.a.j.JMeter: file.encoding=UTF-8
+2026-04-04 04:08:52,325 INFO o.a.j.JMeter: java.awt.headless=true
+2026-04-04 04:08:52,325 INFO o.a.j.JMeter: Max memory     =1073741824
+2026-04-04 04:08:52,325 INFO o.a.j.JMeter: Available Processors =24
+2026-04-04 04:08:52,333 INFO o.a.j.JMeter: Default Locale=English (EN)
+2026-04-04 04:08:52,334 INFO o.a.j.JMeter: JMeter  Locale=English (EN)
+2026-04-04 04:08:52,334 INFO o.a.j.JMeter: JMeterHome=/opt/jmeter
+2026-04-04 04:08:52,334 INFO o.a.j.JMeter: user.dir  =/home/keishi/tru/web_seng4640/web_app_seng4640
+2026-04-04 04:08:52,334 INFO o.a.j.JMeter: PWD       =/home/keishi/tru/web_seng4640/web_app_seng4640
+2026-04-04 04:08:52,334 INFO o.a.j.JMeter: IP: 127.0.1.1 Name: ProartP16-2024-RESET-202603 FullName: ProartP16-2024-RESET-202603.localdomain
+2026-04-04 04:08:52,343 INFO o.a.j.JMeter: Setting property 'jmeter.reportgenerator.outputdir' to:'/home/keishi/tru/web_seng4640/web_app_seng4640/jmeter-runs/flash-sale-stg-110v100-pure-13-57-223-9-p30500-t110-s110-20260404-040851/report'
+2026-04-04 04:08:52,345 INFO o.a.j.s.FileServer: Default base='/home/keishi/tru/web_seng4640/web_app_seng4640'
+2026-04-04 04:08:52,347 INFO o.a.j.s.FileServer: Set new base='/home/keishi/tru/web_seng4640/web_app_seng4640/docs/backend'
+2026-04-04 04:08:52,493 INFO o.a.j.s.SaveService: Testplan (JMX) version: 2.2. Testlog (JTL) version: 2.2
+2026-04-04 04:08:52,514 INFO o.a.j.s.SaveService: Using SaveService properties version 5.0
+2026-04-04 04:08:52,517 INFO o.a.j.s.SaveService: Using SaveService properties file encoding UTF-8
+2026-04-04 04:08:52,520 INFO o.a.j.s.SaveService: Loading file: /home/keishi/tru/web_seng4640/web_app_seng4640/docs/backend/jmeter-flash-sale-checkout-template.jmx
+2026-04-04 04:08:52,569 INFO o.a.j.p.h.c.CookieManager: Settings: Delete null: true Check: true Allow variable: true Save: false Prefix: COOKIE_
+2026-04-04 04:08:52,573 INFO o.a.j.p.h.c.CacheManager: Will only cache the following methods: [GET]
+2026-04-04 04:08:52,586 INFO o.a.j.p.h.s.HTTPSamplerBase: Parser for text/html is org.apache.jmeter.protocol.http.parser.LagartoBasedHtmlParser
+2026-04-04 04:08:52,586 INFO o.a.j.p.h.s.HTTPSamplerBase: Parser for application/xhtml+xml is org.apache.jmeter.protocol.http.parser.LagartoBasedHtmlParser
+2026-04-04 04:08:52,586 INFO o.a.j.p.h.s.HTTPSamplerBase: Parser for application/xml is org.apache.jmeter.protocol.http.parser.LagartoBasedHtmlParser
+2026-04-04 04:08:52,586 INFO o.a.j.p.h.s.HTTPSamplerBase: Parser for text/xml is org.apache.jmeter.protocol.http.parser.LagartoBasedHtmlParser
+2026-04-04 04:08:52,586 INFO o.a.j.p.h.s.HTTPSamplerBase: Parser for text/vnd.wap.wml is org.apache.jmeter.protocol.http.parser.RegexpHTMLParser
+2026-04-04 04:08:52,587 INFO o.a.j.p.h.s.HTTPSamplerBase: Parser for text/css is org.apache.jmeter.protocol.http.parser.CssParser
+2026-04-04 04:08:52,623 INFO o.a.j.JMeter: Creating summariser <summary>
+2026-04-04 04:08:52,632 INFO o.a.j.r.d.ReportGenerator: ReportGenerator will use for Parsing the separator: ','
+2026-04-04 04:08:52,632 INFO o.a.j.r.d.ReportGenerator: Will generate report at end of test from  results file: /home/keishi/tru/web_seng4640/web_app_seng4640/jmeter-runs/flash-sale-stg-110v100-pure-13-57-223-9-p30500-t110-s110-20260404-040851/results.jtl
+2026-04-04 04:08:52,632 INFO o.a.j.r.d.ReportGenerator: Reading report generator properties from: /opt/jmeter/bin/reportgenerator.properties
+2026-04-04 04:08:52,633 INFO o.a.j.r.d.ReportGenerator: Merging with JMeter properties
+2026-04-04 04:08:52,635 INFO o.a.j.r.c.ReportGeneratorConfiguration: Property 'jmeter.reportgenerator.temp_dir' not found, using default value 'temp' instead.
+2026-04-04 04:08:52,638 INFO o.a.j.r.c.ReportGeneratorConfiguration: Property 'jmeter.reportgenerator.apdex_per_transaction' not found, using default value 'null' instead.
+2026-04-04 04:08:52,638 INFO o.a.j.r.c.ReportGeneratorConfiguration: apdex_per_transaction is empty, not APDEX per transaction customization
+2026-04-04 04:08:52,639 INFO o.a.j.r.c.ReportGeneratorConfiguration: Property 'jmeter.reportgenerator.sample_filter' not found, using default value 'null' instead.
+2026-04-04 04:08:52,639 INFO o.a.j.r.c.ReportGeneratorConfiguration: Property 'jmeter.reportgenerator.report_title' not found, using default value 'null' instead.
+2026-04-04 04:08:52,639 INFO o.a.j.r.c.ReportGeneratorConfiguration: Property 'jmeter.reportgenerator.start_date' not found, using default value 'null' instead.
+2026-04-04 04:08:52,639 INFO o.a.j.r.c.ReportGeneratorConfiguration: Property 'jmeter.reportgenerator.end_date' not found, using default value 'null' instead.
+2026-04-04 04:08:52,639 INFO o.a.j.r.c.ReportGeneratorConfiguration: Property 'jmeter.reportgenerator.date_format' not found, using default value 'null' instead.
+2026-04-04 04:08:52,640 INFO o.a.j.r.c.ReportGeneratorConfiguration: Will use date range start date: null, end date: null
+2026-04-04 04:08:52,643 INFO o.a.j.r.c.ReportGeneratorConfiguration: Property 'jmeter.reportgenerator.graph.totalTPS.exclude_controllers' not found, using default value 'false' instead.
+2026-04-04 04:08:52,643 INFO o.a.j.r.c.ReportGeneratorConfiguration: Property 'jmeter.reportgenerator.graph.activeThreadsOverTime.exclude_controllers' not found, using default value 'false' instead.
+2026-04-04 04:08:52,643 INFO o.a.j.r.c.ReportGeneratorConfiguration: Property 'jmeter.reportgenerator.graph.timeVsThreads.exclude_controllers' not found, using default value 'false' instead.
+2026-04-04 04:08:52,643 INFO o.a.j.r.c.ReportGeneratorConfiguration: Property 'jmeter.reportgenerator.graph.responseTimeDistribution.exclude_controllers' not found, using default value 'false' instead.
+2026-04-04 04:08:52,643 INFO o.a.j.r.c.ReportGeneratorConfiguration: Property 'jmeter.reportgenerator.graph.transactionsPerSecond.exclude_controllers' not found, using default value 'false' instead.
+2026-04-04 04:08:52,644 INFO o.a.j.r.c.ReportGeneratorConfiguration: Property 'jmeter.reportgenerator.graph.responseTimePercentiles.exclude_controllers' not found, using default value 'false' instead.
+2026-04-04 04:08:52,644 INFO o.a.j.r.c.ReportGeneratorConfiguration: Property 'jmeter.reportgenerator.graph.responseTimePercentilesOverTime.exclude_controllers' not found, using default value 'false' instead.
+2026-04-04 04:08:52,645 INFO o.a.j.r.c.ReportGeneratorConfiguration: Property 'jmeter.reportgenerator.graph.responseTimesOverTime.exclude_controllers' not found, using default value 'false' instead.
+2026-04-04 04:08:52,645 INFO o.a.j.r.c.ReportGeneratorConfiguration: Property 'jmeter.reportgenerator.graph.connectTimeOverTime.exclude_controllers' not found, using default value 'false' instead.
+2026-04-04 04:08:52,645 INFO o.a.j.r.c.ReportGeneratorConfiguration: Property 'jmeter.reportgenerator.graph.latenciesOverTime.exclude_controllers' not found, using default value 'false' instead.
+2026-04-04 04:08:52,646 INFO o.a.j.r.c.ReportGeneratorConfiguration: Property 'jmeter.reportgenerator.exporter.json.filters_only_sample_series' not found, using default value 'true' instead.
+2026-04-04 04:08:52,646 INFO o.a.j.r.c.ReportGeneratorConfiguration: Property 'jmeter.reportgenerator.exporter.json.series_filter' not found, using default value '' instead.
+2026-04-04 04:08:52,647 INFO o.a.j.r.c.ReportGeneratorConfiguration: Property 'jmeter.reportgenerator.exporter.json.show_controllers_only' not found, using default value 'false' instead.
+2026-04-04 04:08:52,647 INFO o.a.j.r.c.ReportGeneratorConfiguration: Property 'jmeter.reportgenerator.exporter.html.filters_only_sample_series' not found, using default value 'true' instead.
+2026-04-04 04:08:52,647 INFO o.a.j.r.c.ReportGeneratorConfiguration: Property 'jmeter.reportgenerator.exporter.html.series_filter' not found, using default value '' instead.
+2026-04-04 04:08:52,647 INFO o.a.j.r.c.ReportGeneratorConfiguration: Property 'jmeter.reportgenerator.exporter.html.show_controllers_only' not found, using default value 'false' instead.
+2026-04-04 04:08:52,656 INFO o.a.j.e.StandardJMeterEngine: Running the test!
+2026-04-04 04:08:52,657 INFO o.a.j.s.SampleEvent: List of sample_variables: []
+2026-04-04 04:08:52,657 INFO o.a.j.s.SampleEvent: List of sample_variables: []
+2026-04-04 04:08:52,661 INFO o.a.j.e.u.CompoundVariable: Note: Function class names must contain the string: '.functions.'
+2026-04-04 04:08:52,662 INFO o.a.j.e.u.CompoundVariable: Note: Function class names must not contain the string: '.gui.'
+2026-04-04 04:08:52,897 INFO o.a.j.JMeter: Running test (1775300932897)
+2026-04-04 04:08:52,899 INFO o.a.j.e.StandardJMeterEngine: Starting setUp thread groups
+2026-04-04 04:08:52,899 INFO o.a.j.e.StandardJMeterEngine: Starting setUp ThreadGroup: 1 : Manager Dedicated Product Setup 
+2026-04-04 04:08:52,900 INFO o.a.j.e.StandardJMeterEngine: Starting 1 threads for group Manager Dedicated Product Setup.
+2026-04-04 04:08:52,900 INFO o.a.j.e.StandardJMeterEngine: Thread will continue on error
+2026-04-04 04:08:52,900 INFO o.a.j.t.ThreadGroup: Starting thread group... number=1 threads=1 ramp-up=1 delayedStart=false
+2026-04-04 04:08:52,904 INFO o.a.j.t.ThreadGroup: Started thread group number 1
+2026-04-04 04:08:52,904 INFO o.a.j.e.StandardJMeterEngine: Waiting for all setup thread groups to exit
+2026-04-04 04:08:52,905 INFO o.a.j.t.JMeterThread: Thread started: Manager Dedicated Product Setup 1-1
+2026-04-04 04:08:53,328 INFO o.a.j.t.JMeterThread: Thread is done: Manager Dedicated Product Setup 1-1
+2026-04-04 04:08:53,328 INFO o.a.j.t.JMeterThread: Thread finished: Manager Dedicated Product Setup 1-1
+2026-04-04 04:08:53,329 INFO o.a.j.e.StandardJMeterEngine: All Setup Threads have ended
+2026-04-04 04:08:53,350 INFO o.a.j.e.StandardJMeterEngine: Starting ThreadGroup: 1 : Checkout Contention Users
+2026-04-04 04:08:53,350 INFO o.a.j.e.StandardJMeterEngine: Starting 110 threads for group Checkout Contention Users.
+2026-04-04 04:08:53,351 INFO o.a.j.e.StandardJMeterEngine: Thread will continue on error
+2026-04-04 04:08:53,351 INFO o.a.j.t.ThreadGroup: Starting thread group... number=1 threads=110 ramp-up=5 delayedStart=false
+2026-04-04 04:08:53,361 INFO o.a.j.t.JMeterThread: Thread started: Checkout Contention Users 1-1
+2026-04-04 04:08:53,363 INFO o.a.j.s.FileServer: Stored: /home/keishi/tru/web_seng4640/web_app_seng4640/loadtest/stg-loadtest-users.csv
+2026-04-04 04:08:53,404 INFO o.a.j.t.JMeterThread: Thread started: Checkout Contention Users 1-2
+2026-04-04 04:08:53,439 INFO o.a.j.t.ThreadGroup: Started thread group number 1
+2026-04-04 04:08:53,439 INFO o.a.j.e.StandardJMeterEngine: All thread groups have been started
+2026-04-04 04:08:53,448 INFO o.a.j.t.JMeterThread: Thread started: Checkout Contention Users 1-3
+2026-04-04 04:08:53,492 INFO o.a.j.t.JMeterThread: Thread started: Checkout Contention Users 1-4
+2026-04-04 04:08:53,534 INFO o.a.j.t.JMeterThread: Thread started: Checkout Contention Users 1-5
+2026-04-04 04:08:53,581 INFO o.a.j.t.JMeterThread: Thread started: Checkout Contention Users 1-6
+2026-04-04 04:08:53,623 INFO o.a.j.t.JMeterThread: Thread started: Checkout Contention Users 1-7
+2026-04-04 04:08:53,668 INFO o.a.j.t.JMeterThread: Thread started: Checkout Contention Users 1-8
+2026-04-04 04:08:53,712 INFO o.a.j.t.JMeterThread: Thread started: Checkout Contention Users 1-9
+2026-04-04 04:08:53,758 INFO o.a.j.t.JMeterThread: Thread started: Checkout Contention Users 1-10
+2026-04-04 04:08:53,804 INFO o.a.j.t.JMeterThread: Thread started: Checkout Contention Users 1-11
+2026-04-04 04:08:53,850 INFO o.a.j.t.JMeterThread: Thread started: Checkout Contention Users 1-12
+2026-04-04 04:08:53,893 INFO o.a.j.t.JMeterThread: Thread started: Checkout Contention Users 1-13
+2026-04-04 04:08:53,938 INFO o.a.j.t.JMeterThread: Thread started: Checkout Contention Users 1-14
+2026-04-04 04:08:53,983 INFO o.a.j.t.JMeterThread: Thread started: Checkout Contention Users 1-15
+2026-04-04 04:08:54,031 INFO o.a.j.t.JMeterThread: Thread started: Checkout Contention Users 1-16
+2026-04-04 04:08:54,074 INFO o.a.j.t.JMeterThread: Thread started: Checkout Contention Users 1-17
+2026-04-04 04:08:54,118 INFO o.a.j.t.JMeterThread: Thread started: Checkout Contention Users 1-18
+2026-04-04 04:08:54,164 INFO o.a.j.t.JMeterThread: Thread started: Checkout Contention Users 1-19
+2026-04-04 04:08:54,207 INFO o.a.j.t.JMeterThread: Thread started: Checkout Contention Users 1-20
+2026-04-04 04:08:54,253 INFO o.a.j.t.JMeterThread: Thread started: Checkout Contention Users 1-21
+2026-04-04 04:08:54,297 INFO o.a.j.t.JMeterThread: Thread started: Checkout Contention Users 1-22
+2026-04-04 04:08:54,343 INFO o.a.j.t.JMeterThread: Thread started: Checkout Contention Users 1-23
+2026-04-04 04:08:54,387 INFO o.a.j.t.JMeterThread: Thread started: Checkout Contention Users 1-24
+2026-04-04 04:08:54,433 INFO o.a.j.t.JMeterThread: Thread started: Checkout Contention Users 1-25
+2026-04-04 04:08:54,478 INFO o.a.j.t.JMeterThread: Thread started: Checkout Contention Users 1-26
+2026-04-04 04:08:54,524 INFO o.a.j.t.JMeterThread: Thread started: Checkout Contention Users 1-27
+2026-04-04 04:08:54,568 INFO o.a.j.t.JMeterThread: Thread started: Checkout Contention Users 1-28
+2026-04-04 04:08:54,613 INFO o.a.j.t.JMeterThread: Thread started: Checkout Contention Users 1-29
+2026-04-04 04:08:54,658 INFO o.a.j.t.JMeterThread: Thread started: Checkout Contention Users 1-30
+2026-04-04 04:08:54,704 INFO o.a.j.t.JMeterThread: Thread started: Checkout Contention Users 1-31
+2026-04-04 04:08:54,747 INFO o.a.j.t.JMeterThread: Thread started: Checkout Contention Users 1-32
+2026-04-04 04:08:54,792 INFO o.a.j.t.JMeterThread: Thread started: Checkout Contention Users 1-33
+2026-04-04 04:08:54,838 INFO o.a.j.t.JMeterThread: Thread started: Checkout Contention Users 1-34
+2026-04-04 04:08:54,883 INFO o.a.j.t.JMeterThread: Thread started: Checkout Contention Users 1-35
+2026-04-04 04:08:54,927 INFO o.a.j.t.JMeterThread: Thread started: Checkout Contention Users 1-36
+2026-04-04 04:08:54,973 INFO o.a.j.t.JMeterThread: Thread started: Checkout Contention Users 1-37
+2026-04-04 04:08:55,016 INFO o.a.j.t.JMeterThread: Thread started: Checkout Contention Users 1-38
+2026-04-04 04:08:55,063 INFO o.a.j.t.JMeterThread: Thread started: Checkout Contention Users 1-39
+2026-04-04 04:08:55,107 INFO o.a.j.t.JMeterThread: Thread started: Checkout Contention Users 1-40
+2026-04-04 04:08:55,152 INFO o.a.j.t.JMeterThread: Thread started: Checkout Contention Users 1-41
+2026-04-04 04:08:55,197 INFO o.a.j.t.JMeterThread: Thread started: Checkout Contention Users 1-42
+2026-04-04 04:08:55,242 INFO o.a.j.t.JMeterThread: Thread started: Checkout Contention Users 1-43
+2026-04-04 04:08:55,287 INFO o.a.j.t.JMeterThread: Thread started: Checkout Contention Users 1-44
+2026-04-04 04:08:55,332 INFO o.a.j.t.JMeterThread: Thread started: Checkout Contention Users 1-45
+2026-04-04 04:08:55,377 INFO o.a.j.t.JMeterThread: Thread started: Checkout Contention Users 1-46
+2026-04-04 04:08:55,423 INFO o.a.j.t.JMeterThread: Thread started: Checkout Contention Users 1-47
+2026-04-04 04:08:55,468 INFO o.a.j.t.JMeterThread: Thread started: Checkout Contention Users 1-48
+2026-04-04 04:08:55,513 INFO o.a.j.t.JMeterThread: Thread started: Checkout Contention Users 1-49
+2026-04-04 04:08:55,558 INFO o.a.j.t.JMeterThread: Thread started: Checkout Contention Users 1-50
+2026-04-04 04:08:55,602 INFO o.a.j.t.JMeterThread: Thread started: Checkout Contention Users 1-51
+2026-04-04 04:08:55,648 INFO o.a.j.t.JMeterThread: Thread started: Checkout Contention Users 1-52
+2026-04-04 04:08:55,693 INFO o.a.j.t.JMeterThread: Thread started: Checkout Contention Users 1-53
+2026-04-04 04:08:55,738 INFO o.a.j.t.JMeterThread: Thread started: Checkout Contention Users 1-54
+2026-04-04 04:08:55,782 INFO o.a.j.t.JMeterThread: Thread started: Checkout Contention Users 1-55
+2026-04-04 04:08:55,829 INFO o.a.j.t.JMeterThread: Thread started: Checkout Contention Users 1-56
+2026-04-04 04:08:55,873 INFO o.a.j.t.JMeterThread: Thread started: Checkout Contention Users 1-57
+2026-04-04 04:08:55,917 INFO o.a.j.t.JMeterThread: Thread started: Checkout Contention Users 1-58
+2026-04-04 04:08:55,962 INFO o.a.j.t.JMeterThread: Thread started: Checkout Contention Users 1-59
+2026-04-04 04:08:56,007 INFO o.a.j.t.JMeterThread: Thread started: Checkout Contention Users 1-60
+2026-04-04 04:08:56,053 INFO o.a.j.t.JMeterThread: Thread started: Checkout Contention Users 1-61
+2026-04-04 04:08:56,097 INFO o.a.j.t.JMeterThread: Thread started: Checkout Contention Users 1-62
+2026-04-04 04:08:56,143 INFO o.a.j.t.JMeterThread: Thread started: Checkout Contention Users 1-63
+2026-04-04 04:08:56,188 INFO o.a.j.t.JMeterThread: Thread started: Checkout Contention Users 1-64
+2026-04-04 04:08:56,232 INFO o.a.j.t.JMeterThread: Thread started: Checkout Contention Users 1-65
+2026-04-04 04:08:56,278 INFO o.a.j.t.JMeterThread: Thread started: Checkout Contention Users 1-66
+2026-04-04 04:08:56,322 INFO o.a.j.t.JMeterThread: Thread started: Checkout Contention Users 1-67
+2026-04-04 04:08:56,367 INFO o.a.j.t.JMeterThread: Thread started: Checkout Contention Users 1-68
+2026-04-04 04:08:56,413 INFO o.a.j.t.JMeterThread: Thread started: Checkout Contention Users 1-69
+2026-04-04 04:08:56,457 INFO o.a.j.t.JMeterThread: Thread started: Checkout Contention Users 1-70
+2026-04-04 04:08:56,502 INFO o.a.j.t.JMeterThread: Thread started: Checkout Contention Users 1-71
+2026-04-04 04:08:56,547 INFO o.a.j.t.JMeterThread: Thread started: Checkout Contention Users 1-72
+2026-04-04 04:08:56,591 INFO o.a.j.t.JMeterThread: Thread started: Checkout Contention Users 1-73
+2026-04-04 04:08:56,638 INFO o.a.j.t.JMeterThread: Thread started: Checkout Contention Users 1-74
+2026-04-04 04:08:56,682 INFO o.a.j.t.JMeterThread: Thread started: Checkout Contention Users 1-75
+2026-04-04 04:08:56,727 INFO o.a.j.t.JMeterThread: Thread started: Checkout Contention Users 1-76
+2026-04-04 04:08:56,773 INFO o.a.j.t.JMeterThread: Thread started: Checkout Contention Users 1-77
+2026-04-04 04:08:56,818 INFO o.a.j.t.JMeterThread: Thread started: Checkout Contention Users 1-78
+2026-04-04 04:08:56,863 INFO o.a.j.t.JMeterThread: Thread started: Checkout Contention Users 1-79
+2026-04-04 04:08:56,907 INFO o.a.j.t.JMeterThread: Thread started: Checkout Contention Users 1-80
+2026-04-04 04:08:56,952 INFO o.a.j.t.JMeterThread: Thread started: Checkout Contention Users 1-81
+2026-04-04 04:08:56,997 INFO o.a.j.t.JMeterThread: Thread started: Checkout Contention Users 1-82
+2026-04-04 04:08:57,042 INFO o.a.j.t.JMeterThread: Thread started: Checkout Contention Users 1-83
+2026-04-04 04:08:57,087 INFO o.a.j.t.JMeterThread: Thread started: Checkout Contention Users 1-84
+2026-04-04 04:08:57,131 INFO o.a.j.t.JMeterThread: Thread started: Checkout Contention Users 1-85
+2026-04-04 04:08:57,177 INFO o.a.j.t.JMeterThread: Thread started: Checkout Contention Users 1-86
+2026-04-04 04:08:57,222 INFO o.a.j.t.JMeterThread: Thread started: Checkout Contention Users 1-87
+2026-04-04 04:08:57,268 INFO o.a.j.t.JMeterThread: Thread started: Checkout Contention Users 1-88
+2026-04-04 04:08:57,312 INFO o.a.j.t.JMeterThread: Thread started: Checkout Contention Users 1-89
+2026-04-04 04:08:57,358 INFO o.a.j.t.JMeterThread: Thread started: Checkout Contention Users 1-90
+2026-04-04 04:08:57,402 INFO o.a.j.t.JMeterThread: Thread started: Checkout Contention Users 1-91
+2026-04-04 04:08:57,447 INFO o.a.j.t.JMeterThread: Thread started: Checkout Contention Users 1-92
+2026-04-04 04:08:57,492 INFO o.a.j.t.JMeterThread: Thread started: Checkout Contention Users 1-93
+2026-04-04 04:08:57,538 INFO o.a.j.t.JMeterThread: Thread started: Checkout Contention Users 1-94
+2026-04-04 04:08:57,583 INFO o.a.j.t.JMeterThread: Thread started: Checkout Contention Users 1-95
+2026-04-04 04:08:57,627 INFO o.a.j.t.JMeterThread: Thread started: Checkout Contention Users 1-96
+2026-04-04 04:08:57,673 INFO o.a.j.t.JMeterThread: Thread started: Checkout Contention Users 1-97
+2026-04-04 04:08:57,717 INFO o.a.j.t.JMeterThread: Thread started: Checkout Contention Users 1-98
+2026-04-04 04:08:57,763 INFO o.a.j.t.JMeterThread: Thread started: Checkout Contention Users 1-99
+2026-04-04 04:08:57,807 INFO o.a.j.t.JMeterThread: Thread started: Checkout Contention Users 1-100
+2026-04-04 04:08:57,853 INFO o.a.j.t.JMeterThread: Thread started: Checkout Contention Users 1-101
+2026-04-04 04:08:57,896 INFO o.a.j.t.JMeterThread: Thread started: Checkout Contention Users 1-102
+2026-04-04 04:08:57,943 INFO o.a.j.t.JMeterThread: Thread started: Checkout Contention Users 1-103
+2026-04-04 04:08:57,987 INFO o.a.j.t.JMeterThread: Thread started: Checkout Contention Users 1-104
+2026-04-04 04:08:58,033 INFO o.a.j.t.JMeterThread: Thread started: Checkout Contention Users 1-105
+2026-04-04 04:08:58,078 INFO o.a.j.t.JMeterThread: Thread started: Checkout Contention Users 1-106
+2026-04-04 04:08:58,121 INFO o.a.j.t.JMeterThread: Thread started: Checkout Contention Users 1-107
+2026-04-04 04:08:58,167 INFO o.a.j.t.JMeterThread: Thread started: Checkout Contention Users 1-108
+2026-04-04 04:08:58,213 INFO o.a.j.t.JMeterThread: Thread started: Checkout Contention Users 1-109
+2026-04-04 04:08:58,258 INFO o.a.j.t.JMeterThread: Thread started: Checkout Contention Users 1-110
+2026-04-04 04:08:58,292 INFO o.a.j.p.h.s.HTTPHCAbstractImpl: Local host = ProartP16-2024-RESET-202603
+2026-04-04 04:08:58,296 INFO o.a.j.p.h.s.HTTPHC4Impl: HTTP request retry count = 0
+2026-04-04 04:08:58,297 INFO o.a.j.s.SampleResult: Note: Sample TimeStamps are START times
+2026-04-04 04:08:58,297 INFO o.a.j.s.SampleResult: sampleresult.default.encoding is set to UTF-8
+2026-04-04 04:08:58,297 INFO o.a.j.s.SampleResult: sampleresult.useNanoTime=true
+2026-04-04 04:08:58,297 INFO o.a.j.s.SampleResult: sampleresult.nanoThreadSleep=5000
+2026-04-04 04:09:01,200 INFO o.a.j.r.Summariser: summary +      1 in 00:00:08 =    0.1/s Avg:  2811 Min:  2811 Max:  2811 Err:     0 (0.00%) Active: 110 Started: 110 Finished: 0
+2026-04-04 04:09:07,603 INFO o.a.j.t.JMeterThread: Thread is done: Checkout Contention Users 1-95
+2026-04-04 04:09:07,603 INFO o.a.j.t.JMeterThread: Thread finished: Checkout Contention Users 1-95
+2026-04-04 04:09:09,650 INFO o.a.j.t.JMeterThread: Thread is done: Checkout Contention Users 1-3
+2026-04-04 04:09:09,650 INFO o.a.j.t.JMeterThread: Thread finished: Checkout Contention Users 1-3
+2026-04-04 04:09:12,603 INFO o.a.j.t.JMeterThread: Thread is done: Checkout Contention Users 1-83
+2026-04-04 04:09:12,603 INFO o.a.j.t.JMeterThread: Thread finished: Checkout Contention Users 1-83
+2026-04-04 04:09:14,657 INFO o.a.j.t.JMeterThread: Thread is done: Checkout Contention Users 1-43
+2026-04-04 04:09:14,658 INFO o.a.j.t.JMeterThread: Thread finished: Checkout Contention Users 1-43
+2026-04-04 04:09:17,637 INFO o.a.j.t.JMeterThread: Thread is done: Checkout Contention Users 1-2
+2026-04-04 04:09:17,637 INFO o.a.j.t.JMeterThread: Thread finished: Checkout Contention Users 1-2
+2026-04-04 04:09:19,656 INFO o.a.j.t.JMeterThread: Thread is done: Checkout Contention Users 1-4
+2026-04-04 04:09:19,656 INFO o.a.j.t.JMeterThread: Thread finished: Checkout Contention Users 1-4
+2026-04-04 04:09:21,648 INFO o.a.j.t.JMeterThread: Thread is done: Checkout Contention Users 1-75
+2026-04-04 04:09:21,648 INFO o.a.j.t.JMeterThread: Thread finished: Checkout Contention Users 1-75
+2026-04-04 04:09:23,568 INFO o.a.j.t.JMeterThread: Thread is done: Checkout Contention Users 1-53
+2026-04-04 04:09:23,568 INFO o.a.j.t.JMeterThread: Thread finished: Checkout Contention Users 1-53
+2026-04-04 04:09:26,555 INFO o.a.j.t.JMeterThread: Thread is done: Checkout Contention Users 1-105
+2026-04-04 04:09:26,555 INFO o.a.j.t.JMeterThread: Thread finished: Checkout Contention Users 1-105
+2026-04-04 04:09:28,613 INFO o.a.j.t.JMeterThread: Thread is done: Checkout Contention Users 1-16
+2026-04-04 04:09:28,614 INFO o.a.j.t.JMeterThread: Thread finished: Checkout Contention Users 1-16
+2026-04-04 04:09:32,547 INFO o.a.j.r.Summariser: summary +    120 in 00:00:31 =    3.8/s Avg:  6806 Min:  1957 Max: 26926 Err:     0 (0.00%) Active: 100 Started: 110 Finished: 10
+2026-04-04 04:09:32,548 INFO o.a.j.r.Summariser: summary =    121 in 00:00:40 =    3.1/s Avg:  6773 Min:  1957 Max: 26926 Err:     0 (0.00%)
+2026-04-04 04:09:32,548 INFO o.a.j.t.JMeterThread: Thread is done: Checkout Contention Users 1-49
+2026-04-04 04:09:32,548 INFO o.a.j.t.JMeterThread: Thread finished: Checkout Contention Users 1-49
+2026-04-04 04:09:35,534 INFO o.a.j.t.JMeterThread: Thread is done: Checkout Contention Users 1-91
+2026-04-04 04:09:35,535 INFO o.a.j.t.JMeterThread: Thread finished: Checkout Contention Users 1-91
+2026-04-04 04:09:38,561 INFO o.a.j.t.JMeterThread: Thread is done: Checkout Contention Users 1-5
+2026-04-04 04:09:38,561 INFO o.a.j.t.JMeterThread: Thread finished: Checkout Contention Users 1-5
+2026-04-04 04:09:40,578 INFO o.a.j.t.JMeterThread: Thread is done: Checkout Contention Users 1-86
+2026-04-04 04:09:40,579 INFO o.a.j.t.JMeterThread: Thread finished: Checkout Contention Users 1-86
+2026-04-04 04:09:42,575 INFO o.a.j.t.JMeterThread: Thread is done: Checkout Contention Users 1-6
+2026-04-04 04:09:42,575 INFO o.a.j.t.JMeterThread: Thread finished: Checkout Contention Users 1-6
+2026-04-04 04:09:44,662 INFO o.a.j.t.JMeterThread: Thread is done: Checkout Contention Users 1-70
+2026-04-04 04:09:44,662 INFO o.a.j.t.JMeterThread: Thread finished: Checkout Contention Users 1-70
+2026-04-04 04:09:47,620 INFO o.a.j.t.JMeterThread: Thread is done: Checkout Contention Users 1-18
+2026-04-04 04:09:47,620 INFO o.a.j.t.JMeterThread: Thread finished: Checkout Contention Users 1-18
+2026-04-04 04:09:49,755 INFO o.a.j.t.JMeterThread: Thread is done: Checkout Contention Users 1-14
+2026-04-04 04:09:49,755 INFO o.a.j.t.JMeterThread: Thread finished: Checkout Contention Users 1-14
+2026-04-04 04:09:51,792 INFO o.a.j.t.JMeterThread: Thread is done: Checkout Contention Users 1-72
+2026-04-04 04:09:51,792 INFO o.a.j.t.JMeterThread: Thread finished: Checkout Contention Users 1-72
+2026-04-04 04:09:53,715 INFO o.a.j.t.JMeterThread: Thread is done: Checkout Contention Users 1-24
+2026-04-04 04:09:53,715 INFO o.a.j.t.JMeterThread: Thread finished: Checkout Contention Users 1-24
+2026-04-04 04:09:55,694 INFO o.a.j.t.JMeterThread: Thread is done: Checkout Contention Users 1-68
+2026-04-04 04:09:55,694 INFO o.a.j.t.JMeterThread: Thread finished: Checkout Contention Users 1-68
+2026-04-04 04:09:58,671 INFO o.a.j.t.JMeterThread: Thread is done: Checkout Contention Users 1-85
+2026-04-04 04:09:58,671 INFO o.a.j.t.JMeterThread: Thread finished: Checkout Contention Users 1-85
+2026-04-04 04:10:00,671 INFO o.a.j.r.Summariser: summary +     12 in 00:00:28 =    0.4/s Avg: 42701 Min: 29916 Max: 55054 Err:     0 (0.00%) Active: 88 Started: 110 Finished: 22
+2026-04-04 04:10:00,672 INFO o.a.j.r.Summariser: summary =    133 in 00:01:08 =    2.0/s Avg: 10015 Min:  1957 Max: 55054 Err:     0 (0.00%)
+2026-04-04 04:10:00,672 INFO o.a.j.t.JMeterThread: Thread is done: Checkout Contention Users 1-17
+2026-04-04 04:10:00,672 INFO o.a.j.t.JMeterThread: Thread finished: Checkout Contention Users 1-17
+2026-04-04 04:10:02,642 INFO o.a.j.t.JMeterThread: Thread is done: Checkout Contention Users 1-36
+2026-04-04 04:10:02,642 INFO o.a.j.t.JMeterThread: Thread finished: Checkout Contention Users 1-36
+2026-04-04 04:10:05,535 INFO o.a.j.t.JMeterThread: Thread is done: Checkout Contention Users 1-66
+2026-04-04 04:10:05,535 INFO o.a.j.t.JMeterThread: Thread finished: Checkout Contention Users 1-66
+2026-04-04 04:10:05,618 INFO o.a.j.t.JMeterThread: Thread is done: Checkout Contention Users 1-78
+2026-04-04 04:10:05,619 INFO o.a.j.t.JMeterThread: Thread finished: Checkout Contention Users 1-78
+2026-04-04 04:10:05,618 INFO o.a.j.t.JMeterThread: Thread is done: Checkout Contention Users 1-52
+2026-04-04 04:10:05,619 INFO o.a.j.t.JMeterThread: Thread finished: Checkout Contention Users 1-52
+2026-04-04 04:10:05,628 INFO o.a.j.t.JMeterThread: Thread is done: Checkout Contention Users 1-60
+2026-04-04 04:10:05,628 INFO o.a.j.t.JMeterThread: Thread is done: Checkout Contention Users 1-89
+2026-04-04 04:10:05,628 INFO o.a.j.t.JMeterThread: Thread finished: Checkout Contention Users 1-60
+2026-04-04 04:10:05,628 INFO o.a.j.t.JMeterThread: Thread is done: Checkout Contention Users 1-81
+2026-04-04 04:10:05,628 INFO o.a.j.t.JMeterThread: Thread finished: Checkout Contention Users 1-89
+2026-04-04 04:10:05,628 INFO o.a.j.t.JMeterThread: Thread finished: Checkout Contention Users 1-81
+2026-04-04 04:10:05,628 INFO o.a.j.t.JMeterThread: Thread is done: Checkout Contention Users 1-8
+2026-04-04 04:10:05,628 INFO o.a.j.t.JMeterThread: Thread is done: Checkout Contention Users 1-82
+2026-04-04 04:10:05,628 INFO o.a.j.t.JMeterThread: Thread is done: Checkout Contention Users 1-12
+2026-04-04 04:10:05,628 INFO o.a.j.t.JMeterThread: Thread is done: Checkout Contention Users 1-71
+2026-04-04 04:10:05,628 INFO o.a.j.t.JMeterThread: Thread finished: Checkout Contention Users 1-12
+2026-04-04 04:10:05,628 INFO o.a.j.t.JMeterThread: Thread is done: Checkout Contention Users 1-73
+2026-04-04 04:10:05,628 INFO o.a.j.t.JMeterThread: Thread finished: Checkout Contention Users 1-82
+2026-04-04 04:10:05,628 INFO o.a.j.t.JMeterThread: Thread finished: Checkout Contention Users 1-8
+2026-04-04 04:10:05,628 INFO o.a.j.t.JMeterThread: Thread finished: Checkout Contention Users 1-73
+2026-04-04 04:10:05,629 INFO o.a.j.t.JMeterThread: Thread finished: Checkout Contention Users 1-71
+2026-04-04 04:10:05,656 INFO o.a.j.t.JMeterThread: Thread is done: Checkout Contention Users 1-79
+2026-04-04 04:10:05,656 INFO o.a.j.t.JMeterThread: Thread is done: Checkout Contention Users 1-62
+2026-04-04 04:10:05,656 INFO o.a.j.t.JMeterThread: Thread finished: Checkout Contention Users 1-79
+2026-04-04 04:10:05,656 INFO o.a.j.t.JMeterThread: Thread is done: Checkout Contention Users 1-38
+2026-04-04 04:10:05,657 INFO o.a.j.t.JMeterThread: Thread finished: Checkout Contention Users 1-62
+2026-04-04 04:10:05,657 INFO o.a.j.t.JMeterThread: Thread finished: Checkout Contention Users 1-38
+2026-04-04 04:10:05,657 INFO o.a.j.t.JMeterThread: Thread is done: Checkout Contention Users 1-29
+2026-04-04 04:10:05,657 INFO o.a.j.t.JMeterThread: Thread finished: Checkout Contention Users 1-29
+2026-04-04 04:10:05,663 INFO o.a.j.t.JMeterThread: Thread is done: Checkout Contention Users 1-87
+2026-04-04 04:10:05,663 INFO o.a.j.t.JMeterThread: Thread finished: Checkout Contention Users 1-87
+2026-04-04 04:10:05,663 INFO o.a.j.t.JMeterThread: Thread is done: Checkout Contention Users 1-27
+2026-04-04 04:10:05,663 INFO o.a.j.t.JMeterThread: Thread is done: Checkout Contention Users 1-30
+2026-04-04 04:10:05,663 INFO o.a.j.t.JMeterThread: Thread is done: Checkout Contention Users 1-97
+2026-04-04 04:10:05,663 INFO o.a.j.t.JMeterThread: Thread finished: Checkout Contention Users 1-30
+2026-04-04 04:10:05,663 INFO o.a.j.t.JMeterThread: Thread finished: Checkout Contention Users 1-27
+2026-04-04 04:10:05,663 INFO o.a.j.t.JMeterThread: Thread finished: Checkout Contention Users 1-97
+2026-04-04 04:10:05,664 INFO o.a.j.t.JMeterThread: Thread is done: Checkout Contention Users 1-50
+2026-04-04 04:10:05,664 INFO o.a.j.t.JMeterThread: Thread finished: Checkout Contention Users 1-50
+2026-04-04 04:10:05,671 INFO o.a.j.t.JMeterThread: Thread is done: Checkout Contention Users 1-110
+2026-04-04 04:10:05,671 INFO o.a.j.t.JMeterThread: Thread finished: Checkout Contention Users 1-110
+2026-04-04 04:10:05,671 INFO o.a.j.t.JMeterThread: Thread is done: Checkout Contention Users 1-11
+2026-04-04 04:10:05,671 INFO o.a.j.t.JMeterThread: Thread is done: Checkout Contention Users 1-100
+2026-04-04 04:10:05,672 INFO o.a.j.t.JMeterThread: Thread finished: Checkout Contention Users 1-11
+2026-04-04 04:10:05,672 INFO o.a.j.t.JMeterThread: Thread finished: Checkout Contention Users 1-100
+2026-04-04 04:10:05,672 INFO o.a.j.t.JMeterThread: Thread is done: Checkout Contention Users 1-31
+2026-04-04 04:10:05,672 INFO o.a.j.t.JMeterThread: Thread finished: Checkout Contention Users 1-31
+2026-04-04 04:10:05,672 INFO o.a.j.t.JMeterThread: Thread is done: Checkout Contention Users 1-22
+2026-04-04 04:10:05,672 INFO o.a.j.t.JMeterThread: Thread finished: Checkout Contention Users 1-22
+2026-04-04 04:10:05,672 INFO o.a.j.t.JMeterThread: Thread is done: Checkout Contention Users 1-42
+2026-04-04 04:10:05,672 INFO o.a.j.t.JMeterThread: Thread is done: Checkout Contention Users 1-48
+2026-04-04 04:10:05,672 INFO o.a.j.t.JMeterThread: Thread finished: Checkout Contention Users 1-42
+2026-04-04 04:10:05,672 INFO o.a.j.t.JMeterThread: Thread is done: Checkout Contention Users 1-106
+2026-04-04 04:10:05,672 INFO o.a.j.t.JMeterThread: Thread finished: Checkout Contention Users 1-48
+2026-04-04 04:10:05,673 INFO o.a.j.t.JMeterThread: Thread finished: Checkout Contention Users 1-106
+2026-04-04 04:10:05,673 INFO o.a.j.t.JMeterThread: Thread is done: Checkout Contention Users 1-90
+2026-04-04 04:10:05,673 INFO o.a.j.t.JMeterThread: Thread finished: Checkout Contention Users 1-90
+2026-04-04 04:10:05,673 INFO o.a.j.t.JMeterThread: Thread is done: Checkout Contention Users 1-26
+2026-04-04 04:10:05,673 INFO o.a.j.t.JMeterThread: Thread finished: Checkout Contention Users 1-26
+2026-04-04 04:10:05,674 INFO o.a.j.t.JMeterThread: Thread is done: Checkout Contention Users 1-32
+2026-04-04 04:10:05,674 INFO o.a.j.t.JMeterThread: Thread finished: Checkout Contention Users 1-32
+2026-04-04 04:10:05,675 INFO o.a.j.t.JMeterThread: Thread is done: Checkout Contention Users 1-19
+2026-04-04 04:10:05,675 INFO o.a.j.t.JMeterThread: Thread is done: Checkout Contention Users 1-55
+2026-04-04 04:10:05,675 INFO o.a.j.t.JMeterThread: Thread is done: Checkout Contention Users 1-13
+2026-04-04 04:10:05,675 INFO o.a.j.t.JMeterThread: Thread finished: Checkout Contention Users 1-55
+2026-04-04 04:10:05,675 INFO o.a.j.t.JMeterThread: Thread is done: Checkout Contention Users 1-104
+2026-04-04 04:10:05,675 INFO o.a.j.t.JMeterThread: Thread finished: Checkout Contention Users 1-13
+2026-04-04 04:10:05,675 INFO o.a.j.t.JMeterThread: Thread is done: Checkout Contention Users 1-10
+2026-04-04 04:10:05,675 INFO o.a.j.t.JMeterThread: Thread is done: Checkout Contention Users 1-67
+2026-04-04 04:10:05,675 INFO o.a.j.t.JMeterThread: Thread finished: Checkout Contention Users 1-104
+2026-04-04 04:10:05,675 INFO o.a.j.t.JMeterThread: Thread finished: Checkout Contention Users 1-67
+2026-04-04 04:10:05,675 INFO o.a.j.t.JMeterThread: Thread finished: Checkout Contention Users 1-19
+2026-04-04 04:10:05,675 INFO o.a.j.t.JMeterThread: Thread is done: Checkout Contention Users 1-9
+2026-04-04 04:10:05,675 INFO o.a.j.t.JMeterThread: Thread finished: Checkout Contention Users 1-10
+2026-04-04 04:10:05,676 INFO o.a.j.t.JMeterThread: Thread is done: Checkout Contention Users 1-41
+2026-04-04 04:10:05,675 INFO o.a.j.t.JMeterThread: Thread finished: Checkout Contention Users 1-9
+2026-04-04 04:10:05,676 INFO o.a.j.t.JMeterThread: Thread finished: Checkout Contention Users 1-41
+2026-04-04 04:10:05,676 INFO o.a.j.t.JMeterThread: Thread is done: Checkout Contention Users 1-93
+2026-04-04 04:10:05,676 INFO o.a.j.t.JMeterThread: Thread is done: Checkout Contention Users 1-88
+2026-04-04 04:10:05,676 INFO o.a.j.t.JMeterThread: Thread finished: Checkout Contention Users 1-93
+2026-04-04 04:10:05,676 INFO o.a.j.t.JMeterThread: Thread finished: Checkout Contention Users 1-88
+2026-04-04 04:10:05,676 INFO o.a.j.t.JMeterThread: Thread is done: Checkout Contention Users 1-35
+2026-04-04 04:10:05,676 INFO o.a.j.t.JMeterThread: Thread is done: Checkout Contention Users 1-92
+2026-04-04 04:10:05,676 INFO o.a.j.t.JMeterThread: Thread is done: Checkout Contention Users 1-63
+2026-04-04 04:10:05,676 INFO o.a.j.t.JMeterThread: Thread is done: Checkout Contention Users 1-23
+2026-04-04 04:10:05,676 INFO o.a.j.t.JMeterThread: Thread finished: Checkout Contention Users 1-35
+2026-04-04 04:10:05,676 INFO o.a.j.t.JMeterThread: Thread is done: Checkout Contention Users 1-99
+2026-04-04 04:10:05,676 INFO o.a.j.t.JMeterThread: Thread finished: Checkout Contention Users 1-63
+2026-04-04 04:10:05,676 INFO o.a.j.t.JMeterThread: Thread finished: Checkout Contention Users 1-99
+2026-04-04 04:10:05,676 INFO o.a.j.t.JMeterThread: Thread is done: Checkout Contention Users 1-15
+2026-04-04 04:10:05,676 INFO o.a.j.t.JMeterThread: Thread finished: Checkout Contention Users 1-92
+2026-04-04 04:10:05,676 INFO o.a.j.t.JMeterThread: Thread is done: Checkout Contention Users 1-47
+2026-04-04 04:10:05,676 INFO o.a.j.t.JMeterThread: Thread is done: Checkout Contention Users 1-46
+2026-04-04 04:10:05,676 INFO o.a.j.t.JMeterThread: Thread is done: Checkout Contention Users 1-64
+2026-04-04 04:10:05,677 INFO o.a.j.t.JMeterThread: Thread finished: Checkout Contention Users 1-47
+2026-04-04 04:10:05,676 INFO o.a.j.t.JMeterThread: Thread finished: Checkout Contention Users 1-15
+2026-04-04 04:10:05,677 INFO o.a.j.t.JMeterThread: Thread finished: Checkout Contention Users 1-64
+2026-04-04 04:10:05,676 INFO o.a.j.t.JMeterThread: Thread is done: Checkout Contention Users 1-59
+2026-04-04 04:10:05,677 INFO o.a.j.t.JMeterThread: Thread finished: Checkout Contention Users 1-46
+2026-04-04 04:10:05,676 INFO o.a.j.t.JMeterThread: Thread is done: Checkout Contention Users 1-109
+2026-04-04 04:10:05,676 INFO o.a.j.t.JMeterThread: Thread is done: Checkout Contention Users 1-25
+2026-04-04 04:10:05,676 INFO o.a.j.t.JMeterThread: Thread is done: Checkout Contention Users 1-107
+2026-04-04 04:10:05,677 INFO o.a.j.t.JMeterThread: Thread finished: Checkout Contention Users 1-25
+2026-04-04 04:10:05,677 INFO o.a.j.t.JMeterThread: Thread finished: Checkout Contention Users 1-109
+2026-04-04 04:10:05,677 INFO o.a.j.t.JMeterThread: Thread finished: Checkout Contention Users 1-23
+2026-04-04 04:10:05,677 INFO o.a.j.t.JMeterThread: Thread is done: Checkout Contention Users 1-101
+2026-04-04 04:10:05,678 INFO o.a.j.t.JMeterThread: Thread finished: Checkout Contention Users 1-101
+2026-04-04 04:10:05,678 INFO o.a.j.t.JMeterThread: Thread finished: Checkout Contention Users 1-59
+2026-04-04 04:10:05,677 INFO o.a.j.t.JMeterThread: Thread finished: Checkout Contention Users 1-107
+2026-04-04 04:10:05,679 INFO o.a.j.t.JMeterThread: Thread is done: Checkout Contention Users 1-58
+2026-04-04 04:10:05,679 INFO o.a.j.t.JMeterThread: Thread finished: Checkout Contention Users 1-58
+2026-04-04 04:10:05,679 INFO o.a.j.t.JMeterThread: Thread is done: Checkout Contention Users 1-98
+2026-04-04 04:10:05,679 INFO o.a.j.t.JMeterThread: Thread finished: Checkout Contention Users 1-98
+2026-04-04 04:10:05,680 INFO o.a.j.t.JMeterThread: Thread is done: Checkout Contention Users 1-28
+2026-04-04 04:10:05,680 INFO o.a.j.t.JMeterThread: Thread finished: Checkout Contention Users 1-28
+2026-04-04 04:10:05,680 INFO o.a.j.t.JMeterThread: Thread is done: Checkout Contention Users 1-108
+2026-04-04 04:10:05,680 INFO o.a.j.t.JMeterThread: Thread finished: Checkout Contention Users 1-108
+2026-04-04 04:10:05,680 INFO o.a.j.t.JMeterThread: Thread is done: Checkout Contention Users 1-1
+2026-04-04 04:10:05,680 INFO o.a.j.t.JMeterThread: Thread is done: Checkout Contention Users 1-80
+2026-04-04 04:10:05,680 INFO o.a.j.t.JMeterThread: Thread finished: Checkout Contention Users 1-1
+2026-04-04 04:10:05,680 INFO o.a.j.t.JMeterThread: Thread finished: Checkout Contention Users 1-80
+2026-04-04 04:10:05,680 INFO o.a.j.t.JMeterThread: Thread is done: Checkout Contention Users 1-40
+2026-04-04 04:10:05,680 INFO o.a.j.t.JMeterThread: Thread is done: Checkout Contention Users 1-65
+2026-04-04 04:10:05,680 INFO o.a.j.t.JMeterThread: Thread is done: Checkout Contention Users 1-39
+2026-04-04 04:10:05,680 INFO o.a.j.t.JMeterThread: Thread finished: Checkout Contention Users 1-39
+2026-04-04 04:10:05,680 INFO o.a.j.t.JMeterThread: Thread is done: Checkout Contention Users 1-74
+2026-04-04 04:10:05,680 INFO o.a.j.t.JMeterThread: Thread is done: Checkout Contention Users 1-37
+2026-04-04 04:10:05,680 INFO o.a.j.t.JMeterThread: Thread is done: Checkout Contention Users 1-54
+2026-04-04 04:10:05,680 INFO o.a.j.t.JMeterThread: Thread finished: Checkout Contention Users 1-74
+2026-04-04 04:10:05,680 INFO o.a.j.t.JMeterThread: Thread is done: Checkout Contention Users 1-51
+2026-04-04 04:10:05,680 INFO o.a.j.t.JMeterThread: Thread is done: Checkout Contention Users 1-7
+2026-04-04 04:10:05,680 INFO o.a.j.t.JMeterThread: Thread is done: Checkout Contention Users 1-77
+2026-04-04 04:10:05,680 INFO o.a.j.t.JMeterThread: Thread is done: Checkout Contention Users 1-103
+2026-04-04 04:10:05,680 INFO o.a.j.t.JMeterThread: Thread is done: Checkout Contention Users 1-45
+2026-04-04 04:10:05,680 INFO o.a.j.t.JMeterThread: Thread finished: Checkout Contention Users 1-77
+2026-04-04 04:10:05,681 INFO o.a.j.t.JMeterThread: Thread is done: Checkout Contention Users 1-84
+2026-04-04 04:10:05,680 INFO o.a.j.t.JMeterThread: Thread finished: Checkout Contention Users 1-65
+2026-04-04 04:10:05,680 INFO o.a.j.t.JMeterThread: Thread finished: Checkout Contention Users 1-7
+2026-04-04 04:10:05,680 INFO o.a.j.t.JMeterThread: Thread finished: Checkout Contention Users 1-54
+2026-04-04 04:10:05,680 INFO o.a.j.t.JMeterThread: Thread finished: Checkout Contention Users 1-37
+2026-04-04 04:10:05,680 INFO o.a.j.t.JMeterThread: Thread finished: Checkout Contention Users 1-40
+2026-04-04 04:10:05,680 INFO o.a.j.t.JMeterThread: Thread is done: Checkout Contention Users 1-20
+2026-04-04 04:10:05,680 INFO o.a.j.t.JMeterThread: Thread is done: Checkout Contention Users 1-44
+2026-04-04 04:10:05,682 INFO o.a.j.t.JMeterThread: Thread finished: Checkout Contention Users 1-20
+2026-04-04 04:10:05,681 INFO o.a.j.t.JMeterThread: Thread finished: Checkout Contention Users 1-51
+2026-04-04 04:10:05,681 INFO o.a.j.t.JMeterThread: Thread finished: Checkout Contention Users 1-45
+2026-04-04 04:10:05,681 INFO o.a.j.t.JMeterThread: Thread finished: Checkout Contention Users 1-103
+2026-04-04 04:10:05,682 INFO o.a.j.t.JMeterThread: Thread finished: Checkout Contention Users 1-84
+2026-04-04 04:10:05,682 INFO o.a.j.t.JMeterThread: Thread finished: Checkout Contention Users 1-44
+2026-04-04 04:10:05,683 INFO o.a.j.t.JMeterThread: Thread is done: Checkout Contention Users 1-69
+2026-04-04 04:10:05,683 INFO o.a.j.t.JMeterThread: Thread is done: Checkout Contention Users 1-33
+2026-04-04 04:10:05,683 INFO o.a.j.t.JMeterThread: Thread is done: Checkout Contention Users 1-56
+2026-04-04 04:10:05,683 INFO o.a.j.t.JMeterThread: Thread finished: Checkout Contention Users 1-69
+2026-04-04 04:10:05,683 INFO o.a.j.t.JMeterThread: Thread finished: Checkout Contention Users 1-56
+2026-04-04 04:10:05,683 INFO o.a.j.t.JMeterThread: Thread is done: Checkout Contention Users 1-61
+2026-04-04 04:10:05,683 INFO o.a.j.t.JMeterThread: Thread finished: Checkout Contention Users 1-33
+2026-04-04 04:10:05,683 INFO o.a.j.t.JMeterThread: Thread finished: Checkout Contention Users 1-61
+2026-04-04 04:10:05,684 INFO o.a.j.t.JMeterThread: Thread is done: Checkout Contention Users 1-21
+2026-04-04 04:10:05,684 INFO o.a.j.t.JMeterThread: Thread finished: Checkout Contention Users 1-21
+2026-04-04 04:10:05,684 INFO o.a.j.t.JMeterThread: Thread is done: Checkout Contention Users 1-57
+2026-04-04 04:10:05,684 INFO o.a.j.t.JMeterThread: Thread is done: Checkout Contention Users 1-34
+2026-04-04 04:10:05,684 INFO o.a.j.t.JMeterThread: Thread is done: Checkout Contention Users 1-102
+2026-04-04 04:10:05,684 INFO o.a.j.t.JMeterThread: Thread finished: Checkout Contention Users 1-57
+2026-04-04 04:10:05,684 INFO o.a.j.t.JMeterThread: Thread is done: Checkout Contention Users 1-96
+2026-04-04 04:10:05,684 INFO o.a.j.t.JMeterThread: Thread finished: Checkout Contention Users 1-96
+2026-04-04 04:10:05,684 INFO o.a.j.t.JMeterThread: Thread is done: Checkout Contention Users 1-94
+2026-04-04 04:10:05,684 INFO o.a.j.t.JMeterThread: Thread is done: Checkout Contention Users 1-76
+2026-04-04 04:10:05,685 INFO o.a.j.t.JMeterThread: Thread finished: Checkout Contention Users 1-94
+2026-04-04 04:10:05,685 INFO o.a.j.t.JMeterThread: Thread finished: Checkout Contention Users 1-34
+2026-04-04 04:10:05,685 INFO o.a.j.t.JMeterThread: Thread finished: Checkout Contention Users 1-102
+2026-04-04 04:10:05,685 INFO o.a.j.t.JMeterThread: Thread finished: Checkout Contention Users 1-76
+2026-04-04 04:10:05,685 INFO o.a.j.e.StandardJMeterEngine: Notifying test listeners of end of test
+2026-04-04 04:10:05,686 INFO o.a.j.s.FileServer: Close: /home/keishi/tru/web_seng4640/web_app_seng4640/loadtest/stg-loadtest-users.csv
+2026-04-04 04:10:05,690 INFO o.a.j.r.Summariser: summary +     87 in 00:00:05 =   17.3/s Avg: 60015 Min: 57029 Max: 60062 Err:    85 (97.70%) Active: 0 Started: 110 Finished: 110
+2026-04-04 04:10:05,692 INFO o.a.j.r.Summariser: summary =    220 in 00:01:13 =    3.0/s Avg: 29788 Min:  1957 Max: 60062 Err:    85 (38.64%)
+2026-04-04 04:10:05,692 INFO o.a.j.JMeter: Generating Dashboard
+2026-04-04 04:10:05,692 INFO o.a.j.r.d.ReportGenerator: Flushing result collector before report Generation
+2026-04-04 04:10:05,699 INFO o.a.j.r.p.NormalizerSampleConsumer: Using format, 'ms', to parse timeStamp field
+2026-04-04 04:10:05,770 INFO o.a.j.r.p.AbstractSampleConsumer: class org.apache.jmeter.report.processor.AggregateConsumer#stopProducing(): beginDate produced 0 samples
+2026-04-04 04:10:05,771 INFO o.a.j.r.p.AbstractSampleConsumer: class org.apache.jmeter.report.processor.AggregateConsumer#stopProducing(): endDate produced 0 samples
+2026-04-04 04:10:05,772 INFO o.a.j.r.p.AbstractSampleConsumer: class org.apache.jmeter.report.processor.ApdexSummaryConsumer#stopProducing(): apdexSummary produced 0 samples
+2026-04-04 04:10:05,772 INFO o.a.j.r.p.AbstractSampleConsumer: class org.apache.jmeter.report.processor.RequestsSummaryConsumer#stopProducing(): requestsSummary produced 0 samples
+2026-04-04 04:10:05,774 INFO o.a.j.r.p.AbstractSampleConsumer: class org.apache.jmeter.report.processor.StatisticsSummaryConsumer#stopProducing(): statisticsSummary produced 0 samples
+2026-04-04 04:10:05,776 INFO o.a.j.r.p.AbstractSampleConsumer: class org.apache.jmeter.report.processor.Top5ErrorsBySamplerConsumer#stopProducing(): top5ErrorsBySampler produced 0 samples
+2026-04-04 04:10:05,776 INFO o.a.j.r.p.AbstractSampleConsumer: class org.apache.jmeter.report.processor.ErrorsSummaryConsumer#stopProducing(): errorsSummary produced 0 samples
+2026-04-04 04:10:05,776 INFO o.a.j.r.p.AbstractSampleConsumer: class org.apache.jmeter.report.processor.graph.impl.HitsPerSecondGraphConsumer#stopProducing(): hitsPerSecond produced 0 samples
+2026-04-04 04:10:05,786 INFO o.a.j.r.p.AbstractSampleConsumer: class org.apache.jmeter.report.processor.graph.impl.LatencyVSRequestGraphConsumer#stopProducing(): latencyVsRequest produced 0 samples
+2026-04-04 04:10:05,786 INFO o.a.j.r.p.AbstractSampleConsumer: class org.apache.jmeter.report.processor.graph.impl.SyntheticResponseTimeDistributionGraphConsumer#stopProducing(): syntheticResponseTimeDistribution produced 0 samples
+2026-04-04 04:10:05,787 INFO o.a.j.r.p.AbstractSampleConsumer: class org.apache.jmeter.report.processor.graph.impl.BytesThroughputGraphConsumer#stopProducing(): bytesThroughputOverTime produced 0 samples
+2026-04-04 04:10:05,787 INFO o.a.j.r.p.AbstractSampleConsumer: class org.apache.jmeter.report.processor.graph.impl.CodesPerSecondGraphConsumer#stopProducing(): codesPerSecond produced 0 samples
+2026-04-04 04:10:05,791 INFO o.a.j.r.p.AbstractSampleConsumer: class org.apache.jmeter.report.processor.graph.impl.ResponseTimeVSRequestGraphConsumer#stopProducing(): responseTimeVsRequest produced 0 samples
+2026-04-04 04:10:05,791 INFO o.a.j.r.p.AbstractSampleConsumer: class org.apache.jmeter.report.processor.FilterConsumer#stopProducing(): startIntervalControlerFilter produced 1540 samples
+2026-04-04 04:10:05,791 INFO o.a.j.r.p.AbstractSampleConsumer: class org.apache.jmeter.report.processor.graph.impl.TotalTPSGraphConsumer#stopProducing(): totalTPS produced 0 samples
+2026-04-04 04:10:05,791 INFO o.a.j.r.p.AbstractSampleConsumer: class org.apache.jmeter.report.processor.graph.impl.ActiveThreadsGraphConsumer#stopProducing(): activeThreadsOverTime produced 0 samples
+2026-04-04 04:10:05,791 INFO o.a.j.r.p.AbstractSampleConsumer: class org.apache.jmeter.report.processor.graph.impl.TimeVSThreadGraphConsumer#stopProducing(): timeVsThreads produced 0 samples
+2026-04-04 04:10:05,791 INFO o.a.j.r.p.AbstractSampleConsumer: class org.apache.jmeter.report.processor.graph.impl.ResponseTimeDistributionGraphConsumer#stopProducing(): responseTimeDistribution produced 0 samples
+2026-04-04 04:10:05,791 INFO o.a.j.r.p.AbstractSampleConsumer: class org.apache.jmeter.report.processor.graph.impl.TransactionsPerSecondGraphConsumer#stopProducing(): transactionsPerSecond produced 0 samples
+2026-04-04 04:10:05,791 INFO o.a.j.r.p.AbstractSampleConsumer: class org.apache.jmeter.report.processor.graph.impl.ResponseTimePercentilesGraphConsumer#stopProducing(): responseTimePercentiles produced 0 samples
+2026-04-04 04:10:05,793 INFO o.a.j.r.p.AbstractSampleConsumer: class org.apache.jmeter.report.processor.graph.impl.ResponseTimePercentilesOverTimeGraphConsumer#stopProducing(): responseTimePercentilesOverTime produced 0 samples
+2026-04-04 04:10:05,793 INFO o.a.j.r.p.AbstractSampleConsumer: class org.apache.jmeter.report.processor.graph.impl.ResponseTimeOverTimeGraphConsumer#stopProducing(): responseTimesOverTime produced 0 samples
+2026-04-04 04:10:05,793 INFO o.a.j.r.p.AbstractSampleConsumer: class org.apache.jmeter.report.processor.graph.impl.ConnectTimeOverTimeGraphConsumer#stopProducing(): connectTimeOverTime produced 0 samples
+2026-04-04 04:10:05,794 INFO o.a.j.r.p.AbstractSampleConsumer: class org.apache.jmeter.report.processor.graph.impl.LatencyOverTimeGraphConsumer#stopProducing(): latenciesOverTime produced 0 samples
+2026-04-04 04:10:05,794 INFO o.a.j.r.p.AbstractSampleConsumer: class org.apache.jmeter.report.processor.FilterConsumer#stopProducing(): nameFilter produced 3300 samples
+2026-04-04 04:10:05,794 INFO o.a.j.r.p.AbstractSampleConsumer: class org.apache.jmeter.report.processor.FilterConsumer#stopProducing(): dateRangeFilter produced 660 samples
+2026-04-04 04:10:05,794 INFO o.a.j.r.p.AbstractSampleConsumer: class org.apache.jmeter.report.processor.NormalizerSampleConsumer#stopProducing(): normalizer produced 220 samples
+2026-04-04 04:10:05,795 INFO o.a.j.r.p.CsvFileSampleSource: produce(): 220 samples produced in 80ms on channel 0
+2026-04-04 04:10:05,795 INFO o.a.j.r.d.ReportGenerator: Exporting data using exporter:'json' of className:'org.apache.jmeter.report.dashboard.JsonExporter'
+2026-04-04 04:10:05,832 INFO o.a.j.r.d.JsonExporter: Found data for consumer statisticsSummary in context
+2026-04-04 04:10:05,833 INFO o.a.j.r.d.JsonExporter: Creating statistics for overall
+2026-04-04 04:10:05,833 INFO o.a.j.r.d.JsonExporter: Creating statistics for other transactions
+2026-04-04 04:10:05,834 INFO o.a.j.r.d.JsonExporter: Checking output folder
+2026-04-04 04:10:05,834 INFO o.a.j.r.d.JsonExporter: Writing statistics JSON to /home/keishi/tru/web_seng4640/web_app_seng4640/jmeter-runs/flash-sale-stg-110v100-pure-13-57-223-9-p30500-t110-s110-20260404-040851/report/statistics.json
+2026-04-04 04:10:05,858 INFO o.a.j.r.d.ReportGenerator: Exporting data using exporter:'html' of className:'org.apache.jmeter.report.dashboard.HtmlTemplateExporter'
+2026-04-04 04:10:05,860 INFO o.a.j.r.d.HtmlTemplateExporter: Will generate dashboard in folder: /home/keishi/tru/web_seng4640/web_app_seng4640/jmeter-runs/flash-sale-stg-110v100-pure-13-57-223-9-p30500-t110-s110-20260404-040851/report
+2026-04-04 04:10:05,922 INFO o.a.j.r.d.HtmlTemplateExporter: Report will be generated in: /home/keishi/tru/web_seng4640/web_app_seng4640/jmeter-runs/flash-sale-stg-110v100-pure-13-57-223-9-p30500-t110-s110-20260404-040851/report, creating folder structure
+2026-04-04 04:10:05,924 INFO o.a.j.r.d.TemplateVisitor: Copying folder from '/opt/jmeter/bin/report-template' to '/home/keishi/tru/web_seng4640/web_app_seng4640/jmeter-runs/flash-sale-stg-110v100-pure-13-57-223-9-p30500-t110-s110-20260404-040851/report', got message: /home/keishi/tru/web_seng4640/web_app_seng4640/jmeter-runs/flash-sale-stg-110v100-pure-13-57-223-9-p30500-t110-s110-20260404-040851/report, found non empty folder with following content [/home/keishi/tru/web_seng4640/web_app_seng4640/jmeter-runs/flash-sale-stg-110v100-pure-13-57-223-9-p30500-t110-s110-20260404-040851/report/statistics.json], will be ignored
+2026-04-04 04:10:06,036 INFO o.a.j.JMeter: Dashboard generated
