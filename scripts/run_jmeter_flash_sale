@@ -1,0 +1,349 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
+
+has_command() {
+  command -v "$1" >/dev/null 2>&1
+}
+
+log() {
+  echo "[run_jmeter_flash_sale] $*"
+}
+
+append_jmeter_prop() {
+  local -n cmd_ref="$1"
+  local key="$2"
+  local value="$3"
+
+  if [[ -z "${value}" ]]; then
+    return
+  fi
+
+  cmd_ref+=("-J${key}=${value}")
+}
+
+usage() {
+  cat <<'EOF'
+Usage:
+  ./run_jmeter_flash_sale --host 13.57.223.9 --port 30500 --csv loadtest/stg-loadtest-users.csv
+
+Options:
+  --host HOST_OR_URL          Target host or full URL. Default: 127.0.0.1
+  --port PORT                Target port. Default: 30500
+  --protocol http|https      Request protocol. Default: inferred or http
+  --base-path PATH           API base path. Default: /api
+  --csv PATH                 CSV path. Default: loadtest/stg-loadtest-users.csv
+  --threads COUNT            Thread count. Default: 250
+  --sync COUNT               Sync group size. Default: thread count
+  --ramp SECONDS             Ramp time. Default: 5
+  --connect-timeout-ms MS    Connect timeout. Default: 5000
+  --response-timeout-ms MS   Response timeout. Default: 60000
+  --sync-timeout-ms MS       Sync timer timeout. Default: 15000
+  --setup-flash-sale         Log in as the seed product manager and enable flash sale before the customer burst
+  --manager-email EMAIL      Manager login email for setup flow
+  --manager-password PASS    Manager login password for setup flow
+  --flash-sale-price PRICE   Flash sale price used by manager setup flow
+  --product-name NAME        Dedicated product name created by manager setup flow
+  --product-stock COUNT      Dedicated product stock created by manager setup flow
+  --label NAME               Optional run label prefix
+  --output-root DIR          Parent directory for run outputs. Default: $PWD/jmeter-runs
+  --plan PATH                JMeter plan path. Default: docs/backend/jmeter-flash-sale-checkout-template.jmx
+  --jmeter-bin CMD           JMeter executable. Default: jmeter
+  --help                     Show this help
+
+The script writes a timestamped run directory under the current directory, then
+stores:
+  - results.jtl
+  - report/
+  - run-info.txt
+EOF
+}
+
+resolve_existing_path() {
+  local input="$1"
+
+  if [[ "${input}" = /* ]]; then
+    printf '%s\n' "${input}"
+    return
+  fi
+
+  if [[ -e "${PWD}/${input}" ]]; then
+    printf '%s\n' "${PWD}/${input}"
+    return
+  fi
+
+  printf '%s\n' "${REPO_ROOT}/${input}"
+}
+
+csv_missing_message() {
+  local resolved_path="$1"
+  local requested_input="$2"
+  local helper_path="${REPO_ROOT}/run_jmeter_flash_sale"
+
+  cat <<EOF >&2
+CSV file not found: ${resolved_path}
+
+Requested value:
+  ${requested_input}
+
+Notes:
+  - JMeter reads the CSV from the same machine where you run JMeter.
+  - This repo keeps the default CSVs locally under ${REPO_ROOT}/loadtest/.
+  - Seed scripts no longer generate CSV files automatically.
+  - If you need a different user count, edit or duplicate the local CSV and pass it to --csv.
+
+Examples:
+  ${helper_path} --host 13.57.223.9 --port 30500 --csv ${REPO_ROOT}/loadtest/stg-loadtest-users.csv
+EOF
+}
+
+slugify() {
+  printf '%s' "$1" | tr '[:upper:]' '[:lower:]' | sed -E 's/[^a-z0-9]+/-/g; s/^-+//; s/-+$//'
+}
+
+port_is_explicit=false
+if [[ -n "${JMETER_PORT-}" ]]; then
+  port_is_explicit=true
+fi
+
+host_input="${JMETER_HOST:-127.0.0.1}"
+protocol="${JMETER_PROTOCOL:-}"
+port="${JMETER_PORT:-30500}"
+base_path="${JMETER_BASE_PATH:-/api}"
+csv_path_input="${JMETER_CSV_PATH:-loadtest/stg-loadtest-users.csv}"
+thread_count="${JMETER_THREAD_COUNT:-250}"
+sync_group_size="${JMETER_SYNC_GROUP_SIZE:-${thread_count}}"
+ramp_seconds="${JMETER_RAMP_SECONDS:-5}"
+connect_timeout_ms="${JMETER_CONNECT_TIMEOUT_MS:-5000}"
+response_timeout_ms="${JMETER_RESPONSE_TIMEOUT_MS:-60000}"
+sync_timeout_ms="${JMETER_SYNC_TIMEOUT_MS:-15000}"
+setup_flash_sale="${JMETER_SETUP_FLASH_SALE:-false}"
+manager_email="${JMETER_MANAGER_EMAIL:-}"
+manager_password="${JMETER_MANAGER_PASSWORD:-}"
+flash_sale_price="${JMETER_TARGET_FLASH_SALE_PRICE:-}"
+product_name="${JMETER_TARGET_PRODUCT_NAME:-}"
+product_stock="${JMETER_TARGET_PRODUCT_STOCK:-}"
+run_label="${JMETER_RUN_LABEL:-}"
+output_root="${JMETER_OUTPUT_ROOT:-${PWD}/jmeter-runs}"
+plan_path_input="${JMETER_PLAN_PATH:-docs/backend/jmeter-flash-sale-checkout-template.jmx}"
+jmeter_bin="${JMETER_BIN:-jmeter}"
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --host)
+      host_input="$2"
+      shift 2
+      ;;
+    --port)
+      port="$2"
+      port_is_explicit=true
+      shift 2
+      ;;
+    --protocol)
+      protocol="$2"
+      shift 2
+      ;;
+    --base-path)
+      base_path="$2"
+      shift 2
+      ;;
+    --csv)
+      csv_path_input="$2"
+      shift 2
+      ;;
+    --threads)
+      thread_count="$2"
+      shift 2
+      ;;
+    --sync)
+      sync_group_size="$2"
+      shift 2
+      ;;
+    --ramp)
+      ramp_seconds="$2"
+      shift 2
+      ;;
+    --connect-timeout-ms)
+      connect_timeout_ms="$2"
+      shift 2
+      ;;
+    --response-timeout-ms)
+      response_timeout_ms="$2"
+      shift 2
+      ;;
+    --sync-timeout-ms)
+      sync_timeout_ms="$2"
+      shift 2
+      ;;
+    --setup-flash-sale)
+      setup_flash_sale="true"
+      shift
+      ;;
+    --manager-email)
+      manager_email="$2"
+      shift 2
+      ;;
+    --manager-password)
+      manager_password="$2"
+      shift 2
+      ;;
+    --flash-sale-price)
+      flash_sale_price="$2"
+      shift 2
+      ;;
+    --product-name)
+      product_name="$2"
+      shift 2
+      ;;
+    --product-stock)
+      product_stock="$2"
+      shift 2
+      ;;
+    --label)
+      run_label="$2"
+      shift 2
+      ;;
+    --output-root)
+      output_root="$2"
+      shift 2
+      ;;
+    --plan)
+      plan_path_input="$2"
+      shift 2
+      ;;
+    --jmeter-bin)
+      jmeter_bin="$2"
+      shift 2
+      ;;
+    --help|-h)
+      usage
+      exit 0
+      ;;
+    *)
+      echo "Unknown argument: $1" >&2
+      usage >&2
+      exit 1
+      ;;
+  esac
+done
+
+if [[ "${host_input}" == http://* ]]; then
+  [[ -n "${protocol}" ]] || protocol="http"
+  host_input="${host_input#http://}"
+elif [[ "${host_input}" == https://* ]]; then
+  [[ -n "${protocol}" ]] || protocol="https"
+  host_input="${host_input#https://}"
+fi
+
+host_input="${host_input%%/*}"
+
+if [[ "${host_input}" == *:* ]] && [[ "${port_is_explicit}" == false ]]; then
+  maybe_port="${host_input##*:}"
+  if [[ "${maybe_port}" =~ ^[0-9]+$ ]]; then
+    port="${maybe_port}"
+    host_input="${host_input%:*}"
+  fi
+fi
+
+protocol="${protocol:-http}"
+host="${host_input}"
+
+if [[ -z "${host}" ]]; then
+  echo "Host must not be empty." >&2
+  exit 1
+fi
+
+if ! has_command "${jmeter_bin}"; then
+  echo "JMeter executable not found: ${jmeter_bin}" >&2
+  exit 1
+fi
+
+plan_path="$(resolve_existing_path "${plan_path_input}")"
+csv_path="$(resolve_existing_path "${csv_path_input}")"
+
+if [[ ! -f "${plan_path}" ]]; then
+  echo "JMeter plan not found: ${plan_path}" >&2
+  exit 1
+fi
+
+if [[ ! -f "${csv_path}" ]]; then
+  csv_missing_message "${csv_path}" "${csv_path_input}"
+  exit 1
+fi
+
+timestamp="$(date +%Y%m%d-%H%M%S)"
+csv_stem="$(basename "${csv_path}" .csv)"
+csv_label="${csv_stem%-users}"
+host_slug="$(slugify "${host}")"
+label_slug="$(slugify "${run_label:-${csv_label}}")"
+
+mkdir -p "${output_root}"
+
+run_dir="${output_root}/flash-sale-${label_slug}-${host_slug}-p${port}-t${thread_count}-s${sync_group_size}-${timestamp}"
+results_file="${run_dir}/results.jtl"
+report_dir="${run_dir}/report"
+run_info_file="${run_dir}/run-info.txt"
+
+mkdir -p "${run_dir}"
+
+cat > "${run_info_file}" <<EOF
+timestamp=${timestamp}
+protocol=${protocol}
+host=${host}
+port=${port}
+base_path=${base_path}
+csv_path=${csv_path}
+thread_count=${thread_count}
+sync_group_size=${sync_group_size}
+ramp_seconds=${ramp_seconds}
+connect_timeout_ms=${connect_timeout_ms}
+response_timeout_ms=${response_timeout_ms}
+sync_timeout_ms=${sync_timeout_ms}
+setup_flash_sale=${setup_flash_sale}
+manager_email=${manager_email}
+flash_sale_price=${flash_sale_price}
+product_name=${product_name}
+product_stock=${product_stock}
+plan_path=${plan_path}
+results_file=${results_file}
+report_dir=${report_dir}
+EOF
+
+log "Starting JMeter run..."
+log "Run directory: ${run_dir}"
+
+declare -a jmeter_cmd=(
+  "${jmeter_bin}"
+  -n
+  -t "${plan_path}"
+  -Jprotocol="${protocol}"
+  -Jhost="${host}"
+  -Jport="${port}"
+  -Jbase_path="${base_path}"
+  -Jthread_count="${thread_count}"
+  -Jsync_group_size="${sync_group_size}"
+  -Jramp_seconds="${ramp_seconds}"
+  -Jconnect_timeout_ms="${connect_timeout_ms}"
+  -Jresponse_timeout_ms="${response_timeout_ms}"
+  -Jsync_timeout_ms="${sync_timeout_ms}"
+  -Jsetup_flash_sale="${setup_flash_sale}"
+  -Jcsv_path="${csv_path}"
+  -l "${results_file}"
+  -e
+  -o "${report_dir}"
+)
+
+append_jmeter_prop jmeter_cmd "manager_email" "${manager_email}"
+append_jmeter_prop jmeter_cmd "manager_password" "${manager_password}"
+append_jmeter_prop jmeter_cmd "target_flash_sale_price" "${flash_sale_price}"
+append_jmeter_prop jmeter_cmd "target_product_name" "${product_name}"
+append_jmeter_prop jmeter_cmd "target_product_stock" "${product_stock}"
+
+"${jmeter_cmd[@]}"
+
+log "Done."
+log "Results: ${results_file}"
+log "Report : ${report_dir}/index.html"

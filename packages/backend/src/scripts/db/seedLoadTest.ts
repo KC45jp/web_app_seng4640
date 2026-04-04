@@ -186,7 +186,6 @@ async function cleanupPreviousLoadTestData(
 
 async function writeArtifacts(input: {
   appEnv: string;
-  customerPassword: string;
   flashSalePrice: number;
   productCategory: ProductCategory;
   productId: string;
@@ -194,18 +193,8 @@ async function writeArtifacts(input: {
   productStock: number;
   summaryPath: string;
   userCount: number;
-  usersCsvPath: string;
-  users: Array<{ email: string; paymentMethod: "credit_card" }>;
 }): Promise<void> {
   await mkdir(ARTIFACTS_DIR, { recursive: true });
-
-  const csvBody = [
-    "email,password,paymentMethod",
-    ...input.users.map(
-      (user) => `${user.email},${input.customerPassword},${user.paymentMethod}`
-    ),
-  ].join("\n");
-  await writeFile(input.usersCsvPath, `${csvBody}\n`, "utf8");
 
   const summary = {
     generatedAt: new Date().toISOString(),
@@ -219,7 +208,7 @@ async function writeArtifacts(input: {
       stock: input.productStock,
       flashSalePrice: input.flashSalePrice,
     },
-    usersCsvPath: input.usersCsvPath,
+    localCsvPath: `loadtest/${input.appEnv}-loadtest-users.csv`,
     routes: {
       login: "/api/auth/login",
       checkout: "/api/checkout",
@@ -361,11 +350,9 @@ async function run(): Promise<void> {
     );
 
     const artifactPrefix = `${appEnv}-loadtest`;
-    const usersCsvPath = join(ARTIFACTS_DIR, `${artifactPrefix}-users.csv`);
     const summaryPath = join(ARTIFACTS_DIR, `${artifactPrefix}-summary.json`);
     await writeArtifacts({
       appEnv,
-      customerPassword,
       flashSalePrice: Number(flashSalePrice.toFixed(2)),
       productCategory,
       productId: loadTestProduct._id.toString(),
@@ -373,11 +360,6 @@ async function run(): Promise<void> {
       productStock,
       summaryPath,
       userCount,
-      usersCsvPath,
-      users: users.map((user) => ({
-        email: user.email,
-        paymentMethod: "credit_card",
-      })),
     });
 
     scriptLogger.info(
@@ -386,7 +368,6 @@ async function run(): Promise<void> {
         productId: loadTestProduct._id.toString(),
         productStock,
         userCount,
-        usersCsvPath,
         summaryPath,
       },
       "Load-test staging seed completed"
@@ -398,7 +379,6 @@ async function run(): Promise<void> {
         `users=${userCount}`,
         `stock=${productStock}`,
         `productId=${loadTestProduct._id.toString()}`,
-        `usersCsv=${usersCsvPath}`,
         `summary=${summaryPath}`,
       ].join(" | ")
     );

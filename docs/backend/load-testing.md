@@ -31,6 +31,11 @@ pod:
 Because it runs inside the pod, it uses the same `MONGO_URI` and other env vars
 that the deployed backend is already using.
 
+After the pod-side seed finishes, the helper copies only the summary file back to
+the EC2 host under `artifacts/loadtest/`:
+
+- `stg-loadtest-summary.json`
+
 If you want to restore the normal staging catalog and demo customers from inside
 the live `k3s` backend pod once, use:
 
@@ -76,10 +81,14 @@ For the local JMeter run, point the template at:
 http://127.0.0.1:5000
 ```
 
-The load-test seed also writes artifacts under `artifacts/loadtest/`:
+The load-test seed writes its summary artifact under `artifacts/loadtest/`:
 
-- `stg-loadtest-users.csv`
 - `stg-loadtest-summary.json`
+
+The CSV files are kept locally in the repo under `loadtest/`:
+
+- `loadtest/stg-loadtest-users.csv`
+- `loadtest/dev-loadtest-users.csv`
 
 The CSV columns are:
 
@@ -137,7 +146,7 @@ Relevant routes for the simplified flash-sale test:
 
 Because each seeded customer already has a cart with quantity `1`, the JMeter plan only needs:
 
-1. Read a row from `stg-loadtest-users.csv`
+1. Read a row from `loadtest/stg-loadtest-users.csv`
 2. `POST /api/auth/login`
 3. Extract `$.accessToken`
 4. Add `Authorization: Bearer ${accessToken}`
@@ -185,6 +194,25 @@ For the actual run, prefer CLI mode over the GUI:
 jmeter -n -t flash-sale.jmx -l artifacts/loadtest/results.jtl -e -o artifacts/loadtest/report
 ```
 
+If you want the output directory and result file to be timestamped automatically
+under your current working directory, use the helper:
+
+```bash
+./run_jmeter_flash_sale --host 13.57.223.9 --port 30500 --csv loadtest/stg-loadtest-users.csv
+```
+
+That creates a run folder like:
+
+```text
+./jmeter-runs/flash-sale-stg-loadtest-13-57-223-9-p30500-t250-s250-20260404-023500/
+```
+
+Inside that folder you get:
+
+- `results.jtl`
+- `report/index.html`
+- `run-info.txt`
+
 An example using the included template:
 
 ```bash
@@ -196,11 +224,62 @@ jmeter \
   -Jthread_count=250 \
   -Jsync_group_size=250 \
   -Jresponse_timeout_ms=60000 \
-  -Jcsv_path=artifacts/loadtest/stg-loadtest-users.csv \
+  -Jcsv_path=loadtest/stg-loadtest-users.csv \
   -l artifacts/loadtest/results.jtl \
   -e \
   -o artifacts/loadtest/report
 ```
+
+The helper accepts the same knobs as flags, for example:
+
+```bash
+./run_jmeter_flash_sale \
+  --host 13.57.223.9 \
+  --port 30500 \
+  --csv loadtest/stg-loadtest-users.csv \
+  --threads 250 \
+  --sync 250 \
+  --response-timeout-ms 60000
+```
+
+For the smaller `stock 50 / customers 55` scenario, reset staging like this:
+
+```bash
+cd packages/backend
+LOADTEST_USER_COUNT=55 LOADTEST_PRODUCT_STOCK=50 npm run db:reset:loadtest:stg
+```
+
+Then run JMeter with the same `55` customers and let the seed manager re-assert
+flash sale state before the checkout burst:
+
+```bash
+./run_jmeter_flash_sale \
+  --host 13.57.223.9 \
+  --port 30500 \
+  --csv loadtest/stg-loadtest-users.csv \
+  --threads 55 \
+  --sync 55 \
+  --setup-flash-sale \
+  --manager-email seed-manager@example.com \
+  --manager-password manager123 \
+  --product-name "[JMeter] Dedicated Flash Sale Product" \
+  --product-stock 50 \
+  --flash-sale-price 19.99 \
+  --label stg-55v50
+```
+
+That setup flow now does four things:
+
+- manager login
+- create one dedicated product for this run
+- enable flash sale on that dedicated product
+- replace each customer's first cart item with that dedicated product before checkout
+
+The manager-side API calls are:
+
+- `POST /api/auth/login`
+- `POST /api/admin/products`
+- `PATCH /api/admin/products/:id/flash-sale`
 
 For local backend testing, the same command becomes:
 
@@ -213,8 +292,18 @@ jmeter \
   -Jthread_count=250 \
   -Jsync_group_size=250 \
   -Jresponse_timeout_ms=60000 \
-  -Jcsv_path=artifacts/loadtest/dev-loadtest-users.csv \
+  -Jcsv_path=loadtest/dev-loadtest-users.csv \
   -l artifacts/loadtest/local-results.jtl \
   -e \
   -o artifacts/loadtest/local-report
+```
+
+For local backend testing with timestamped output:
+
+```bash
+./run_jmeter_flash_sale \
+  --host 127.0.0.1 \
+  --port 5000 \
+  --csv loadtest/dev-loadtest-users.csv \
+  --label local-dev
 ```

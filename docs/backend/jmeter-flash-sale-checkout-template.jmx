@@ -2,7 +2,7 @@
 <jmeterTestPlan version="1.2" properties="5.0" jmeter="5.6.3">
   <hashTree>
     <TestPlan guiclass="TestPlanGui" testclass="TestPlan" testname="Flash Sale Checkout Template" enabled="true">
-      <stringProp name="TestPlan.comments">Seed staging with 250 customers and stock 200 if you want 200 successes and 50 expected stock conflicts.</stringProp>
+      <stringProp name="TestPlan.comments">Seed staging with disposable customers, then optionally let the seed manager create a dedicated flash-sale product before the checkout burst.</stringProp>
       <boolProp name="TestPlan.functional_mode">false</boolProp>
       <boolProp name="TestPlan.tearDown_on_shutdown">true</boolProp>
       <boolProp name="TestPlan.serialize_threadgroups">false</boolProp>
@@ -30,7 +30,7 @@
           </elementProp>
           <elementProp name="csv_path" elementType="Argument">
             <stringProp name="Argument.name">csv_path</stringProp>
-            <stringProp name="Argument.value">${__P(csv_path,artifacts/loadtest/stg-loadtest-users.csv)}</stringProp>
+            <stringProp name="Argument.value">${__P(csv_path,loadtest/stg-loadtest-users.csv)}</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
           </elementProp>
           <elementProp name="thread_count" elementType="Argument">
@@ -63,11 +63,260 @@
             <stringProp name="Argument.value">${__P(sync_timeout_ms,15000)}</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
           </elementProp>
+          <elementProp name="setup_flash_sale" elementType="Argument">
+            <stringProp name="Argument.name">setup_flash_sale</stringProp>
+            <stringProp name="Argument.value">${__P(setup_flash_sale,false)}</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="manager_email" elementType="Argument">
+            <stringProp name="Argument.name">manager_email</stringProp>
+            <stringProp name="Argument.value">${__P(manager_email,seed-manager@example.com)}</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="manager_password" elementType="Argument">
+            <stringProp name="Argument.name">manager_password</stringProp>
+            <stringProp name="Argument.value">${__P(manager_password,manager123)}</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="target_flash_sale_price" elementType="Argument">
+            <stringProp name="Argument.name">target_flash_sale_price</stringProp>
+            <stringProp name="Argument.value">${__P(target_flash_sale_price,19.99)}</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="target_product_name" elementType="Argument">
+            <stringProp name="Argument.name">target_product_name</stringProp>
+            <stringProp name="Argument.value">${__P(target_product_name,[JMeter] Dedicated Flash Sale Product)}</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="target_product_description" elementType="Argument">
+            <stringProp name="Argument.name">target_product_description</stringProp>
+            <stringProp name="Argument.value">${__P(target_product_description,Dedicated JMeter-created product used for checkout contention testing.)}</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="target_product_price" elementType="Argument">
+            <stringProp name="Argument.name">target_product_price</stringProp>
+            <stringProp name="Argument.value">${__P(target_product_price,99.99)}</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="target_product_stock" elementType="Argument">
+            <stringProp name="Argument.name">target_product_stock</stringProp>
+            <stringProp name="Argument.value">${__P(target_product_stock,50)}</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="target_product_category" elementType="Argument">
+            <stringProp name="Argument.name">target_product_category</stringProp>
+            <stringProp name="Argument.value">${__P(target_product_category,storage)}</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="target_product_image_url" elementType="Argument">
+            <stringProp name="Argument.name">target_product_image_url</stringProp>
+            <stringProp name="Argument.value">${__P(target_product_image_url,https://placehold.co/600x600/png?text=JMeter+Dedicated)}</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
         </collectionProp>
       </elementProp>
       <stringProp name="TestPlan.user_define_classpath"></stringProp>
     </TestPlan>
     <hashTree>
+      <SetupThreadGroup guiclass="SetupThreadGroupGui" testclass="SetupThreadGroup" testname="Manager Dedicated Product Setup" enabled="true">
+        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
+        <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
+          <boolProp name="LoopController.continue_forever">false</boolProp>
+          <stringProp name="LoopController.loops">1</stringProp>
+        </elementProp>
+        <stringProp name="ThreadGroup.num_threads">1</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">1</stringProp>
+        <boolProp name="ThreadGroup.scheduler">false</boolProp>
+        <stringProp name="ThreadGroup.duration"></stringProp>
+        <stringProp name="ThreadGroup.delay"></stringProp>
+        <boolProp name="ThreadGroup.same_user_on_next_iteration">true</boolProp>
+      </SetupThreadGroup>
+      <hashTree>
+        <IfController guiclass="IfControllerPanel" testclass="IfController" testname="Run Manager Setup When Requested" enabled="true">
+          <stringProp name="IfController.condition">${__groovy((vars.get('setup_flash_sale') ?: 'false').toBoolean())}</stringProp>
+          <boolProp name="IfController.evaluateAll">false</boolProp>
+          <boolProp name="IfController.useExpression">true</boolProp>
+        </IfController>
+        <hashTree>
+          <ConfigTestElement guiclass="HttpDefaultsGui" testclass="ConfigTestElement" testname="Setup HTTP Defaults" enabled="true">
+            <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="HTTP Defaults" enabled="true">
+              <collectionProp name="Arguments.arguments"/>
+            </elementProp>
+            <stringProp name="HTTPSampler.domain">${host}</stringProp>
+            <stringProp name="HTTPSampler.port">${port}</stringProp>
+            <stringProp name="HTTPSampler.protocol">${protocol}</stringProp>
+            <stringProp name="HTTPSampler.contentEncoding">utf-8</stringProp>
+            <stringProp name="HTTPSampler.path"></stringProp>
+            <stringProp name="HTTPSampler.connect_timeout">${connect_timeout_ms}</stringProp>
+            <stringProp name="HTTPSampler.response_timeout">${response_timeout_ms}</stringProp>
+          </ConfigTestElement>
+          <hashTree/>
+          <CookieManager guiclass="CookiePanel" testclass="CookieManager" testname="Setup Cookie Manager" enabled="true">
+            <boolProp name="CookieManager.clearEachIteration">true</boolProp>
+            <boolProp name="CookieManager.controlledByThreadGroup">false</boolProp>
+          </CookieManager>
+          <hashTree/>
+          <CacheManager guiclass="CacheManagerGui" testclass="CacheManager" testname="Setup Cache Manager" enabled="true">
+            <boolProp name="clearEachIteration">true</boolProp>
+            <boolProp name="useExpires">true</boolProp>
+          </CacheManager>
+          <hashTree/>
+          <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="Setup JSON Headers" enabled="true">
+            <collectionProp name="HeaderManager.headers">
+              <elementProp name="" elementType="Header">
+                <stringProp name="Header.name">Accept</stringProp>
+                <stringProp name="Header.value">application/json</stringProp>
+              </elementProp>
+              <elementProp name="" elementType="Header">
+                <stringProp name="Header.name">Content-Type</stringProp>
+                <stringProp name="Header.value">application/json</stringProp>
+              </elementProp>
+            </collectionProp>
+          </HeaderManager>
+          <hashTree/>
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Manager Login" enabled="true">
+            <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="Manager Login Body" enabled="true">
+              <collectionProp name="Arguments.arguments">
+                <elementProp name="" elementType="HTTPArgument">
+                  <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                  <stringProp name="Argument.value">{&#xd;
+  "email": "${manager_email}",&#xd;
+  "password": "${manager_password}"&#xd;
+}</stringProp>
+                  <stringProp name="Argument.metadata">=</stringProp>
+                </elementProp>
+              </collectionProp>
+            </elementProp>
+            <stringProp name="HTTPSampler.path">${base_path}/auth/login</stringProp>
+            <stringProp name="HTTPSampler.method">POST</stringProp>
+            <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
+            <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+            <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+            <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+            <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+          </HTTPSamplerProxy>
+          <hashTree>
+            <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Manager Login Returns 200" enabled="true">
+              <collectionProp name="Asserion.test_strings">
+                <stringProp name="0">200</stringProp>
+              </collectionProp>
+              <stringProp name="Assertion.custom_message"></stringProp>
+              <stringProp name="Assertion.test_field">Assertion.response_code</stringProp>
+              <boolProp name="Assertion.assume_success">false</boolProp>
+              <intProp name="Assertion.test_type">8</intProp>
+            </ResponseAssertion>
+            <hashTree/>
+            <JSONPostProcessor guiclass="JSONPostProcessorGui" testclass="JSONPostProcessor" testname="Extract Manager Access Token" enabled="true">
+              <stringProp name="JSONPostProcessor.referenceNames">managerAccessToken</stringProp>
+              <stringProp name="JSONPostProcessor.jsonPathExprs">$.accessToken</stringProp>
+              <stringProp name="JSONPostProcessor.match_numbers">1</stringProp>
+              <stringProp name="JSONPostProcessor.defaultValues">MISSING_MANAGER_TOKEN</stringProp>
+              <boolProp name="JSONPostProcessor.compute_concat">false</boolProp>
+            </JSONPostProcessor>
+            <hashTree/>
+          </hashTree>
+          <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="Manager Authorization Header" enabled="true">
+            <collectionProp name="HeaderManager.headers">
+              <elementProp name="" elementType="Header">
+                <stringProp name="Header.name">Authorization</stringProp>
+                <stringProp name="Header.value">Bearer ${managerAccessToken}</stringProp>
+              </elementProp>
+            </collectionProp>
+          </HeaderManager>
+          <hashTree/>
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Create Dedicated Product" enabled="true">
+            <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="Create Dedicated Product Body" enabled="true">
+              <collectionProp name="Arguments.arguments">
+                <elementProp name="" elementType="HTTPArgument">
+                  <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                  <stringProp name="Argument.value">{&#xd;
+  "name": "${target_product_name}",&#xd;
+  "description": "${target_product_description}",&#xd;
+  "price": ${target_product_price},&#xd;
+  "stock": ${target_product_stock},&#xd;
+  "imageUrl": "${target_product_image_url}",&#xd;
+  "category": "${target_product_category}"&#xd;
+}</stringProp>
+                  <stringProp name="Argument.metadata">=</stringProp>
+                </elementProp>
+              </collectionProp>
+            </elementProp>
+            <stringProp name="HTTPSampler.path">${base_path}/admin/products</stringProp>
+            <stringProp name="HTTPSampler.method">POST</stringProp>
+            <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
+            <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+            <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+            <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+            <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+          </HTTPSamplerProxy>
+          <hashTree>
+            <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Create Dedicated Product Returns 201" enabled="true">
+              <collectionProp name="Asserion.test_strings">
+                <stringProp name="0">201</stringProp>
+              </collectionProp>
+              <stringProp name="Assertion.custom_message"></stringProp>
+              <stringProp name="Assertion.test_field">Assertion.response_code</stringProp>
+              <boolProp name="Assertion.assume_success">false</boolProp>
+              <intProp name="Assertion.test_type">8</intProp>
+            </ResponseAssertion>
+            <hashTree/>
+            <JSONPostProcessor guiclass="JSONPostProcessorGui" testclass="JSONPostProcessor" testname="Extract Dedicated Product Id" enabled="true">
+              <stringProp name="JSONPostProcessor.referenceNames">createdProductId</stringProp>
+              <stringProp name="JSONPostProcessor.jsonPathExprs">$.product._id</stringProp>
+              <stringProp name="JSONPostProcessor.match_numbers">1</stringProp>
+              <stringProp name="JSONPostProcessor.defaultValues">MISSING_CREATED_PRODUCT_ID</stringProp>
+              <boolProp name="JSONPostProcessor.compute_concat">false</boolProp>
+            </JSONPostProcessor>
+            <hashTree/>
+            <JSR223PostProcessor guiclass="TestBeanGUI" testclass="JSR223PostProcessor" testname="Store Dedicated Product Id For Customer Threads" enabled="true">
+              <stringProp name="cacheKey">store-dedicated-product-id</stringProp>
+              <stringProp name="filename"></stringProp>
+              <stringProp name="parameters"></stringProp>
+              <stringProp name="script">def productId = vars.get('createdProductId')&#xd;
+if (productId &amp;&amp; productId != 'MISSING_CREATED_PRODUCT_ID') {&#xd;
+    props.put('loadtestProductId', productId)&#xd;
+} else {&#xd;
+    props.remove('loadtestProductId')&#xd;
+}</stringProp>
+              <stringProp name="scriptLanguage">groovy</stringProp>
+            </JSR223PostProcessor>
+            <hashTree/>
+          </hashTree>
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Enable Flash Sale" enabled="true">
+            <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="Enable Flash Sale Body" enabled="true">
+              <collectionProp name="Arguments.arguments">
+                <elementProp name="" elementType="HTTPArgument">
+                  <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                  <stringProp name="Argument.value">{&#xd;
+  "isFlashSale": true,&#xd;
+  "flashSalePrice": ${target_flash_sale_price}&#xd;
+}</stringProp>
+                  <stringProp name="Argument.metadata">=</stringProp>
+                </elementProp>
+              </collectionProp>
+            </elementProp>
+            <stringProp name="HTTPSampler.path">${base_path}/admin/products/${createdProductId}/flash-sale</stringProp>
+            <stringProp name="HTTPSampler.method">PATCH</stringProp>
+            <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
+            <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+            <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+            <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+            <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+          </HTTPSamplerProxy>
+          <hashTree>
+            <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Enable Flash Sale Returns 200" enabled="true">
+              <collectionProp name="Asserion.test_strings">
+                <stringProp name="0">200</stringProp>
+              </collectionProp>
+              <stringProp name="Assertion.custom_message"></stringProp>
+              <stringProp name="Assertion.test_field">Assertion.response_code</stringProp>
+              <boolProp name="Assertion.assume_success">false</boolProp>
+              <intProp name="Assertion.test_type">8</intProp>
+            </ResponseAssertion>
+            <hashTree/>
+          </hashTree>
+        </hashTree>
+      </hashTree>
       <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Checkout Contention Users" enabled="true">
         <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
         <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
@@ -171,52 +420,174 @@
           </JSONPostProcessor>
           <hashTree/>
         </hashTree>
-        <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="Authorization Header" enabled="true">
-          <collectionProp name="HeaderManager.headers">
-            <elementProp name="" elementType="Header">
-              <stringProp name="Header.name">Authorization</stringProp>
-              <stringProp name="Header.value">Bearer ${accessToken}</stringProp>
-            </elementProp>
-          </collectionProp>
-        </HeaderManager>
-        <hashTree/>
-        <SyncTimer guiclass="TestBeanGUI" testclass="SyncTimer" testname="Synchronize Checkout Burst" enabled="true">
-          <stringProp name="groupSize">${sync_group_size}</stringProp>
-          <stringProp name="timeoutInMs">${sync_timeout_ms}</stringProp>
-        </SyncTimer>
-        <hashTree/>
-        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Checkout" enabled="true">
-          <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="Checkout Body" enabled="true">
-            <collectionProp name="Arguments.arguments">
-              <elementProp name="" elementType="HTTPArgument">
-                <boolProp name="HTTPArgument.always_encode">false</boolProp>
-                <stringProp name="Argument.value">{&#xd;
-  "paymentMethod": "${paymentMethod}"&#xd;
-}</stringProp>
-                <stringProp name="Argument.metadata">=</stringProp>
+        <IfController guiclass="IfControllerPanel" testclass="IfController" testname="Checkout Only After Successful Login" enabled="true">
+          <stringProp name="IfController.condition">${__groovy(vars.get('accessToken') != 'MISSING_TOKEN')}</stringProp>
+          <boolProp name="IfController.evaluateAll">false</boolProp>
+          <boolProp name="IfController.useExpression">true</boolProp>
+        </IfController>
+        <hashTree>
+          <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="Authorization Header" enabled="true">
+            <collectionProp name="HeaderManager.headers">
+              <elementProp name="" elementType="Header">
+                <stringProp name="Header.name">Authorization</stringProp>
+                <stringProp name="Header.value">Bearer ${accessToken}</stringProp>
               </elementProp>
             </collectionProp>
-          </elementProp>
-          <stringProp name="HTTPSampler.path">${base_path}/checkout</stringProp>
-          <stringProp name="HTTPSampler.method">POST</stringProp>
-          <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
-          <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
-          <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
-          <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
-          <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
-        </HTTPSamplerProxy>
-        <hashTree>
-          <JSR223PostProcessor guiclass="TestBeanGUI" testclass="JSR223PostProcessor" testname="Treat 409 As Expected Rejection" enabled="true">
-            <stringProp name="cacheKey">checkout-409-is-expected</stringProp>
-            <stringProp name="filename"></stringProp>
-            <stringProp name="parameters"></stringProp>
-            <stringProp name="script">if (prev.getResponseCode() == '409') {&#xd;
+          </HeaderManager>
+          <hashTree/>
+          <IfController guiclass="IfControllerPanel" testclass="IfController" testname="Prepare Dedicated Product In Cart When Requested" enabled="true">
+            <stringProp name="IfController.condition">${__groovy((vars.get('setup_flash_sale') ?: 'false').toBoolean())}</stringProp>
+            <boolProp name="IfController.evaluateAll">false</boolProp>
+            <boolProp name="IfController.useExpression">true</boolProp>
+          </IfController>
+          <hashTree>
+            <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Get Cart" enabled="true">
+              <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="HTTP Arguments" enabled="true">
+                <collectionProp name="Arguments.arguments"/>
+              </elementProp>
+              <stringProp name="HTTPSampler.path">${base_path}/cart</stringProp>
+              <stringProp name="HTTPSampler.method">GET</stringProp>
+              <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+              <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+              <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+              <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+            </HTTPSamplerProxy>
+            <hashTree>
+              <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Get Cart Returns 200" enabled="true">
+                <collectionProp name="Asserion.test_strings">
+                  <stringProp name="0">200</stringProp>
+                </collectionProp>
+                <stringProp name="Assertion.custom_message"></stringProp>
+                <stringProp name="Assertion.test_field">Assertion.response_code</stringProp>
+                <boolProp name="Assertion.assume_success">false</boolProp>
+                <intProp name="Assertion.test_type">8</intProp>
+              </ResponseAssertion>
+              <hashTree/>
+              <JSONPostProcessor guiclass="JSONPostProcessorGui" testclass="JSONPostProcessor" testname="Extract Existing Cart Product Id" enabled="true">
+                <stringProp name="JSONPostProcessor.referenceNames">existingCartProductId</stringProp>
+                <stringProp name="JSONPostProcessor.jsonPathExprs">$.cart.items[0].productId</stringProp>
+                <stringProp name="JSONPostProcessor.match_numbers">1</stringProp>
+                <stringProp name="JSONPostProcessor.defaultValues">NO_EXISTING_PRODUCT</stringProp>
+                <boolProp name="JSONPostProcessor.compute_concat">false</boolProp>
+              </JSONPostProcessor>
+              <hashTree/>
+            </hashTree>
+            <IfController guiclass="IfControllerPanel" testclass="IfController" testname="Remove Existing Cart Item When Present" enabled="true">
+              <stringProp name="IfController.condition">${__groovy(vars.get('existingCartProductId') != 'NO_EXISTING_PRODUCT')}</stringProp>
+              <boolProp name="IfController.evaluateAll">false</boolProp>
+              <boolProp name="IfController.useExpression">true</boolProp>
+            </IfController>
+            <hashTree>
+              <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Remove Existing Cart Item" enabled="true">
+                <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="HTTP Arguments" enabled="true">
+                  <collectionProp name="Arguments.arguments"/>
+                </elementProp>
+                <stringProp name="HTTPSampler.path">${base_path}/cart/items/${existingCartProductId}</stringProp>
+                <stringProp name="HTTPSampler.method">DELETE</stringProp>
+                <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+                <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+                <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+                <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+              </HTTPSamplerProxy>
+              <hashTree>
+                <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Remove Existing Cart Item Returns 200" enabled="true">
+                  <collectionProp name="Asserion.test_strings">
+                    <stringProp name="0">200</stringProp>
+                  </collectionProp>
+                  <stringProp name="Assertion.custom_message"></stringProp>
+                  <stringProp name="Assertion.test_field">Assertion.response_code</stringProp>
+                  <boolProp name="Assertion.assume_success">false</boolProp>
+                  <intProp name="Assertion.test_type">8</intProp>
+                </ResponseAssertion>
+                <hashTree/>
+              </hashTree>
+            </hashTree>
+            <IfController guiclass="IfControllerPanel" testclass="IfController" testname="Add Dedicated Product When Setup Succeeded" enabled="true">
+              <stringProp name="IfController.condition">${__groovy(props.get('loadtestProductId') != null)}</stringProp>
+              <boolProp name="IfController.evaluateAll">false</boolProp>
+              <boolProp name="IfController.useExpression">true</boolProp>
+            </IfController>
+            <hashTree>
+              <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Add Dedicated Product To Cart" enabled="true">
+                <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="Add Dedicated Product To Cart Body" enabled="true">
+                  <collectionProp name="Arguments.arguments">
+                    <elementProp name="" elementType="HTTPArgument">
+                      <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                      <stringProp name="Argument.value">{&#xd;
+  "productId": "${__property(loadtestProductId,NO_PRODUCT_ID)}",&#xd;
+  "quantity": 1&#xd;
+}</stringProp>
+                      <stringProp name="Argument.metadata">=</stringProp>
+                    </elementProp>
+                  </collectionProp>
+                </elementProp>
+                <stringProp name="HTTPSampler.path">${base_path}/cart/items</stringProp>
+                <stringProp name="HTTPSampler.method">POST</stringProp>
+                <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
+                <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+                <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+                <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+                <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+              </HTTPSamplerProxy>
+              <hashTree>
+                <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Add Dedicated Product To Cart Returns 200" enabled="true">
+                  <collectionProp name="Asserion.test_strings">
+                    <stringProp name="0">200</stringProp>
+                  </collectionProp>
+                  <stringProp name="Assertion.custom_message"></stringProp>
+                  <stringProp name="Assertion.test_field">Assertion.response_code</stringProp>
+                  <boolProp name="Assertion.assume_success">false</boolProp>
+                  <intProp name="Assertion.test_type">8</intProp>
+                </ResponseAssertion>
+                <hashTree/>
+              </hashTree>
+            </hashTree>
+          </hashTree>
+          <IfController guiclass="IfControllerPanel" testclass="IfController" testname="Proceed To Checkout When Ready" enabled="true">
+            <stringProp name="IfController.condition">${__groovy((vars.get('setup_flash_sale') ?: 'false').toBoolean() ? props.get('loadtestProductId') != null : true)}</stringProp>
+            <boolProp name="IfController.evaluateAll">false</boolProp>
+            <boolProp name="IfController.useExpression">true</boolProp>
+          </IfController>
+          <hashTree>
+            <SyncTimer guiclass="TestBeanGUI" testclass="SyncTimer" testname="Synchronize Checkout Burst" enabled="true">
+              <stringProp name="groupSize">${sync_group_size}</stringProp>
+              <stringProp name="timeoutInMs">${sync_timeout_ms}</stringProp>
+            </SyncTimer>
+            <hashTree/>
+            <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Checkout" enabled="true">
+              <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="Checkout Body" enabled="true">
+                <collectionProp name="Arguments.arguments">
+                  <elementProp name="" elementType="HTTPArgument">
+                    <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                    <stringProp name="Argument.value">{&#xd;
+  "paymentMethod": "${paymentMethod}"&#xd;
+}</stringProp>
+                    <stringProp name="Argument.metadata">=</stringProp>
+                  </elementProp>
+                </collectionProp>
+              </elementProp>
+              <stringProp name="HTTPSampler.path">${base_path}/checkout</stringProp>
+              <stringProp name="HTTPSampler.method">POST</stringProp>
+              <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
+              <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+              <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+              <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+              <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+            </HTTPSamplerProxy>
+            <hashTree>
+              <JSR223PostProcessor guiclass="TestBeanGUI" testclass="JSR223PostProcessor" testname="Treat 409 As Expected Rejection" enabled="true">
+                <stringProp name="cacheKey">checkout-409-is-expected</stringProp>
+                <stringProp name="filename"></stringProp>
+                <stringProp name="parameters"></stringProp>
+                <stringProp name="script">if (prev.getResponseCode() == '409') {&#xd;
     prev.setSuccessful(true)&#xd;
     prev.setResponseMessage('Expected stock rejection')&#xd;
 }</stringProp>
-            <stringProp name="scriptLanguage">groovy</stringProp>
-          </JSR223PostProcessor>
-          <hashTree/>
+                <stringProp name="scriptLanguage">groovy</stringProp>
+              </JSR223PostProcessor>
+              <hashTree/>
+            </hashTree>
+          </hashTree>
         </hashTree>
       </hashTree>
     </hashTree>
