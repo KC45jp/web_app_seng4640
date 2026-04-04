@@ -30,7 +30,7 @@ Thumbs.db
 # db local
 /db/db/data/*
 
-# unnesessary document
+# legacy local scratch documents
 /.document/*
 
 

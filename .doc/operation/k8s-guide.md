@@ -1,5 +1,11 @@
 # k3s デプロイガイド（backend のみ Kubernetes）
 
+> Note:
+> This is a backend-only k3s guide for a narrower learning/deployment path.
+> The actual staging startup flow in `scripts/stg_server_start` also builds the
+> frontend image and runs the frontend in Docker on EC2. So this file should be
+> read as a focused backend/k3s guide, not as the full final staging topology.
+
 ## このガイドの目的
 
 今回は役割を分けます。
@@ -118,8 +124,8 @@ mongodb://172.27.202.96:27017/seng4640?replicaSet=rs0&directConnection=true
 
 ## Step 1: frontend はローカルのまま起動する
 
-frontend は今回は k3s に載せません。
-いままで通り Vite dev server を使います。
+frontend はこの backend-only 学習パスでは k3s に載せません。
+ここでは Vite dev server を使う前提で説明します。
 
 backend が k3s の NodePort `30500` で見える前提なら、frontend は次のように起動できます。
 
@@ -140,8 +146,10 @@ VITE_API_BASE_URL=http://${NODE_IP}:30500 npm run dev -- --host 0.0.0.0
 backend は `file:../shared` に依存しているので、Docker build の中に `packages/shared` が必要です。
 そのため backend Dockerfile では、`shared` を先に build してから backend を install します。
 
-現在の方針では、frontend の Dockerfile は必須ではありません。
-残しておいても問題ありませんが、今回の backend-only k3s 構成では使いません。
+この backend-only ガイドの中では、frontend の Dockerfile は必須ではありません。
+残しておいても問題ありませんが、このガイドの経路では使いません。
+
+ただし、最終の staging 起動フローでは frontend Dockerfile は実際に使われています。
 
 ### backend ビルド
 
@@ -421,6 +429,9 @@ kubectl delete namespace seng4640
 
 おすすめは 1 です。
 今の学習目標では frontend Dockerfile を詰める優先度は低いので、backend が安定してから戻るのがやりやすいです。
+
+なお、これはこのガイドに閉じた判断です。実際の staging 運用では
+frontend Dockerfile を使って EC2 上で frontend container を起動しています。
 
 将来的に frontend を Docker 化するなら、そのときは:
 

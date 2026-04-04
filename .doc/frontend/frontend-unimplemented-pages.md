@@ -1,5 +1,7 @@
 # Frontend 未実装ページ調査
 
+このメモは実装確認後にアーカイブしたノートです。
+
 調査日: 2026-03-30
 
 ## 結論
@@ -67,4 +69,4 @@ backend 側のルート定義:
 
 参照:
 
-- `docs/frontend/frontend-plan-en.md:85`
+- `doc/frontend/frontend-plan-en.md:86`

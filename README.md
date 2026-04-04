@@ -1,108 +1,104 @@
-# Project Name
+# SENG 4640 Web App
 
-Brief description of what this project does and who it is for.
-
-## Table of Contents
-
-- [Overview](#overview)
-- [Features](#features)
-- [Tech Stack](#tech-stack)
-- [Getting Started](#getting-started)
-- [Usage](#usage)
-- [Configuration](#configuration)
-- [Testing](#testing)
-- [Project Structure](#project-structure)
-- [Contributing](#contributing)
-- [License](#license)
-- [Contact](#contact)
+Role-based e-commerce web application built for the SENG 4640 final project.
+The repo contains a React frontend, an Express/MongoDB backend, seed scripts,
+and load-testing helpers for the flash-sale checkout scenario.
 
 ## Overview
 
-Describe the problem this project solves and the high-level approach.
+- Guest users can browse products and product details.
+- Customers can register, log in, manage a cart, check out, and view orders.
+- Product Managers can manage their own products and flash-sale settings.
+- Super Admins can manage Product Manager accounts.
 
-## Features
+## Stack
 
-- Feature 1
-- Feature 2
-- Feature 3
+- Frontend: React 19, TypeScript, Vite, React Router, Zustand
+- Backend: Express 5, TypeScript, Mongoose, JWT auth, Multer, Sharp
+- Database: MongoDB replica set
+- Operations: Docker Compose, k3s manifests, JMeter helpers
 
-## Tech Stack
+## Quick Start
 
-- Language: [e.g., JavaScript, TypeScript, Python]
-- Framework: [e.g., React, Node.js, Django]
-- Database: [e.g., PostgreSQL, MongoDB]
-- Other: [e.g., Docker, Redis]
-
-## Getting Started
-
-### Prerequisites
-
-- [e.g., Node.js 20+]
-- [e.g., npm or yarn]
-
-### Installation
+### 1. Start MongoDB
 
 ```bash
-git clone <repo-url>
-cd <project-directory>
-<install-command>
+cd db
+docker compose up -d
 ```
 
-### Run Locally
+### 2. Start the backend
+
+The backend reads local development settings from
+`packages/backend/.env.dev`.
 
 ```bash
-<start-command>
+cd packages/backend
+npm install
+npm run db:reset:standard:dev
+npm run dev
 ```
 
-## Usage
+Backend runs on `http://localhost:5000` by default.
 
-Explain how to use the project with basic examples.
+### 3. Start the frontend
 
 ```bash
-<example-command>
+cd packages/frontend
+npm install
+npm run dev
 ```
 
-## Configuration
+If needed, point the frontend at a different backend with
+`VITE_API_BASE_URL`.
 
-List required environment variables and configuration.
-
-```env
-KEY_1=value
-KEY_2=value
+```bash
+cd packages/frontend
+VITE_API_BASE_URL=http://127.0.0.1:5000 npm run dev
 ```
 
 ## Testing
 
+### Backend automated tests
+
 ```bash
-<test-command>
+cd packages/backend
+npm test
 ```
 
-Add notes about test coverage or testing strategy if needed.
+Current tests cover config loading, auth middleware, health responses, and the
+checkout concurrency path.
+
+### Flash-sale load testing
+
+See:
+
+- `doc/operation/load-testing.md`
+- `loadtest/jmeter-flash-sale-checkout-template.jmx`
+- `run_jmeter_flash_sale`
+
+## Docs Layout
+
+- `doc/`: active project documentation
+- `doc/backend/`: backend and API reference docs
+- `doc/frontend/`: current frontend scope/reference docs
+- `doc/operation/`: deployment, health, and load-testing runbooks
+- `doc/other/`: course or project-context documents
+- `.doc/`: archived notes, Japanese memos, and implementation-complete planning notes
 
 ## Project Structure
 
 ```text
 .
-|-- src/
-|-- tests/
-|-- docs/
-`-- README.md
+|-- .doc/
+|-- db/
+|-- doc/
+|-- k8s/
+|-- loadtest/
+|-- packages/
+|   |-- backend/
+|   |-- frontend/
+|   `-- shared/
+|-- run_jmeter_flash_sale
+`-- scripts/
 ```
-
-## Contributing
-
-1. Fork the repository.
-2. Create a feature branch.
-3. Commit your changes.
-4. Push your branch.
-5. Open a pull request.
-
-## License
-
-Specify the license here (for example, MIT).
-
-## Contact
-
-- Maintainer: [Your Name]
-- Email: [you@example.com]
-- Project Link: [https://github.com/your-org/your-repo]

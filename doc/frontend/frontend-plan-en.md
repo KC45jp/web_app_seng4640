@@ -1,14 +1,20 @@
 # Frontend Plan (Role-Based E-commerce UI)
 
+This document is kept as the frontend scope and routing reference that guided
+implementation.
+
 ## 1. Consistency Check Result
 
-After comparing `final-project-requirements-ja.md` and `backend_required_apis.md`, your overall direction is consistent.
-If you keep the following four rules fixed during implementation, there will be no conflicts.
+After comparing the final project requirements and
+`doc/backend/backend_required_apis.md`, the overall direction is consistent.
+If the following four rules stay fixed, there should be no role or routing
+conflicts.
 
 - Treat "Product Owner" as "Product Manager (manager role)" throughout.
-- Guests can only browse products. They cannot view `Flash Sale inventory counts`, use `Cart`, or use `Checkout`.
+- Guests can only browse products. They cannot view flash-sale inventory
+  counts, use cart, or use checkout.
 - `Cart / Checkout / My Page` require Customer login.
-- Super Admin only manages Product Manager accounts (not regular product CRUD).
+- Super Admin only manages Product Manager accounts.
 
 ## 2. Shared UI (All Modes)
 
@@ -22,8 +28,8 @@ If you keep the following four rules fixed during implementation, there will be 
 
 ### Public / Guest
 
-- `/` Main page (Flash Sale / new arrivals)
-- `/search` Search results page (sort/filter UI, processing handled by backend)
+- `/` Main page
+- `/search` Search results page
 - `/products/:id` Product details
 - `/login` Login
 - `/signup` Customer registration
@@ -32,30 +38,30 @@ If you keep the following four rules fixed during implementation, there will be 
 
 - `/cart` Cart
 - `/checkout` Checkout
-- `/mypage` User info + purchase history (including order tracking)
+- `/mypage` User info + purchase history
 
 ### Product Manager Only
 
-- `/pm/login` Login (can be unified with `/login`)
+- `/pm/login` Login
 - `/pm/dashboard` List of own products
 - `/pm/products/new` Create new product
-- `/pm/products/:id` Product details (edit/delete/flash sale settings)
+- `/pm/products/:id` Product details / edit / flash-sale settings
 
 ### Super Admin Only
 
-- `/admin/login` Login (can be unified with `/login`)
-- `/admin/managers` Product Manager list/add/delete
+- `/admin/login` Login
+- `/admin/managers` Product Manager list / add / delete
 
 ## 4. API Mapping by Screen
 
 - Main/Search/Product: `GET /api/products`, `GET /api/products/:id`
-- Search sorting/pagination: send `sortBy`, `sortOrder`, `page`, `limit` as query params
+- Search sorting/pagination: `sortBy`, `sortOrder`, `page`, `limit`
 
 ### Customer APIs
 
 - Profile: `GET /api/me`, `PATCH /api/me`
 - Cart: `GET /api/cart`, `POST /api/cart/items`, `PATCH /api/cart/items/:productId`, `DELETE /api/cart/items/:productId`
-- Checkout: `POST /api/checkout` (`paymentMethod: credit_card | paypal`)
+- Checkout: `POST /api/checkout`
 - Orders: `GET /api/orders`, `GET /api/orders/:id`
 
 ### Product Manager APIs
@@ -80,14 +86,15 @@ If you keep the following four rules fixed during implementation, there will be 
 - Route guard (Customer): allow `cart/checkout/mypage`
 - Route guard (Manager): allow `pm/*`
 - Route guard (Admin): allow `admin/*`
-- Flash Sale inventory display (Guest): hidden
-- Flash Sale inventory display (logged-in users): visible (still within requirements)
+- Flash-sale inventory display (Guest): hidden
+- Flash-sale inventory display (logged-in users): visible when the product
+  experience needs it
 
-## 6. Recommended Implementation Order
+## 6. Original Recommended Implementation Order
 
 1. Shared header + routing + authentication/role guards
-2. Main / Search / Product (browse pages)
+2. Main / Search / Product
 3. Login / Sign up
-4. Customer features (Cart, Checkout, MyPage)
-5. Manager features (Dashboard, New Product, Product Edit)
-6. Admin features (Manager management)
+4. Customer features
+5. Manager features
+6. Admin features

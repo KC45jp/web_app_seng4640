@@ -50,7 +50,7 @@ Options:
   --product-stock COUNT      Dedicated product stock created by manager setup flow
   --label NAME               Optional run label prefix
   --output-root DIR          Parent directory for run outputs. Default: $PWD/jmeter-runs
-  --plan PATH                JMeter plan path. Default: docs/backend/jmeter-flash-sale-checkout-template.jmx
+  --plan PATH                JMeter plan path. Default: loadtest/jmeter-flash-sale-checkout-template.jmx
   --jmeter-bin CMD           JMeter executable. Default: jmeter
   --help                     Show this help
 
@@ -128,7 +128,7 @@ product_name="${JMETER_TARGET_PRODUCT_NAME:-}"
 product_stock="${JMETER_TARGET_PRODUCT_STOCK:-}"
 run_label="${JMETER_RUN_LABEL:-}"
 output_root="${JMETER_OUTPUT_ROOT:-${PWD}/jmeter-runs}"
-plan_path_input="${JMETER_PLAN_PATH:-docs/backend/jmeter-flash-sale-checkout-template.jmx}"
+plan_path_input="${JMETER_PLAN_PATH:-loadtest/jmeter-flash-sale-checkout-template.jmx}"
 jmeter_bin="${JMETER_BIN:-jmeter}"
 
 while [[ $# -gt 0 ]]; do

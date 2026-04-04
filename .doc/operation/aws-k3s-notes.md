@@ -1,10 +1,16 @@
 # Deployment Notes: k3s, AWS, Frontend, MongoDB
 
+> Note:
+> This memo reflects an earlier backend-focused k3s design discussion.
+> The actual staging startup flow in `scripts/stg_server_start` builds the
+> frontend as a Docker image and runs it in a Docker container on EC2, while
+> the backend is deployed through k3s.
+
 ## このメモの目的
 
 このメモは、今回話した「何を k3s に載せるか」「frontend は Docker 化すべきか」「MongoDB はどこで動かすのが自然か」を整理したものです。
 
-現時点の方針:
+このメモを書いた時点での方針:
 
 - backend は k3s で動かす
 - frontend はいったんローカル起動のまま
@@ -164,6 +170,10 @@ MongoDB は replica set で複数ノードに展開できます。
 
 は学習順序としてかなり良いです。
 
+ただし、最終の staging 起動フローではこの前提をそのまま採用しているわけではありません。
+実際の `stg_server_start` では frontend も Docker image を build して
+EC2 上の Docker container として起動しています。
+
 Sources:
 
 - https://www.mongodb.com/docs/manual/tutorial/deploy-replica-set/
@@ -185,5 +195,5 @@ Sources:
 4. frontend は `VITE_API_BASE_URL=http://<NODE_IP>:30500` でローカル起動する
 5. MongoDB は Docker Compose のまま使う
 
-frontend の Dockerfile は今回は必須ではありません。
-将来 frontend を Docker 化したくなったときに、nginx の multi-stage build として見直せば十分です。
+この部分は backend-only 学習メモとしての提案です。
+現在の staging 運用では frontend の Dockerfile も実際に使われています。
