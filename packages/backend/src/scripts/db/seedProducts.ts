@@ -89,6 +89,13 @@ async function seedUserAccount(
   };
 }
 
+function buildPlaceholderImageUrls(): string[] {
+  return PRODUCT_CATEGORIES.map((category) => {
+    const label = getProductCategoryLabel(category);
+    return `https://placehold.co/800x800/png?text=${encodeURIComponent(label)}`;
+  });
+}
+
 async function uploadSeedImages(scriptLogger: Logger): Promise<string[]> {
   let files: string[];
   try {
@@ -96,11 +103,21 @@ async function uploadSeedImages(scriptLogger: Logger): Promise<string[]> {
       /\.(jpg|jpeg|png)$/i.test(f)
     );
   } catch {
-    throw new Error(`Images directory not found: ${IMAGES_DIR}`);
+    const placeholderUrls = buildPlaceholderImageUrls();
+    scriptLogger.warn(
+      { imagesDir: IMAGES_DIR, placeholderCount: placeholderUrls.length },
+      "Images directory not found, using placeholder image URLs for seed"
+    );
+    return placeholderUrls;
   }
 
   if (files.length === 0) {
-    throw new Error(`No image files found in: ${IMAGES_DIR}`);
+    const placeholderUrls = buildPlaceholderImageUrls();
+    scriptLogger.warn(
+      { imagesDir: IMAGES_DIR, placeholderCount: placeholderUrls.length },
+      "No image files found, using placeholder image URLs for seed"
+    );
+    return placeholderUrls;
   }
 
   const urls: string[] = [];

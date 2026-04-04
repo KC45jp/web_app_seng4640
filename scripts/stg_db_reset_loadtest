@@ -1,0 +1,73 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+K8S_NAMESPACE="${K8S_NAMESPACE:-seng4640}"
+BACKEND_DEPLOYMENT="${BACKEND_DEPLOYMENT:-backend}"
+
+has_command() {
+  command -v "$1" >/dev/null 2>&1
+}
+
+log() {
+  echo "[stg_db_reset_loadtest] $*"
+}
+
+resolve_kubectl_cmd() {
+  if ! has_command kubectl; then
+    return 1
+  fi
+
+  if kubectl version --client >/dev/null 2>&1; then
+    printf 'sudo kubectl\n'
+  else
+    return 1
+  fi
+}
+
+append_env_export() {
+  local key="$1"
+  local value="${!key-}"
+
+  if [[ -z "${value}" ]]; then
+    return
+  fi
+
+  POD_SCRIPT+=$'\n'
+  POD_SCRIPT+="export ${key}=$(printf '%q' "${value}")"
+}
+
+main() {
+  local kubectl_cmd
+
+  if ! kubectl_cmd="$(resolve_kubectl_cmd)"; then
+    echo "kubectl is required but was not found." >&2
+    exit 1
+  fi
+
+  log "Waiting for deployment/${BACKEND_DEPLOYMENT} in namespace ${K8S_NAMESPACE}..."
+  ${kubectl_cmd} rollout status "deployment/${BACKEND_DEPLOYMENT}" -n "${K8S_NAMESPACE}" --timeout=120s
+
+  POD_SCRIPT=$'set -eu\ncd /app/packages/backend'
+  append_env_export "LOADTEST_USER_COUNT"
+  append_env_export "LOADTEST_PRODUCT_STOCK"
+  append_env_export "LOADTEST_CUSTOMER_PASSWORD"
+  append_env_export "LOADTEST_EMAIL_PREFIX"
+  append_env_export "LOADTEST_EMAIL_DOMAIN"
+  append_env_export "LOADTEST_PRODUCT_NAME"
+  append_env_export "LOADTEST_PRODUCT_DESCRIPTION"
+  append_env_export "LOADTEST_PRODUCT_IMAGE_URL"
+  append_env_export "LOADTEST_PRODUCT_CATEGORY"
+  append_env_export "LOADTEST_PRODUCT_PRICE"
+  append_env_export "LOADTEST_FLASH_SALE_PRICE"
+  append_env_export "LOADTEST_FLASH_SALE_DURATION_HOURS"
+  POD_SCRIPT+=$'\nnode --import tsx src/scripts/db/clean.ts'
+  POD_SCRIPT+=$'\nnode --import tsx src/scripts/db/seedLoadTest.ts'
+
+  log "Running clean + load-test seed inside deployment/${BACKEND_DEPLOYMENT}..."
+  ${kubectl_cmd} exec -n "${K8S_NAMESPACE}" "deployment/${BACKEND_DEPLOYMENT}" -- sh -lc "${POD_SCRIPT}"
+
+  log "Done."
+}
+
+main "$@"

@@ -16,6 +16,8 @@
     "db:seed:products:stg": "node --env-file=.env.stg --import tsx src/scripts/db/seedProducts.ts",
     "db:seed:loadtest:dev": "node --env-file=.env.dev --import tsx src/scripts/db/seedLoadTest.ts",
     "db:seed:loadtest:stg": "node --env-file=.env.stg --import tsx src/scripts/db/seedLoadTest.ts",
+    "db:reset:standard:dev": "npm run db:clean:dev && npm run db:seed:products:dev && npm run db:seed:customer:dev",
+    "db:reset:standard:stg": "npm run db:clean:stg && npm run db:seed:products:stg && npm run db:seed:customer:stg",
     "db:reset:loadtest:dev": "npm run db:clean:dev && npm run db:seed:loadtest:dev",
     "db:reset:loadtest:stg": "npm run db:clean:stg && npm run db:seed:loadtest:stg"
   },

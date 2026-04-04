@@ -15,6 +15,42 @@ That flow does three things:
 2. Seeds one dedicated flash-sale product for checkout contention testing.
 3. Seeds `200` disposable customer accounts with pre-filled carts.
 
+If you want to run the staging clean + load-test seed from inside the live `k3s`
+backend pod once, use:
+
+```bash
+LOADTEST_USER_COUNT=250 LOADTEST_PRODUCT_STOCK=200 ./stg_db_reset_loadtest
+```
+
+That helper waits for `deployment/backend`, then executes these scripts inside the
+pod:
+
+1. `src/scripts/db/clean.ts`
+2. `src/scripts/db/seedLoadTest.ts`
+
+Because it runs inside the pod, it uses the same `MONGO_URI` and other env vars
+that the deployed backend is already using.
+
+If you want to restore the normal staging catalog and demo customers from inside
+the live `k3s` backend pod once, use:
+
+```bash
+./stg_db_reset_standard
+```
+
+That helper runs these scripts inside the pod:
+
+1. `src/scripts/db/clean.ts`
+2. `src/scripts/db/seedProducts.ts`
+3. `src/scripts/db/customerSeed.ts`
+
+For local or direct host-side staging seeding, the matching package scripts are:
+
+```bash
+cd packages/backend
+npm run db:reset:standard:stg
+```
+
 ## Local dry run flow
 
 You can also validate the whole path against your local backend and local MongoDB first.
