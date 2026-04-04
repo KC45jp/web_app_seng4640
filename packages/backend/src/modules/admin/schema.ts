@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { PRODUCT_CATEGORIES } from "@seng4640/shared";
 import type {
   AdminCreateManagerInput,
   AdminCreateProductInput,
@@ -6,13 +7,15 @@ import type {
   AdminUpdateProductInput,
 } from "@seng4640/shared";
 
+const productCategorySchema = z.string().trim().pipe(z.enum(PRODUCT_CATEGORIES));
+
 export const adminCreateProductSchema = z.object({
   name: z.string().trim().min(1),
   description: z.string().trim().min(1),
   price: z.number().nonnegative(),
   stock: z.number().int().nonnegative(),
   imageUrl: z.string().trim().min(1),
-  category: z.string().trim().min(1),
+  category: productCategorySchema,
   isFlashSale: z.boolean().optional(),
 }) satisfies z.ZodType<AdminCreateProductInput>;
 

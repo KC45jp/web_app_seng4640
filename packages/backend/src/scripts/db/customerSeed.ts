@@ -70,7 +70,7 @@ async function run(): Promise<void> {
   const now = new Date();
 
   try {
-    await connectForDbScript("seed:customer:dev");
+    await connectForDbScript("seed:customer");
     await ensureBaseCollectionsAndIndexes();
 
     for (const customer of seedCustomers) {

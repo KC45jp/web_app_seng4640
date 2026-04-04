@@ -11,8 +11,13 @@
     "db:clean:dev": "node --env-file=.env.dev --import tsx src/scripts/db/clean.ts",
     "db:clean:stg": "node --env-file=.env.stg --import tsx src/scripts/db/clean.ts",
     "db:seed:customer:dev": "node --env-file=.env.dev --import tsx src/scripts/db/customerSeed.ts",
+    "db:seed:customer:stg": "node --env-file=.env.stg --import tsx src/scripts/db/customerSeed.ts",
     "db:seed:products:dev": "node --env-file=.env.dev --import tsx src/scripts/db/seedProducts.ts",
-    "db:seed:products:stg": "node --env-file=.env.stg --import tsx src/scripts/db/seedProducts.ts"
+    "db:seed:products:stg": "node --env-file=.env.stg --import tsx src/scripts/db/seedProducts.ts",
+    "db:seed:loadtest:dev": "node --env-file=.env.dev --import tsx src/scripts/db/seedLoadTest.ts",
+    "db:seed:loadtest:stg": "node --env-file=.env.stg --import tsx src/scripts/db/seedLoadTest.ts",
+    "db:reset:loadtest:dev": "npm run db:clean:dev && npm run db:seed:loadtest:dev",
+    "db:reset:loadtest:stg": "npm run db:clean:stg && npm run db:seed:loadtest:stg"
   },
   "keywords": [],
   "author": "",

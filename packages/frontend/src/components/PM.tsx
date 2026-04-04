@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link, useNavigate, useParams } from "react-router-dom";
+import * as shared from "@seng4640/shared";
 import type {
   AdminCreateProductInput,
   AdminUpdateFlashSaleInput,
@@ -158,10 +159,11 @@ function parseProductForm(values: ProductFormValues):
   | { input: null; error: string } {
   const price = Number(values.price);
   const stock = Number(values.stock);
+  const category = values.category.trim();
 
   if (!values.name.trim()) return { input: null, error: "Product name is required." };
   if (!values.description.trim()) return { input: null, error: "Description is required." };
-  if (!values.category.trim()) return { input: null, error: "Category is required." };
+  if (!shared.isProductCategory(category)) return { input: null, error: "Please select a valid category." };
   if (!values.imageUrl.trim()) return { input: null, error: "Image URL is required." };
   if (!Number.isFinite(price) || price < 0) return { input: null, error: "Price must be 0 or more." };
   if (!Number.isInteger(stock) || stock < 0) return { input: null, error: "Stock must be a whole number 0 or more." };
@@ -170,7 +172,7 @@ function parseProductForm(values: ProductFormValues):
     input: {
       name: values.name.trim(),
       description: values.description.trim(),
-      category: values.category.trim(),
+      category,
       imageUrl: values.imageUrl.trim(),
       price,
       stock,
@@ -349,12 +351,19 @@ function ManagerProductFormFields({
 
       <label className="manager-field">
         <span>Category</span>
-        <input
+        <select
           className="manager-input"
           value={values.category}
           disabled={disabled}
           onChange={(event) => onChange("category", event.target.value)}
-        />
+        >
+          <option value="">Select a category</option>
+          {shared.PRODUCT_CATEGORIES.map((categoryOption) => (
+            <option key={categoryOption} value={categoryOption}>
+              {shared.getProductCategoryLabel(categoryOption)}
+            </option>
+          ))}
+        </select>
       </label>
 
       <label className="manager-field">
@@ -403,7 +412,7 @@ function ManagerProductListItem({ product }: { product: Product }) {
       <div className="manager-product-row-main">
         <div className="manager-product-row-header">
           <div>
-            <p className="product-card-category">{product.category}</p>
+            <p className="product-card-category">{shared.getProductCategoryLabel(product.category)}</p>
             <h2 className="manager-product-row-name">{product.name}</h2>
           </div>
           <div className="manager-badge-row">

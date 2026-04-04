@@ -2,7 +2,12 @@ import bcrypt from "bcryptjs";
 import { readdir, readFile } from "node:fs/promises";
 import { join } from "node:path";
 
-import { UserRole, type AdminCreateProductInput } from "@seng4640/shared";
+import {
+  PRODUCT_CATEGORIES,
+  UserRole,
+  getProductCategoryLabel,
+  type AdminCreateProductInput,
+} from "@seng4640/shared";
 import type { Logger } from "pino";
 
 import { userModel } from "@/db/models/user.models";
@@ -15,21 +20,6 @@ import {
   disconnectDbScript,
   ensureBaseCollectionsAndIndexes,
 } from "./common";
-
-type ProductCategory =
-  | "apparel"
-  | "electronics"
-  | "home"
-  | "outdoor"
-  | "books";
-
-const categories: ProductCategory[] = [
-  "apparel",
-  "electronics",
-  "home",
-  "outdoor",
-  "books",
-];
 
 const IMAGES_DIR = join(__dirname, "../../../../../db/.images");
 const SEED_UPLOADER_ID = "seed-script";
@@ -139,11 +129,12 @@ function buildProducts(
   const products: AdminCreateProductInput[] = [];
 
   for (let i = 1; i <= count; i += 1) {
-    const category = categories[(i - 1) % categories.length];
+    const category = PRODUCT_CATEGORIES[(i - 1) % PRODUCT_CATEGORIES.length];
+    const categoryLabel = getProductCategoryLabel(category);
 
     products.push({
-      name: `Product ${i}`,
-      description: `Development seed product ${i} in ${category} category.`,
+      name: `${categoryLabel} Component ${i}`,
+      description: `Development seed product ${i} in the ${categoryLabel} category.`,
       price: Number((9.99 + i * 1.75).toFixed(2)),
       stock: 10 + ((i * 3) % 90),
       imageUrl: imageUrls[(i - 1) % imageUrls.length],

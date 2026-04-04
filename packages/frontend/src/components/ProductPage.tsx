@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useParams, Link } from "react-router-dom";
+import * as shared from "@seng4640/shared";
 import type { ProductDetail } from "@seng4640/shared";
 import { addCartItem } from "@/api/cart";
 import { getProductById, resolveImageUrl } from "@/api/search";
@@ -194,7 +195,7 @@ function ProductInfoPanel({
 
   return (
     <div className="product-detail-info-col page-card">
-      <p className="product-card-category">{product.category}</p>
+      <p className="product-card-category">{shared.getProductCategoryLabel(product.category)}</p>
       <h1 className="product-detail-name">{product.name}</h1>
       <ProductPriceRow product={product} />
       <ProductStockInfo product={product} showStock={showStock} />

@@ -22,6 +22,41 @@ export type ApiErrorResponse = {
 export type PaymentMethod = "credit_card" | "paypal";
 export type ProductSortBy = "relevance" | "price" | "createdAt" | "name";
 export type SortOrder = "asc" | "desc";
+export const PRODUCT_CATEGORIES = [
+  "cpu",
+  "gpu",
+  "motherboard",
+  "memory",
+  "storage",
+  "power-supply",
+  "case",
+  "cooling",
+] as const;
+
+export type ProductCategory = (typeof PRODUCT_CATEGORIES)[number];
+
+export const PRODUCT_CATEGORY_LABELS: Record<ProductCategory, string> = {
+  cpu: "CPU",
+  gpu: "GPU",
+  motherboard: "Motherboard",
+  memory: "Memory",
+  storage: "Storage",
+  "power-supply": "Power Supply",
+  case: "Case",
+  cooling: "Cooling",
+};
+
+export function isProductCategory(value: string): value is ProductCategory {
+  return PRODUCT_CATEGORIES.includes(value as ProductCategory);
+}
+
+export function getProductCategoryLabel(value: string): string {
+  if (isProductCategory(value)) {
+    return PRODUCT_CATEGORY_LABELS[value];
+  }
+
+  return value;
+}
 
 // Auth API
 export type RegisterInput = {

@@ -1,9 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { useSearchParams, Link } from "react-router-dom";
+import * as shared from "@seng4640/shared";
 import type { ListProductsQuery, Product } from "@seng4640/shared";
 import { listProducts, resolveImageUrl } from "@/api/search";
-
-const CATEGORIES = ["apparel", "electronics", "home", "outdoor", "books"];
 
 const SORT_OPTIONS: { value: NonNullable<ListProductsQuery["sortBy"]>; label: string }[] = [
   { value: "relevance", label: "Relevance" },
@@ -13,6 +12,18 @@ const SORT_OPTIONS: { value: NonNullable<ListProductsQuery["sortBy"]>; label: st
 ];
 
 const LIMIT = 12;
+
+function getDefaultSortOrder(sortBy: NonNullable<ListProductsQuery["sortBy"]>): "asc" | "desc" {
+  switch (sortBy) {
+    case "price":
+    case "name":
+      return "asc";
+    case "createdAt":
+    case "relevance":
+    default:
+      return "desc";
+  }
+}
 
 // ── 共通ラッパー ──────────────────────────────────────────
 
@@ -64,8 +75,10 @@ function SearchFilters({
           onChange={(e) => setParam("category", e.target.value)}
         >
           <option value="">All</option>
-          {CATEGORIES.map((c) => (
-            <option key={c} value={c}>{c.charAt(0).toUpperCase() + c.slice(1)}</option>
+          {shared.PRODUCT_CATEGORIES.map((categoryOption) => (
+            <option key={categoryOption} value={categoryOption}>
+              {shared.getProductCategoryLabel(categoryOption)}
+            </option>
           ))}
         </select>
       </FilterGroup>
@@ -145,7 +158,7 @@ function ProductCard({ product }: { product: Product }) {
         )}
       </div>
       <div className="product-card-body">
-        <p className="product-card-category">{product.category}</p>
+        <p className="product-card-category">{shared.getProductCategoryLabel(product.category)}</p>
         <p className="product-card-name">{product.name}</p>
         <p className="product-card-price">
           {product.isFlashSale && product.flashSalePrice != null && (
@@ -237,11 +250,16 @@ export function SearchPage() {
   const [searchParams, setSearchParams] = useSearchParams();
 
   const q = searchParams.get("q") ?? "";
-  const category = searchParams.get("category") ?? "";
+  const rawCategory = searchParams.get("category")?.trim() ?? "";
+  const category = shared.isProductCategory(rawCategory) ? rawCategory : "";
   const minPrice = searchParams.get("minPrice") ?? "";
   const maxPrice = searchParams.get("maxPrice") ?? "";
   const sortBy = (searchParams.get("sortBy") ?? "relevance") as NonNullable<ListProductsQuery["sortBy"]>;
-  const sortOrder = (searchParams.get("sortOrder") ?? "desc") as "asc" | "desc";
+  const rawSortOrder = searchParams.get("sortOrder");
+  const sortOrder =
+    rawSortOrder === "asc" || rawSortOrder === "desc"
+      ? rawSortOrder
+      : getDefaultSortOrder(sortBy);
   const page = Math.max(1, Number(searchParams.get("page") ?? "1"));
 
   const { data, isPending, isError } = useQuery({

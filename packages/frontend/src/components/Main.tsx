@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
+import * as shared from "@seng4640/shared";
 import type { Product } from "@seng4640/shared";
 import { listProducts, resolveImageUrl } from "@/api/search";
 
@@ -23,7 +24,7 @@ function ProductCard({ product }: { product: Product }) {
         )}
       </div>
       <div className="product-card-body">
-        <p className="product-card-category">{product.category}</p>
+        <p className="product-card-category">{shared.getProductCategoryLabel(product.category)}</p>
         <p className="product-card-name">{product.name}</p>
         <p className="product-card-price">
           {product.isFlashSale && product.flashSalePrice != null && (

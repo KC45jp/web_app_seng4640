@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { PRODUCT_CATEGORIES } from "@seng4640/shared";
 import type {
   GetProductByIdResult,
   ListProductsQuery,
@@ -7,9 +8,11 @@ import type {
   ProductDetail,
 } from "@seng4640/shared";
 
+const productCategorySchema = z.string().trim().pipe(z.enum(PRODUCT_CATEGORIES));
+
 export const listProductsQuerySchema = z.object({
   q: z.string().optional(),
-  category: z.string().optional(),
+  category: productCategorySchema.optional(),
   minPrice: z.coerce.number().nonnegative().optional(),
   maxPrice: z.coerce.number().nonnegative().optional(),
   sortBy: z.enum(["relevance", "price", "createdAt", "name"]).optional(),
@@ -24,7 +27,7 @@ export const productSummarySchema = z.object({
   description: z.string().min(1),
   price: z.number().nonnegative(),
   flashSalePrice: z.number().nonnegative().nullable().optional(),
-  category: z.string().min(1),
+  category: productCategorySchema,
   imageUrl: z.string().min(1),
   isFlashSale: z.boolean(),
   isActive: z.boolean(),
