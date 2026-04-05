@@ -15,6 +15,7 @@ COPY --from=shared-builder /app/packages/shared/dist /app/packages/shared/dist
 COPY packages/backend/package*.json ./
 RUN npm ci
 COPY packages/backend/ ./
+COPY db/.images/ /app/db/.images/
 
 EXPOSE 5000
 CMD ["node", "--import", "tsx", "src/index.ts"]

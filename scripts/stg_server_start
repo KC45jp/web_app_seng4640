@@ -30,6 +30,43 @@ require_command() {
   fi
 }
 
+warn_missing_seed_images() {
+  local images_dir="${ROOT_DIR}/db/.images"
+
+  cat <<EOF
+Seed product images directory is missing: ${images_dir}
+
+Create the directory and place product PNG/JPG files there before running this script.
+Without it, the backend image cannot include seed images and DB reset will fall back to placeholder image URLs.
+EOF
+}
+
+warn_empty_seed_images() {
+  local images_dir="${ROOT_DIR}/db/.images"
+
+  cat <<EOF
+Warning: no PNG/JPG files were found in ${images_dir}
+
+Staging deploy will continue, but product seeding will use placeholder image URLs.
+Add seed images to ${images_dir} and rerun ./stg_db_reset_standard after deploying if you want real product images.
+EOF
+}
+
+check_seed_images_dir() {
+  local images_dir="${ROOT_DIR}/db/.images"
+  local image_count
+
+  if [[ ! -d "${images_dir}" ]]; then
+    warn_missing_seed_images >&2
+    exit 1
+  fi
+
+  image_count="$(find "${images_dir}" -maxdepth 1 -type f \( -iname '*.png' -o -iname '*.jpg' -o -iname '*.jpeg' \) | wc -l | tr -d '[:space:]')"
+  if [[ "${image_count}" -eq 0 ]]; then
+    warn_empty_seed_images
+  fi
+}
+
 resolve_public_ip() {
   local metadata_token
   local public_ip
@@ -133,6 +170,8 @@ cd "${ROOT_DIR}"
 
 echo "Resetting staging resources before deploy..."
 "${RESET_SCRIPT}"
+
+check_seed_images_dir
 
 echo "Building backend image..."
 "${DOCKER[@]}" build -f packages/backend/Dockerfile -t "${BACKEND_IMAGE}" .

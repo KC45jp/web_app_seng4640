@@ -96,6 +96,13 @@ function buildPlaceholderImageUrls(): string[] {
   });
 }
 
+function getSeedImageInstruction(): string {
+  return [
+    "Populate db/.images with PNG or JPG seed files before building the staging backend image.",
+    "Then redeploy with ./stg_server_start and rerun ./stg_db_reset_standard to reseed products with real images.",
+  ].join(" ");
+}
+
 async function uploadSeedImages(scriptLogger: Logger): Promise<string[]> {
   let files: string[];
   try {
@@ -105,7 +112,11 @@ async function uploadSeedImages(scriptLogger: Logger): Promise<string[]> {
   } catch {
     const placeholderUrls = buildPlaceholderImageUrls();
     scriptLogger.warn(
-      { imagesDir: IMAGES_DIR, placeholderCount: placeholderUrls.length },
+      {
+        imagesDir: IMAGES_DIR,
+        placeholderCount: placeholderUrls.length,
+        instruction: getSeedImageInstruction(),
+      },
       "Images directory not found, using placeholder image URLs for seed"
     );
     return placeholderUrls;
@@ -114,7 +125,11 @@ async function uploadSeedImages(scriptLogger: Logger): Promise<string[]> {
   if (files.length === 0) {
     const placeholderUrls = buildPlaceholderImageUrls();
     scriptLogger.warn(
-      { imagesDir: IMAGES_DIR, placeholderCount: placeholderUrls.length },
+      {
+        imagesDir: IMAGES_DIR,
+        placeholderCount: placeholderUrls.length,
+        instruction: getSeedImageInstruction(),
+      },
       "No image files found, using placeholder image URLs for seed"
     );
     return placeholderUrls;

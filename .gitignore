@@ -35,6 +35,7 @@ Thumbs.db
 
 
 /db/.images/*
+!/db/.images/.gitkeep
 
 /k8s_operation/
 
