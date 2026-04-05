@@ -91,6 +91,13 @@ function buildProductSort(query: ListProductsQuery): Record<string, SortOrder> {
       return { createdAt: -1 };
   }
 }
+
+const NAME_SORT_COLLATION = {
+  locale: "en",
+  numericOrdering: true,
+  strength: 2,
+} as const;
+
 function serializeProduct(doc: ProductDoc): Product {
   return {
     _id: doc._id.toString(),
@@ -118,7 +125,11 @@ export async function listProducts(
 
   const filter = buildProductListFilter(_query);
   const sort = buildProductSort(_query);
-  const items = await productModel.find(filter).sort(sort).skip(skip).limit(limit).lean<ProductDoc[]>();
+  const itemsQuery = productModel.find(filter).sort(sort).skip(skip).limit(limit);
+  if (_query.sortBy === "name") {
+    itemsQuery.collation(NAME_SORT_COLLATION);
+  }
+  const items = await itemsQuery.lean<ProductDoc[]>();
 
   const total = await productModel.countDocuments(filter)
 

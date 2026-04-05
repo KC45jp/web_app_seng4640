@@ -7,6 +7,7 @@ import {
   UserRole,
   getProductCategoryLabel,
   type AdminCreateProductInput,
+  type ProductCategory,
 } from "@seng4640/shared";
 import type { Logger } from "pino";
 
@@ -44,6 +45,17 @@ const seedAdminAccount: SeedUserAccount = {
   email: "admin@example.com",
   password: "admin123",
   role: UserRole.ADMIN,
+};
+
+const CATEGORY_NAME_THEMES: Record<ProductCategory, string[]> = {
+  cpu: ["X86", "X64", "ARM", "Intel", "AMD", "Zen", "Ryzen", "Core"],
+  gpu: ["CUDA", "Radeon", "GeForce", "Arc", "RDNA", "Turing", "Tensor", "Pixel"],
+  motherboard: ["ATX", "MicroATX", "MiniITX", "Socket", "Chipset", "Backplane", "Northbridge", "Southbridge"],
+  memory: ["DDR4", "DDR5", "LPDDR5", "ECC", "Kingston", "Corsair", "HyperX", "Trident"],
+  storage: ["NVMe", "SATA", "Optane", "Barracuda", "IronWolf", "Crucial", "Evo", "Aorus"],
+  "power-supply": ["Bronze", "Gold", "Platinum", "Titanium", "Seasonic", "Corsair", "Modular", "Silent"],
+  case: ["Falcon", "Raven", "Panther", "Lynx", "Atlas", "Nova", "Forge", "Vector"],
+  cooling: ["Frost", "Blizzard", "Vortex", "Kraken", "Noctua", "Glacier", "Aero", "Boreal"],
 };
 
 async function seedUserAccount(
@@ -103,6 +115,16 @@ function getSeedImageInstruction(): string {
   ].join(" ");
 }
 
+function buildSeedProductName(
+  category: ProductCategory,
+  globalIndex: number,
+  categoryOccurrence: number
+): string {
+  const themeNames = CATEGORY_NAME_THEMES[category];
+  const baseName = themeNames[categoryOccurrence % themeNames.length];
+  return `${baseName} ${globalIndex}`;
+}
+
 async function uploadSeedImages(scriptLogger: Logger): Promise<string[]> {
   let files: string[];
   try {
@@ -159,14 +181,19 @@ function buildProducts(
   imageUrls: string[]
 ): AdminCreateProductInput[] {
   const products: AdminCreateProductInput[] = [];
+  const categoryOccurrences = Object.fromEntries(
+    PRODUCT_CATEGORIES.map((category) => [category, 0])
+  ) as Record<ProductCategory, number>;
 
   for (let i = 1; i <= count; i += 1) {
     const category = PRODUCT_CATEGORIES[(i - 1) % PRODUCT_CATEGORIES.length];
     const categoryLabel = getProductCategoryLabel(category);
+    const productName = buildSeedProductName(category, i, categoryOccurrences[category]);
+    categoryOccurrences[category] += 1;
 
     products.push({
-      name: `${categoryLabel} Component ${i}`,
-      description: `Development seed product ${i} in the ${categoryLabel} category.`,
+      name: productName,
+      description: `Development seed product ${productName} in the ${categoryLabel} category.`,
       price: Number((9.99 + i * 1.75).toFixed(2)),
       stock: 10 + ((i * 3) % 90),
       imageUrl: imageUrls[(i - 1) % imageUrls.length],
