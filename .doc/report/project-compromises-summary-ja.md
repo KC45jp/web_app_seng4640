@@ -21,11 +21,11 @@
 
 ### 1 台の EC2 に寄せ、backend も single-node k3s に留めた
 
-今回の staging では、frontend と backend を 1 台の EC2 インスタンス上に集約し、backend はその中の single-node k3s で動かす形を採用しました。frontend は同じ EC2 上の Docker container として動かし、MongoDB は別レイヤで扱っています。
+今回の staging では、frontend と backend を 1 台の EC2 インスタンス上に集約し、backend はその中の single-node k3s で動かす形を採用しました。frontend は同じ EC2 上の Docker container として動かし、MongoDB は別レイヤで扱っています。ここで言いたいのは「k3s クラスタが単一ノードである」ということであり、**backend の Pod replica 数を 1 に固定しているという意味ではありません**。
 
 ここで重要なのは、**frontend と backend が同じコンテナに入っているわけではない**という点です。実際には backend は k3s の Pod 側、frontend は別 Docker container 側ですが、**どちらも同じ 1 台の EC2 ホストに同居している**のが staging の実態です。
 
-今回の妥協点としてより本質的だったのは、**サービスをホスト単位で分離せず、単一 EC2 に寄せたこと**と、**k3s も multi-node ではなく single-node に留めたこと**です。
+今回の妥協点としてより本質的だったのは、**サービスをホスト単位で分離せず、単一 EC2 に寄せたこと**と、**k3s も multi-node ではなく single-node に留めたこと**です。つまり問題の中心は replica 数そのものより、**クラスタ全体が 1 台の EC2 に依存していること**にあります。
 
 この判断の理由は次の通りです。
 
@@ -181,7 +181,7 @@ Flash Sale の高競合時に性能が落ちる要因として、MongoDB 側の 
 
 ## レポート向けに短く言うなら
 
-今回の設計では、限られた期間と予算の中で、まず Flash Sale における在庫整合性と、役割別 EC サイトとしての基本要件を確実に満たすことを優先した。実際の staging では、frontend と backend を 1 台の EC2 に集約し、backend は single-node k3s、frontend は同一ホスト上の Docker container、MongoDB は別レイヤという構成を採用している。そのため、multi-node 化やホスト分離による高可用化、frontend まで含めた配備方式の完全統一、MongoDB の本格的なクラスタ運用、S3 ベースの画像配信、専用 DB 基盤への移行、高負荷時のレスポンス最適化などは将来改善項目として後回しにした。言い換えると、本プロジェクトは「長期商用運用の理想構成」よりも、「課題要件を安全かつ説明可能な形で満たす現実的な構成」を選んだ点に設計上の妥協がある。
+今回の設計では、限られた期間と予算の中で、まず Flash Sale における在庫整合性と、役割別 EC サイトとしての基本要件を確実に満たすことを優先した。実際の staging では、frontend と backend を 1 台の EC2 に集約し、backend は single-node k3s、frontend は同一ホスト上の Docker container、MongoDB は別レイヤという構成を採用している。backend の replica 数は運用上 1 とは限らないが、クラスタ全体は依然として単一ホスト依存である。そのため、multi-node 化やホスト分離による高可用化、frontend まで含めた配備方式の完全統一、MongoDB の本格的なクラスタ運用、S3 ベースの画像配信、専用 DB 基盤への移行、高負荷時のレスポンス最適化などは将来改善項目として後回しにした。言い換えると、本プロジェクトは「長期商用運用の理想構成」よりも、「課題要件を安全かつ説明可能な形で満たす現実的な構成」を選んだ点に設計上の妥協がある。
 
 ## もともと近い内容が書かれていたファイル
 

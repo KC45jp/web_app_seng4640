@@ -112,6 +112,7 @@ Scope note:
 See also:
 
 - `doc/backend/gridfs-image-storage.md`
+- `doc/backend/api-js-examples.md`
 
 ## Authorization Notes
 

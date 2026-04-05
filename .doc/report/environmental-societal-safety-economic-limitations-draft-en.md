@@ -104,8 +104,9 @@ for cost control:
 - reusing existing laptops and development environments instead of buying new
   hardware
 - preferring a compact staging deployment in which frontend and backend shared
-  one EC2 host, with the backend running under single-node k3s and the
-  frontend running as a separate Docker container on that same machine
+  one EC2 host, with the backend running under single-node k3s, potentially
+  with more than one pod replica, and the frontend running as a separate
+  Docker container on that same machine
 - using a prototype-scale image-storage solution instead of adding a separate
   object-storage pipeline too early
 - avoiding full commercial payment integration for the prototype
@@ -149,13 +150,14 @@ files can all increase energy use and resource consumption.
 The prototype attempted to reduce these impacts by limiting system scope and
 avoiding unnecessary infrastructure. The deployment strategy avoided a larger
 always-on multi-node platform by keeping staging on a single EC2 instance:
-backend ran under single-node k3s, while the frontend ran as a separate Docker
-container on the same host. Image uploads are resized and constrained, which
-lowers storage use and data transfer. Open-source software was reused instead
-of purchasing proprietary tools, and existing development laptops were reused
-instead of introducing dedicated new hardware. In short, the design sought to
-deliver required functionality with the smallest practical footprint for a
-student project.
+backend ran under single-node k3s, even if multiple backend pod replicas were
+used operationally, while the frontend ran as a separate Docker container on
+the same host. Image uploads are resized and constrained, which lowers storage
+use and data transfer. Open-source software was reused instead of purchasing
+proprietary tools, and existing development laptops were reused instead of
+introducing dedicated new hardware. In short, the design sought to deliver
+required functionality with the smallest practical footprint for a student
+project.
 
 ### 3Rs Analysis: Reduce, Reuse, Recycle
 
@@ -207,8 +209,9 @@ Third, accessibility and privacy have been considered but not fully validated.
 The frontend includes some good baseline practices, but a full WCAG audit,
 formal privacy notice, consent workflow, and legal compliance review are still
 outside the current scope. Fourth, the deployment is intentionally simple:
-frontend and backend share one EC2 host, the backend uses only single-node
-k3s, and the system therefore does not provide production-grade redundancy,
+frontend and backend share one EC2 host, the backend runs on single-node k3s,
+and the system therefore remains dependent on one machine even if multiple pod
+replicas are used. This means it does not provide production-grade redundancy,
 auto-scaling, or strong fault isolation between services. Finally, some project
 costs are minimized by relying on open-source software and already available
 infrastructure, which is appropriate for a
